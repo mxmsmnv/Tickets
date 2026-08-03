@@ -1,0 +1,1921 @@
+/* Tickets admin workspace: native AdminThemeUikit + pw-design-system. */
+.ProcessTickets .TicketsAdmin {
+	--tickets-space-xs: .5rem;
+	--tickets-space-sm: .75rem;
+	--tickets-space-md: 1rem;
+	--tickets-space-lg: 1.5rem;
+	--tickets-space-xl: 2rem;
+	color: var(--pw-text-color);
+}
+
+.ProcessTickets .TicketsAdmin,
+.ProcessTickets .TicketsAdmin * {
+	box-sizing: border-box;
+}
+
+.ProcessTickets .TicketsAdmin > * {
+	min-width: 0;
+}
+
+.ProcessTickets .TicketsAdmin h2,
+.ProcessTickets .TicketsAdmin h3,
+.ProcessTickets .TicketsAdmin h4,
+.ProcessTickets .TicketsAdmin strong,
+.ProcessTickets .TicketsAdmin b,
+.ProcessTickets .TicketsAdmin .uk-button,
+.ProcessTickets .TicketsAdmin .uk-form-label {
+	font-weight: 500;
+}
+
+.ProcessTickets .TicketsAdmin .uk-text-meta.uk-text-uppercase {
+	font-weight: 600;
+	letter-spacing: .055em;
+}
+
+.ProcessTickets .TicketsAdmin-nav {
+	overflow-x: auto;
+	overflow-y: hidden;
+	flex-wrap: nowrap;
+	scrollbar-width: thin;
+}
+
+.ProcessTickets .TicketsAdmin-nav > li > a {
+	white-space: nowrap;
+}
+
+.ProcessTickets .TicketsAdminNavigation {
+	align-items: flex-start;
+	gap: var(--tickets-space-md);
+	margin-bottom: var(--tickets-space-xl) !important;
+	padding-bottom: var(--tickets-space-sm);
+	border-bottom: 1px solid color-mix(in srgb, var(--pw-border-color) 72%, transparent);
+}
+
+.ProcessTickets .TicketsAdminNavigation .uk-subnav {
+	margin-bottom: 0;
+}
+
+.ProcessTickets .TicketsAdminSettings {
+	display: grid;
+	width: 3rem;
+	height: 3rem;
+	place-items: center;
+	color: var(--pw-muted-color);
+	text-decoration: none;
+}
+
+.ProcessTickets .TicketsAdminSettings svg {
+	display: block;
+	width: 2rem;
+	height: 2rem;
+}
+
+.ProcessTickets .TicketsAdminSettings:hover,
+.ProcessTickets .TicketsAdminSettings:focus-visible {
+	background: color-mix(in srgb, var(--pw-border-color) 35%, transparent);
+	text-decoration: none;
+}
+
+.ProcessTickets .TicketsAdmin .uk-card-default,
+.ProcessTickets .TicketsAdmin .uk-card-muted {
+	border-color: var(--pw-border-color);
+	background: var(--pw-blocks-background);
+	color: var(--pw-text-color);
+}
+
+.ProcessTickets .TicketsAdmin .uk-input,
+.ProcessTickets .TicketsAdmin .uk-select,
+.ProcessTickets .TicketsAdmin .uk-textarea {
+	background: var(--pw-inputs-background);
+	color: var(--pw-text-color);
+}
+
+.ProcessTickets .TicketsAdmin .uk-button,
+.ProcessTickets .TicketsAdmin .uk-button:hover,
+.ProcessTickets .TicketsAdmin .uk-button:focus,
+.ProcessTickets .TicketsAdmin .uk-button:active {
+	text-decoration: none;
+}
+
+.ProcessTickets .TicketsAdmin .uk-overflow-auto {
+	max-width: 100%;
+}
+
+.ProcessTickets .TicketsPageIntro {
+	display: flex;
+	align-items: flex-end;
+	justify-content: space-between;
+	gap: var(--tickets-space-xl);
+	margin: 0 0 var(--tickets-space-xl);
+}
+
+.ProcessTickets .TicketsPageIntro-copy {
+	max-width: 58rem;
+}
+
+.ProcessTickets .TicketsPageIntro-eyebrow {
+	margin: 0 0 .45rem;
+	color: var(--pw-muted-color);
+	font-size: .75rem;
+	font-weight: 600;
+	letter-spacing: .065em;
+	text-transform: uppercase;
+}
+
+.ProcessTickets .TicketsPageIntro-copy > p:last-child {
+	max-width: 52rem;
+	margin: .8rem 0 0;
+	color: var(--pw-muted-color);
+	font-size: clamp(1rem, 1.4vw, 1.2rem);
+	line-height: 1.5;
+}
+
+.ProcessTickets .TicketsPageIntro-actions {
+	display: flex;
+	align-items: flex-end;
+	justify-content: flex-end;
+	flex: 0 0 auto;
+	min-width: 0;
+}
+
+.ProcessTickets .TicketsIntroNotice {
+	display: grid;
+	gap: .15rem;
+	max-width: 22rem;
+	padding: .8rem 1rem;
+	border: 1px solid var(--pw-border-color);
+	border-radius: var(--pw-input-radius);
+	background: var(--pw-blocks-background);
+}
+
+.ProcessTickets .TicketsIntroNotice span {
+	color: var(--pw-muted-color);
+	font-size: .78rem;
+}
+
+.ProcessTickets .TicketsDashboardHealth {
+	display: flex;
+	align-items: center;
+	gap: .75rem;
+	min-width: 17rem;
+	padding: .8rem 1rem;
+	border: 1px solid var(--pw-border-color);
+	border-radius: var(--pw-input-radius);
+	background: var(--pw-blocks-background);
+}
+
+.ProcessTickets .TicketsDashboardHealth-dot {
+	width: .7rem;
+	height: .7rem;
+	border-radius: 50%;
+	background: #2e8540;
+	box-shadow: 0 0 0 .25rem color-mix(in srgb, #2e8540 18%, transparent);
+}
+
+.ProcessTickets .TicketsDashboardHealth strong,
+.ProcessTickets .TicketsDashboardHealth small {
+	display: block;
+}
+
+.ProcessTickets .TicketsDashboardHealth small {
+	margin-top: .1rem;
+	color: var(--pw-muted-color);
+}
+
+.ProcessTickets .TicketsMetricGrid {
+	display: grid;
+	grid-template-columns: repeat(4, minmax(0, 1fr));
+	gap: var(--tickets-space-sm);
+	margin-bottom: var(--tickets-space-lg);
+}
+
+.ProcessTickets .TicketsMetric {
+	display: flex;
+	align-items: flex-start;
+	gap: .8rem;
+	min-width: 0;
+	padding: 1rem;
+	border: 1px solid var(--pw-border-color);
+	border-radius: var(--pw-input-radius);
+	background: var(--pw-blocks-background);
+}
+
+.ProcessTickets .TicketsMetric .TicketsMetric-icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	flex: 0 0 2.2rem;
+	width: 2.2rem;
+	height: 2.2rem;
+	line-height: 1;
+	border-radius: 50%;
+	background: color-mix(in srgb, var(--pw-primary-color, #e83561) 10%, transparent);
+	color: var(--pw-primary-color, #e83561);
+}
+
+.ProcessTickets .TicketsMetric .TicketsMetric-icon svg {
+	display: block;
+	width: 1.15rem;
+	height: 1.15rem;
+	flex: none;
+}
+
+.ProcessTickets .TicketsMetric > div {
+	min-width: 0;
+}
+
+.ProcessTickets .TicketsMetric span,
+.ProcessTickets .TicketsMetric strong,
+.ProcessTickets .TicketsMetric small {
+	display: block;
+}
+
+.ProcessTickets .TicketsMetric > div > span {
+	color: var(--pw-muted-color);
+	font-size: .78rem;
+	font-weight: 500;
+	letter-spacing: .02em;
+}
+
+.ProcessTickets .TicketsMetric strong {
+	margin-block: .18rem;
+	font-size: clamp(1.35rem, 2vw, 1.85rem);
+	font-weight: 500;
+	line-height: 1.1;
+}
+
+.ProcessTickets .TicketsMetric small {
+	color: var(--pw-muted-color);
+	font-size: .72rem;
+	line-height: 1.35;
+}
+
+.ProcessTickets .TicketsStatusStrip {
+	display: grid;
+	grid-template-columns: repeat(5, minmax(0, 1fr));
+	margin: 0 0 var(--tickets-space-lg);
+	border: 1px solid var(--pw-border-color);
+	border-radius: var(--pw-input-radius);
+	background: var(--pw-blocks-background);
+	overflow: hidden;
+}
+
+.ProcessTickets .TicketsStatusStrip a {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: .5rem;
+	min-width: 0;
+	padding: .75rem 1rem;
+	color: inherit;
+	text-decoration: none;
+}
+
+.ProcessTickets .TicketsStatusStrip a + a {
+	border-left: 1px solid var(--pw-border-color);
+}
+
+.ProcessTickets .TicketsStatusStrip a:hover,
+.ProcessTickets .TicketsStatusStrip a:focus-visible {
+	background: color-mix(in srgb, var(--pw-border-color) 28%, transparent);
+}
+
+.ProcessTickets .TicketsStatusStrip span {
+	min-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.ProcessTickets .TicketsStatusStrip strong {
+	font-size: 1.05rem;
+}
+
+.ProcessTickets .TicketsInsightGrid {
+	display: grid;
+	grid-template-columns: minmax(20rem, 1.35fr) repeat(2, minmax(15rem, 1fr));
+	gap: var(--tickets-space-sm);
+	margin-bottom: var(--tickets-space-xl);
+}
+
+.ProcessTickets .TicketsPanel {
+	min-width: 0;
+	padding: 1rem;
+	border: 1px solid var(--pw-border-color);
+	border-radius: var(--pw-input-radius);
+	background: var(--pw-blocks-background);
+}
+
+.ProcessTickets .TicketsPanel > header {
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	gap: 1rem;
+}
+
+.ProcessTickets .TicketsPanel h3 {
+	margin: .15rem 0 0;
+	font-size: 1.15rem;
+	font-weight: 500;
+}
+
+.ProcessTickets .TicketsPanel > header > strong {
+	font-size: 1.4rem;
+}
+
+.ProcessTickets .TicketsTrendChart {
+	display: grid;
+	grid-template-columns: repeat(14, minmax(.5rem, 1fr));
+	align-items: end;
+	gap: .32rem;
+	height: 9.5rem;
+	margin-top: 1.25rem;
+	padding-top: .5rem;
+	border-bottom: 1px solid var(--pw-border-color);
+}
+
+.ProcessTickets .TicketsTrendChart > span {
+	display: grid;
+	grid-template-rows: 1fr auto;
+	align-items: end;
+	height: 100%;
+	min-width: 0;
+}
+
+.ProcessTickets .TicketsTrendChart i {
+	display: block;
+	height: var(--tickets-bar);
+	min-height: .25rem;
+	border-radius: .2rem .2rem 0 0;
+	background: var(--pw-primary-color, #e83561);
+	opacity: .82;
+}
+
+.ProcessTickets .TicketsTrendChart small {
+	padding-top: .35rem;
+	color: var(--pw-muted-color);
+	font-size: .62rem;
+	text-align: center;
+}
+
+.ProcessTickets .TicketsBreakdownList {
+	display: grid;
+	gap: .7rem;
+	margin-top: 1rem;
+}
+
+.ProcessTickets .TicketsBreakdownList a {
+	color: inherit;
+	text-decoration: none;
+}
+
+.ProcessTickets .TicketsBreakdownList a > span {
+	display: flex;
+	justify-content: space-between;
+	gap: .5rem;
+	margin-bottom: .25rem;
+}
+
+.ProcessTickets .TicketsBreakdownList small {
+	color: var(--pw-muted-color);
+}
+
+.ProcessTickets .TicketsBreakdownList a > i {
+	display: block;
+	height: .3rem;
+	border-radius: .3rem;
+	background: color-mix(in srgb, var(--pw-border-color) 65%, transparent);
+	overflow: hidden;
+}
+
+.ProcessTickets .TicketsBreakdownList b {
+	display: block;
+	width: var(--tickets-share);
+	height: 100%;
+	border-radius: inherit;
+	background: var(--pw-primary-color, #e83561);
+}
+
+.ProcessTickets .TicketsQueue {
+	border-top: 1px solid var(--pw-border-color);
+	padding-top: var(--tickets-space-lg);
+}
+
+.ProcessTickets .TicketsQueueHeader {
+	display: flex;
+	align-items: end;
+	justify-content: space-between;
+	gap: 1rem;
+}
+
+.ProcessTickets .TicketsQueueHeader h2 {
+	display: inline-block;
+	margin: .15rem .5rem .15rem 0;
+	font-size: 1.7rem;
+}
+
+.ProcessTickets .TicketsQueueHeader > div > span,
+.ProcessTickets .TicketsQueueHeader > p {
+	color: var(--pw-muted-color);
+}
+
+.ProcessTickets .TicketsFilters {
+	display: grid;
+	grid-template-columns: minmax(15rem, 1.6fr) repeat(4, minmax(9rem, 1fr));
+	align-items: end;
+	gap: .75rem;
+	margin-block: 1.25rem;
+}
+
+.ProcessTickets .TicketsFilters label,
+.ProcessTickets .TicketsFilters select,
+.ProcessTickets .TicketsFilters input,
+.ProcessTickets .TicketsFilters .uk-button {
+	min-width: 0;
+	width: 100%;
+}
+
+.ProcessTickets .TicketsFilterField {
+	display: grid;
+	align-content: end;
+	gap: .35rem;
+}
+
+.ProcessTickets .TicketsFilterField .uk-form-label,
+.ProcessTickets .TicketsAutomationFields .uk-form-label {
+	display: block;
+	margin: 0;
+	font-size: .76rem;
+	line-height: 1.25;
+}
+
+.ProcessTickets .TicketsFilterField .uk-input,
+.ProcessTickets .TicketsFilterField .uk-select,
+.ProcessTickets .TicketsFilterSubmit .uk-button,
+.ProcessTickets .TicketsAutomationFields .uk-input,
+.ProcessTickets .TicketsAutomationFields .uk-select {
+	height: 2.65rem;
+}
+
+.ProcessTickets .TicketsFilterSubmit {
+	display: flex;
+	align-items: end;
+}
+
+.ProcessTickets .TicketsReportActions {
+	display: flex;
+	align-items: flex-end;
+	gap: .75rem;
+}
+
+.ProcessTickets .TicketsReportActions label {
+	display: grid;
+	gap: .35rem;
+}
+
+.ProcessTickets .TicketsReportActions .uk-select {
+	min-width: 9rem;
+}
+
+.ProcessTickets .TicketsReportGrid {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	align-items: start;
+	gap: var(--tickets-space-lg);
+	margin-bottom: var(--tickets-space-lg);
+}
+
+.ProcessTickets .TicketsReportPanel {
+	min-width: 0;
+	overflow: hidden;
+}
+
+.ProcessTickets .TicketsReportPanel > h2 {
+	margin: 0;
+	padding: var(--tickets-space-lg) var(--tickets-space-lg) var(--tickets-space-md);
+	font-weight: 500;
+	line-height: 1.2;
+}
+
+.ProcessTickets .TicketsReportPanel .uk-overflow-auto,
+.ProcessTickets .TicketsReportPanel .uk-table {
+	margin: 0;
+}
+
+.ProcessTickets .TicketsReportPanel .uk-table th:first-child,
+.ProcessTickets .TicketsReportPanel .uk-table td:first-child {
+	padding-left: var(--tickets-space-lg);
+}
+
+.ProcessTickets .TicketsReportPanel .uk-table th:last-child,
+.ProcessTickets .TicketsReportPanel .uk-table td:last-child {
+	padding-right: var(--tickets-space-lg);
+}
+
+@media (max-width: 959px) {
+	.ProcessTickets .TicketsReportGrid {
+		grid-template-columns: minmax(0, 1fr);
+	}
+}
+
+.ProcessTickets .TicketsFilterSearch {
+	position: relative;
+}
+
+.ProcessTickets .TicketsFilterSearch .uk-form-icon {
+	pointer-events: none;
+}
+
+.ProcessTickets .TicketsQueueTable {
+	border: 1px solid var(--pw-border-color);
+	border-radius: var(--pw-input-radius);
+}
+
+.ProcessTickets .TicketsQueueTable table {
+	margin: 0;
+}
+
+.ProcessTickets .TicketsQueueTable thead {
+	background: color-mix(in srgb, var(--pw-border-color) 28%, transparent);
+}
+
+.ProcessTickets .TicketsQueueTable th,
+.ProcessTickets .TicketsQueueTable td {
+	padding-inline: .85rem;
+}
+
+.ProcessTickets .TicketsQueueSubject {
+	display: inline-block;
+	max-width: 34rem;
+	font-weight: 500;
+}
+
+.ProcessTickets .TicketsBadge {
+	display: inline-flex;
+	align-items: center;
+	padding: .25rem .55rem;
+	border-radius: 999px;
+	background: color-mix(in srgb, var(--pw-border-color) 45%, transparent);
+	font-size: .75rem;
+	font-weight: 500;
+	white-space: nowrap;
+}
+
+.ProcessTickets .TicketsBadge[data-color="warning"] {
+	background: #fff1c2;
+	color: #6f4d00;
+}
+
+.ProcessTickets .TicketsBadge[data-color="success"] {
+	background: #dff3e3;
+	color: #225e2d;
+}
+
+.ProcessTickets .TicketsPriority {
+	display: inline-flex;
+	align-items: center;
+	gap: .4rem;
+	white-space: nowrap;
+}
+
+.ProcessTickets .TicketsPriority i {
+	width: .45rem;
+	height: .45rem;
+	border-radius: 50%;
+	background: var(--pw-muted-color);
+}
+
+.ProcessTickets .TicketsPriority[data-priority="high"] i {
+	background: #c77c00;
+}
+
+.ProcessTickets .TicketsPriority[data-priority="urgent"] i {
+	background: #b42318;
+}
+
+.ProcessTickets .TicketsQueueOpen {
+	display: grid;
+	place-items: center;
+	width: 2rem;
+	height: 2rem;
+	border-radius: 50%;
+	text-decoration: none;
+}
+
+.ProcessTickets .TicketsQueueOpen:hover,
+.ProcessTickets .TicketsQueueOpen:focus-visible {
+	background: color-mix(in srgb, var(--pw-primary-color, #e83561) 10%, transparent);
+}
+
+.ProcessTickets .TicketsViewBack {
+	margin: 0 0 var(--tickets-space-md);
+}
+
+.ProcessTickets .TicketsViewBack a {
+	display: inline-flex;
+	align-items: center;
+	gap: .5rem;
+	font-weight: 500;
+}
+
+.ProcessTickets .TicketsCaseHeader {
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	gap: 2rem;
+	padding: 1.35rem 1.5rem;
+	border: 1px solid var(--pw-border-color);
+	border-radius: var(--pw-input-radius);
+	background: var(--pw-blocks-background);
+}
+
+.ProcessTickets .TicketsCaseHeader-main {
+	min-width: 0;
+}
+
+.ProcessTickets .TicketsCaseHeader-eyebrow,
+.ProcessTickets .TicketsCaseHeader-meta,
+.ProcessTickets .TicketsCaseHeader-state {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: .55rem 1rem;
+}
+
+.ProcessTickets .TicketsCaseHeader-eyebrow {
+	color: var(--pw-muted-color);
+	font-size: .75rem;
+	font-weight: 600;
+	letter-spacing: .05em;
+	text-transform: uppercase;
+}
+
+.ProcessTickets .TicketsCaseHeader-eyebrow code {
+	padding: .15rem .4rem;
+	border-radius: .25rem;
+	background: color-mix(in srgb, var(--pw-border-color) 35%, transparent);
+	color: var(--pw-text-color);
+	font-size: .72rem;
+}
+
+.ProcessTickets .TicketsCaseHeader h2 {
+	margin: .45rem 0 .7rem;
+	font-size: clamp(1.55rem, 2.6vw, 2.35rem);
+	font-weight: 500;
+	line-height: 1.12;
+}
+
+.ProcessTickets .TicketsCaseHeader-meta {
+	color: var(--pw-muted-color);
+	font-size: .82rem;
+}
+
+.ProcessTickets .TicketsCaseHeader-meta span {
+	display: inline-flex;
+	align-items: center;
+	gap: .4rem;
+}
+
+.ProcessTickets .TicketsCaseHeader-state {
+	justify-content: flex-end;
+	flex: 0 0 auto;
+}
+
+.ProcessTickets .TicketsViewLayout {
+	display: grid;
+	grid-template-columns: minmax(0, 1.7fr) minmax(19rem, .7fr);
+	gap: var(--tickets-space-md);
+	align-items: start;
+	margin-top: var(--tickets-space-md);
+}
+
+.ProcessTickets .TicketsViewMain,
+.ProcessTickets .TicketsViewAside {
+	display: grid;
+	gap: var(--tickets-space-md);
+	min-width: 0;
+}
+
+.ProcessTickets .TicketsViewAside {
+	position: sticky;
+	top: 1rem;
+}
+
+.ProcessTickets .TicketsConversation,
+.ProcessTickets .TicketsReplyComposer,
+.ProcessTickets .TicketsSidePanel {
+	border: 1px solid var(--pw-border-color);
+	border-radius: var(--pw-input-radius);
+	background: var(--pw-blocks-background);
+}
+
+.ProcessTickets .TicketsConversation > header,
+.ProcessTickets .TicketsReplyComposer > header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 1rem;
+	padding: 1rem 1.25rem;
+	border-bottom: 1px solid var(--pw-border-color);
+}
+
+.ProcessTickets .TicketsConversation > header h2,
+.ProcessTickets .TicketsReplyComposer > header h2,
+.ProcessTickets .TicketsSidePanel h2 {
+	margin: .12rem 0 0;
+	font-size: 1.2rem;
+}
+
+.ProcessTickets .TicketsConversation > header > span {
+	color: var(--pw-muted-color);
+	font-size: .78rem;
+}
+
+.ProcessTickets .TicketsThread {
+	display: grid;
+	gap: 0;
+}
+
+.ProcessTickets .TicketsMessage {
+	display: grid;
+	grid-template-columns: 2.5rem minmax(0, 1fr);
+	gap: .8rem;
+	padding: 1.15rem 1.25rem;
+}
+
+.ProcessTickets .TicketsMessage + .TicketsMessage {
+	border-top: 1px solid var(--pw-border-color);
+}
+
+.ProcessTickets .TicketsMessage[data-author="staff"] {
+	background: color-mix(in srgb, var(--pw-primary-color, #e83561) 5%, var(--pw-blocks-background));
+}
+
+.ProcessTickets .TicketsMessage-avatar,
+.ProcessTickets .TicketsSidePanel-avatar,
+.ProcessTickets .TicketsSidePanel-icon {
+	display: grid;
+	place-items: center;
+	width: 2.5rem;
+	height: 2.5rem;
+	border-radius: 50%;
+	background: color-mix(in srgb, var(--pw-border-color) 52%, transparent);
+	font-weight: 500;
+}
+
+.ProcessTickets .TicketsMessage[data-author="staff"] .TicketsMessage-avatar,
+.ProcessTickets .TicketsSidePanel-icon {
+	background: color-mix(in srgb, var(--pw-primary-color, #e83561) 13%, transparent);
+	color: var(--pw-primary-color, #e83561);
+}
+
+.ProcessTickets .TicketsMessage-content {
+	min-width: 0;
+}
+
+.ProcessTickets .TicketsMessage-content > header {
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	gap: 1rem;
+}
+
+.ProcessTickets .TicketsMessage-content > header strong,
+.ProcessTickets .TicketsMessage-content > header span {
+	display: block;
+}
+
+.ProcessTickets .TicketsMessage-content > header strong {
+	font-weight: 500;
+}
+
+.ProcessTickets .TicketsMessage-content > header span,
+.ProcessTickets .TicketsMessage-content time {
+	color: var(--pw-muted-color);
+	font-size: .72rem;
+}
+
+.ProcessTickets .TicketsMessage-text {
+	margin-top: .65rem;
+	font-size: .95rem;
+	line-height: 1.58;
+}
+
+.ProcessTickets .TicketsMessage-attachments {
+	display: flex;
+	flex-wrap: wrap;
+	gap: .65rem;
+	margin-top: .85rem;
+}
+
+.ProcessTickets .TicketsMessage-attachment {
+	display: flex;
+	align-items: center;
+	gap: .75rem;
+	min-width: min(18rem, 100%);
+	padding: .45rem;
+	border: 1px solid var(--pw-border-color);
+	border-radius: var(--pw-input-radius);
+	color: inherit;
+	text-decoration: none;
+}
+
+.ProcessTickets .TicketsMessage-attachment:hover,
+.ProcessTickets .TicketsMessage-attachment:focus-visible {
+	background: color-mix(in srgb, var(--pw-border-color) 22%, transparent);
+}
+
+.ProcessTickets .TicketsMessage-attachmentPreview {
+	display: grid;
+	place-items: center;
+	flex: 0 0 4rem;
+	width: 4rem;
+	height: 3rem;
+	border-radius: calc(var(--pw-input-radius) * .7);
+	background: color-mix(in srgb, var(--pw-border-color) 35%, transparent);
+	overflow: hidden;
+}
+
+.ProcessTickets .TicketsMessage-attachmentPreview img {
+	width: 100%;
+	height: 100%;
+	object-fit: contain;
+}
+
+.ProcessTickets .TicketsMessage-attachment strong,
+.ProcessTickets .TicketsMessage-attachment small {
+	display: block;
+}
+
+.ProcessTickets .TicketsMessage-attachment small {
+	margin-top: .2rem;
+	color: var(--pw-muted-color);
+}
+
+.ProcessTickets .TicketsMessage-attachment small i {
+	margin-right: .35rem;
+}
+
+.ProcessTickets .TicketsReplyComposer > header > div > p:last-child {
+	margin: .3rem 0 0;
+	color: var(--pw-muted-color);
+	font-size: .82rem;
+}
+
+.ProcessTickets .TicketsReplyComposer > header [data-ticket-ai-draft] {
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+	flex-wrap: wrap;
+	gap: var(--tickets-space-xs);
+}
+
+.ProcessTickets .TicketsAiDraftStatus {
+	flex-basis: 100%;
+	max-width: 22rem;
+	text-align: right;
+}
+
+.ProcessTickets .TicketsDraftSources {
+	margin: 1rem 1.25rem 0;
+	padding: .8rem 1rem;
+	border-radius: var(--pw-input-radius);
+	background: color-mix(in srgb, #2e8540 9%, transparent);
+}
+
+.ProcessTickets .TicketsDraftSources ul {
+	margin: .4rem 0 0;
+	padding-left: 1.2rem;
+}
+
+.ProcessTickets .TicketsReplyForm {
+	padding: 1.15rem 1.25rem 1.25rem;
+}
+
+.ProcessTickets .TicketsReplyForm textarea {
+	min-height: 11rem;
+	resize: vertical;
+}
+
+.ProcessTickets .TicketsReplyActions {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 1rem;
+	margin-top: .75rem;
+}
+
+.ProcessTickets .TicketsReplyAttachment {
+	display: inline-flex;
+	align-items: center;
+	gap: .45rem;
+	color: var(--pw-muted-color);
+	cursor: pointer;
+}
+
+.ProcessTickets .TicketsReplyAttachment input {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
+	clip: rect(0 0 0 0);
+}
+
+.ProcessTickets .TicketsReplyAttachment:focus-within,
+.ProcessTickets .TicketsReplyAttachment:hover {
+	color: var(--pw-primary-color, #e83561);
+}
+
+.ProcessTickets .TicketsSidePanel {
+	padding: 1rem;
+}
+
+.ProcessTickets .TicketsSidePanel > header {
+	display: flex;
+	align-items: center;
+	gap: .75rem;
+	margin-bottom: 1rem;
+}
+
+.ProcessTickets .TicketsSidePanel > header p {
+	margin: .15rem 0 0;
+	color: var(--pw-muted-color);
+	font-size: .78rem;
+}
+
+.ProcessTickets .TicketsSidePanel .uk-form-label {
+	margin-top: .65rem;
+}
+
+.ProcessTickets .TicketsSidePanel .uk-button-primary {
+	margin-top: .85rem;
+}
+
+.ProcessTickets .TicketsSidePanel dl {
+	display: grid;
+	grid-template-columns: minmax(6rem, .7fr) minmax(0, 1.3fr);
+	gap: .7rem 1rem;
+	margin: 0;
+}
+
+.ProcessTickets .TicketsSidePanel dt,
+.ProcessTickets .TicketsSidePanel dd {
+	margin: 0;
+}
+
+.ProcessTickets .TicketsSidePanel dt {
+	color: var(--pw-muted-color);
+	font-size: .75rem;
+	font-weight: 500;
+	letter-spacing: .03em;
+	text-transform: uppercase;
+}
+
+.ProcessTickets .TicketsSidePanel dd {
+	min-width: 0;
+	overflow-wrap: anywhere;
+}
+
+.ProcessTickets .TicketsCaseDates h2 {
+	margin-top: 0;
+	margin-bottom: 1rem;
+}
+
+.ProcessTickets .TicketsCaseDates .uk-button {
+	margin-top: 1rem;
+}
+
+.ProcessTickets .TicketsSidePanel-icon svg {
+	display: block;
+	width: 1.25rem;
+	height: 1.25rem;
+}
+
+.ProcessTickets .TicketsCustomerFeedback-score {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: var(--tickets-space-sm);
+	padding: var(--tickets-space-sm) var(--tickets-space-md);
+	border-radius: var(--pw-input-radius);
+	background: color-mix(in srgb, var(--pw-primary-color, #e83561) 8%, transparent);
+}
+
+.ProcessTickets .TicketsCustomerFeedback-score strong {
+	font-size: 1.5rem;
+	font-weight: 500;
+}
+
+.ProcessTickets .TicketsCustomerFeedback-score span {
+	color: var(--pw-primary-color, #e83561);
+	font-size: 1.1rem;
+	letter-spacing: .12em;
+}
+
+.ProcessTickets .TicketsCustomerFeedback blockquote {
+	margin: var(--tickets-space-sm) 0 0;
+	padding: var(--tickets-space-sm) var(--tickets-space-md);
+	border-left: 3px solid var(--pw-primary-color, #e83561);
+	background: color-mix(in srgb, var(--pw-border-color) 18%, transparent);
+	font-size: .88rem;
+}
+
+.ProcessTickets .TicketsCustomerFeedback-empty,
+.ProcessTickets .TicketsCustomerFeedback-date {
+	margin: 0;
+	color: var(--pw-muted-color);
+}
+
+.ProcessTickets .TicketsCustomerFeedback-date {
+	margin-top: var(--tickets-space-sm);
+	font-size: .76rem;
+}
+
+.ProcessTickets .TicketsEmpty {
+	padding: 4rem 1rem;
+	text-align: center;
+}
+
+.ProcessTickets .TicketsEmpty > .fa {
+	font-size: 2rem;
+	color: var(--pw-muted-color);
+}
+
+.ProcessTickets .TicketsTemplateIntro {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) minmax(18rem, 26rem);
+	gap: var(--tickets-space-xl);
+	align-items: start;
+	margin: 0 0 var(--tickets-space-lg);
+}
+
+.ProcessTickets .TicketsTemplateIntro h2 {
+	font-size: clamp(1.8rem, 3vw, 2.35rem);
+	font-weight: 500;
+	line-height: 1.15;
+}
+
+.ProcessTickets .TicketsTemplateIntro .uk-alert-primary {
+	margin: 0;
+}
+
+.ProcessTickets .TicketsTemplateSummary {
+	display: grid;
+	grid-template-columns: repeat(4, minmax(0, 1fr));
+	margin-bottom: var(--tickets-space-md);
+	border: 1px solid var(--pw-border-color);
+	border-radius: var(--pw-input-radius);
+	background: var(--pw-blocks-background);
+	overflow: hidden;
+}
+
+.ProcessTickets .TicketsTemplateSummary article {
+	display: grid;
+	gap: .15rem;
+	min-width: 0;
+	padding: 1rem;
+}
+
+.ProcessTickets .TicketsTemplateSummary article + article {
+	border-left: 1px solid var(--pw-border-color);
+}
+
+.ProcessTickets .TicketsTemplateSummary span,
+.ProcessTickets .TicketsTemplateSummary small {
+	color: var(--pw-muted-color);
+}
+
+.ProcessTickets .TicketsTemplateSummary span {
+	font-size: .75rem;
+	font-weight: 500;
+	letter-spacing: .04em;
+	text-transform: uppercase;
+}
+
+.ProcessTickets .TicketsTemplateSummary strong {
+	font-size: 1.6rem;
+	font-weight: 500;
+	line-height: 1.15;
+}
+
+.ProcessTickets .TicketsTemplateSummary small {
+	overflow: hidden;
+	font-size: .72rem;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.ProcessTickets .TicketsTemplatePicker {
+	margin-bottom: var(--tickets-space-md);
+	overflow-x: auto;
+	scrollbar-width: thin;
+}
+
+.ProcessTickets .TicketsTemplatePicker .uk-subnav {
+	display: flex;
+	flex-wrap: nowrap;
+	min-width: max-content;
+	margin-bottom: 0;
+}
+
+.ProcessTickets .TicketsTemplatePicker a {
+	display: grid;
+	gap: .15rem;
+	min-width: 10rem;
+	text-transform: none;
+}
+
+.ProcessTickets .TicketsTemplatePicker .uk-active a {
+	font-weight: 500;
+}
+
+.ProcessTickets .TicketsTemplatePicker small {
+	font-size: .68rem;
+	opacity: .75;
+}
+
+.ProcessTickets .TicketsTemplateWorkspace {
+	overflow: clip;
+	scroll-margin-top: 1rem;
+}
+
+.ProcessTickets .TicketsTemplateWorkspace > header {
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	gap: 1rem;
+	padding: 1.5rem;
+	border-bottom: 1px solid var(--pw-border-color);
+}
+
+.ProcessTickets .TicketsTemplateWorkspace > header h2,
+.ProcessTickets .TicketsTemplateWorkspace > header p {
+	margin: .25rem 0 0;
+}
+
+.ProcessTickets .TicketsTemplateWorkspace > header h2 {
+	font-weight: 500;
+}
+
+.ProcessTickets .TicketsTemplateWorkspace > header p {
+	color: var(--pw-muted-color);
+}
+
+.ProcessTickets .TicketsTemplateWorkspace > header code {
+	max-width: 40%;
+	overflow: hidden;
+	color: var(--pw-muted-color);
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.ProcessTickets .TicketsTemplateCard {
+	overflow: clip;
+}
+
+.ProcessTickets .TicketsTemplateCard > summary {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 1rem;
+	padding: 1rem var(--pw-spacing);
+	cursor: pointer;
+	list-style: none;
+}
+
+.ProcessTickets .TicketsTemplateCard > summary::-webkit-details-marker {
+	display: none;
+}
+
+.ProcessTickets .TicketsTemplateCard > summary > span {
+	display: grid;
+	grid-template-columns: auto 1fr;
+	align-items: center;
+	gap: .25rem .75rem;
+}
+
+.ProcessTickets .TicketsTemplateCard > summary strong {
+	font-size: 1.125rem;
+}
+
+.ProcessTickets .TicketsTemplateCard > summary small {
+	grid-column: 2;
+	color: var(--pw-muted-color);
+}
+
+.ProcessTickets .TicketsTemplateCard[open] > summary {
+	border-bottom: 1px solid var(--pw-border-color);
+}
+
+.ProcessTickets .TicketsTemplateCard[open] > summary > .fa {
+	transform: rotate(180deg);
+}
+
+.ProcessTickets .TicketsTemplateForm {
+	padding: 1.5rem;
+}
+
+.ProcessTickets .TicketsTemplateGrid {
+	display: grid;
+	grid-template-columns: minmax(0, 1.45fr) minmax(18rem, .75fr);
+	gap: var(--tickets-space-lg);
+	align-items: start;
+}
+
+.ProcessTickets .TicketsTemplateSubject {
+	min-height: 2.5rem;
+	font-size: 1rem;
+	line-height: 1.5;
+}
+
+.ProcessTickets .TicketsTemplateEditor,
+.ProcessTickets .TicketsTemplatePreview {
+	min-width: 0;
+}
+
+.ProcessTickets .TicketsVariableBar {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: .4rem;
+	margin-block: 1rem;
+}
+
+.ProcessTickets .TicketsVariableBar > span {
+	font-size: .75rem;
+	font-weight: 500;
+	letter-spacing: .04em;
+	text-transform: uppercase;
+}
+
+.ProcessTickets .TicketsVariableBar .uk-button {
+	font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+	font-size: .72rem;
+	text-transform: none;
+}
+
+.ProcessTickets .TicketsTemplateTinyMCE {
+	margin-top: .35rem;
+}
+
+.ProcessTickets .TicketsTemplateActions {
+	display: flex;
+	align-items: center;
+	gap: 1rem;
+	margin-top: 1rem;
+}
+
+.ProcessTickets .TicketsTemplatePreview {
+	position: sticky;
+	top: 1rem;
+	border: 1px solid var(--pw-border-color);
+	border-radius: var(--pw-input-radius);
+	background: var(--pw-blocks-background);
+	overflow: hidden;
+}
+
+.ProcessTickets .TicketsTemplatePreviewHeader,
+.ProcessTickets .TicketsTemplatePreviewSubject {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: .75rem;
+	padding: .75rem 1rem;
+	border-bottom: 1px solid var(--pw-border-color);
+}
+
+.ProcessTickets .TicketsTemplatePreviewSubject {
+	display: block;
+	font-weight: 500;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.ProcessTickets .TicketsTemplatePreview iframe {
+	display: block;
+	width: 100%;
+	height: 24rem;
+	border: 0;
+	background: #fff;
+}
+
+.ProcessTickets .TicketsTemplatePreview > p {
+	margin: 0;
+	padding: .75rem 1rem;
+}
+
+@media (max-width: 639px) {
+	.ProcessTickets .TicketsAdmin .uk-card-body {
+		padding: 1rem;
+	}
+
+	.ProcessTickets .TicketsTemplateIntro,
+	.ProcessTickets .TicketsTemplateGrid {
+		grid-template-columns: minmax(0, 1fr);
+	}
+
+	.ProcessTickets .TicketsTemplateSummary {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+
+	.ProcessTickets .TicketsTemplateSummary article:nth-child(3) {
+		border-left: 0;
+	}
+
+	.ProcessTickets .TicketsTemplateSummary article:nth-child(n + 3) {
+		border-top: 1px solid var(--pw-border-color);
+	}
+
+	.ProcessTickets .TicketsTemplateWorkspace > header {
+		align-items: stretch;
+		flex-direction: column;
+		padding: 1rem;
+	}
+
+	.ProcessTickets .TicketsTemplateWorkspace > header code {
+		max-width: 100%;
+	}
+
+	.ProcessTickets .TicketsTemplateCard > summary,
+	.ProcessTickets .TicketsTemplateForm {
+		padding: 1rem;
+	}
+
+	.ProcessTickets .TicketsTemplatePreview {
+		position: static;
+	}
+
+	.ProcessTickets .TicketsPageIntro,
+	.ProcessTickets .TicketsQueueHeader {
+		align-items: flex-start;
+		flex-direction: column;
+	}
+
+	.ProcessTickets .TicketsPageIntro-actions,
+	.ProcessTickets .TicketsPageIntro-actions > *,
+	.ProcessTickets .TicketsReportActions {
+		width: 100%;
+	}
+
+	.ProcessTickets .TicketsReportActions > form,
+	.ProcessTickets .TicketsReportActions > a {
+		flex: 1 1 0;
+	}
+
+	.ProcessTickets .TicketsDashboardHealth {
+		width: 100%;
+		min-width: 0;
+		box-sizing: border-box;
+	}
+
+	.ProcessTickets .TicketsMetricGrid,
+	.ProcessTickets .TicketsInsightGrid,
+	.ProcessTickets .TicketsFilters {
+		grid-template-columns: minmax(0, 1fr);
+	}
+
+	.ProcessTickets .TicketsMetricGrid {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+
+	.ProcessTickets .TicketsStatusStrip {
+		display: flex;
+		overflow-x: auto;
+	}
+
+	.ProcessTickets .TicketsStatusStrip a {
+		flex: 0 0 auto;
+	}
+
+	.ProcessTickets .TicketsTrendChart small {
+		display: none;
+	}
+
+	.ProcessTickets .TicketsCaseHeader,
+	.ProcessTickets .TicketsConversation > header,
+	.ProcessTickets .TicketsReplyComposer > header,
+	.ProcessTickets .TicketsReplyActions {
+		align-items: flex-start;
+		flex-direction: column;
+	}
+
+	.ProcessTickets .TicketsCaseHeader-state {
+		justify-content: flex-start;
+	}
+
+	.ProcessTickets .TicketsMessage {
+		grid-template-columns: 2.15rem minmax(0, 1fr);
+		padding: 1rem;
+	}
+
+	.ProcessTickets .TicketsMessage-avatar {
+		width: 2.15rem;
+		height: 2.15rem;
+	}
+
+	.ProcessTickets .TicketsMessage-content > header {
+		flex-direction: column;
+		gap: .25rem;
+	}
+
+	.ProcessTickets .TicketsReplyComposer > header form,
+	.ProcessTickets .TicketsReplyComposer > header .uk-button,
+	.ProcessTickets .TicketsReplyActions .uk-button {
+		width: 100%;
+	}
+
+	.ProcessTickets .TicketsAiDraftStatus {
+		max-width: none;
+		text-align: left;
+	}
+
+	.ProcessTickets .TicketsSidePanel dl {
+		grid-template-columns: minmax(0, 1fr);
+		gap: .15rem;
+	}
+
+	.ProcessTickets .TicketsSidePanel dd + dt {
+		margin-top: .65rem;
+	}
+}
+
+.ProcessTickets .TicketsMessage[data-author="internal"] .TicketsMessage-content {
+	background: #fff8d8;
+	border-color: #dfca71;
+}
+.ProcessTickets .TicketsInternalNote { margin: 0 1.25rem 1.25rem; border-top: 1px solid var(--pw-color-border, #d7d7d7); padding-top: 1rem; }
+.ProcessTickets .TicketsInternalNote summary { cursor: pointer; font-weight: 500; }
+.ProcessTickets .TicketsInternalNote summary i { margin-right: .5rem; }
+.ProcessTickets .TicketsInternalNoteForm { display: grid; gap: var(--tickets-space-sm); margin-top: var(--tickets-space-sm); }
+.ProcessTickets .TicketsInternalNoteForm textarea { min-height: 8rem; resize: vertical; }
+.ProcessTickets .TicketsInternalNoteForm .uk-button { justify-self: start; }
+.ProcessTickets .TicketsSla[data-breached="true"] { border-left: 4px solid #c62828; }
+.ProcessTickets .TicketsSla h2 i { margin-right: .5rem; }
+.ProcessTickets .TicketsRelated { list-style: none; margin: 0 0 1rem; padding: 0; display: grid; gap: .5rem; }
+.ProcessTickets .TicketsRelated li { display: grid; gap: .15rem; }
+.ProcessTickets .TicketsRelated small { color: var(--pw-color-muted, #666); text-transform: capitalize; }
+.ProcessTickets .TicketsAutomationRun {
+	display: grid;
+	justify-items: end;
+	gap: var(--tickets-space-xs);
+}
+
+.ProcessTickets .TicketsAutomationRun small {
+	color: var(--pw-muted-color);
+}
+
+.ProcessTickets .TicketsAutomationSummary {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(8rem, 11rem)) minmax(18rem, 1fr);
+	align-items: stretch;
+	gap: var(--tickets-space-sm);
+	margin-bottom: var(--tickets-space-lg);
+}
+
+.ProcessTickets .TicketsAutomationSummary article,
+.ProcessTickets .TicketsAutomationSummary > p {
+	margin: 0;
+	border: 1px solid var(--pw-color-border, #d7d7d7);
+	background: var(--pw-panel-background, #fff);
+}
+
+.ProcessTickets .TicketsAutomationSummary article {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) auto;
+	align-items: center;
+	gap: var(--tickets-space-sm);
+	padding: var(--tickets-space-sm) var(--tickets-space-md);
+}
+
+.ProcessTickets .TicketsAutomationSummary article span,
+.ProcessTickets .TicketsAutomationSummary > p {
+	color: var(--pw-muted-color);
+}
+
+.ProcessTickets .TicketsAutomationSummary article strong {
+	font-size: 1.5rem;
+	line-height: 1;
+}
+
+.ProcessTickets .TicketsAutomationSummary > p {
+	display: flex;
+	align-items: center;
+	gap: var(--tickets-space-sm);
+	padding: var(--tickets-space-sm) var(--tickets-space-md);
+}
+
+.ProcessTickets .TicketsAutomationSummary > p i {
+	color: var(--pw-accent-color, #d33b62);
+}
+
+.ProcessTickets .TicketsAutomationGrid {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	align-items: start;
+	gap: var(--tickets-space-lg);
+}
+
+.ProcessTickets .TicketsAutomationGrid > .uk-card {
+	min-width: 0;
+	padding: 0;
+	overflow: hidden;
+}
+
+.ProcessTickets .TicketsAutomationPanel-header {
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	gap: var(--tickets-space-md);
+	padding: var(--tickets-space-lg);
+	border-bottom: 1px solid var(--pw-color-border, #d7d7d7);
+}
+
+.ProcessTickets .TicketsAutomationPanel-header h2 {
+	margin: .25rem 0 .35rem;
+	font-weight: 500;
+}
+
+.ProcessTickets .TicketsAutomationPanel-header p:last-child {
+	max-width: 34rem;
+	margin: 0;
+	color: var(--pw-muted-color);
+}
+
+.ProcessTickets .TicketsAutomationList {
+	display: grid;
+	gap: var(--tickets-space-xs);
+	max-height: 18rem;
+	padding: var(--tickets-space-md) var(--tickets-space-lg);
+	overflow: auto;
+	border-bottom: 1px solid var(--pw-color-border, #d7d7d7);
+	background: color-mix(in srgb, var(--pw-panel-background, #fff) 94%, var(--pw-color-border, #d7d7d7));
+}
+
+.ProcessTickets .TicketsAutomationList a {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: var(--tickets-space-md);
+	min-height: 3.5rem;
+	padding: var(--tickets-space-sm) var(--tickets-space-md);
+	border: 1px solid var(--pw-color-border, #d7d7d7);
+	background: var(--pw-panel-background, #fff);
+	color: inherit;
+	text-decoration: none;
+}
+
+.ProcessTickets .TicketsAutomationList a:hover,
+.ProcessTickets .TicketsAutomationList a:focus-visible,
+.ProcessTickets .TicketsAutomationList a.is-active {
+	border-color: var(--pw-accent-color, #d33b62);
+	box-shadow: inset 3px 0 0 var(--pw-accent-color, #d33b62);
+	text-decoration: none;
+}
+
+.ProcessTickets .TicketsAutomationList a > span:first-child {
+	display: grid;
+	min-width: 0;
+	gap: .15rem;
+}
+
+.ProcessTickets .TicketsAutomationList small {
+	display: block;
+	color: var(--pw-muted-color, #666);
+}
+
+.ProcessTickets .TicketsAutomationEmpty {
+	display: grid;
+	grid-template-columns: 2.5rem minmax(0, 1fr);
+	align-items: center;
+	column-gap: var(--tickets-space-md);
+	min-height: 5rem;
+	padding: var(--tickets-space-md);
+	border: 1px dashed var(--pw-color-border, #d7d7d7);
+	background: var(--pw-panel-background, #fff);
+}
+
+.ProcessTickets .TicketsAutomationEmpty i {
+	grid-row: 1 / 3;
+	font-size: 1.25rem;
+	text-align: center;
+	color: var(--pw-muted-color);
+}
+
+.ProcessTickets .TicketsAutomationEmpty span {
+	align-self: end;
+	font-weight: 500;
+}
+
+.ProcessTickets .TicketsAutomationEmpty small {
+	align-self: start;
+}
+
+.ProcessTickets .TicketsAutomationForm {
+	display: grid;
+	gap: var(--tickets-space-lg);
+	padding: var(--tickets-space-lg);
+}
+
+.ProcessTickets .TicketsAutomationForm-section {
+	display: grid;
+	gap: var(--tickets-space-md);
+}
+
+.ProcessTickets .TicketsAutomationForm-section + .TicketsAutomationForm-section {
+	padding-top: var(--tickets-space-lg);
+	border-top: 1px solid var(--pw-color-border, #d7d7d7);
+}
+
+.ProcessTickets .TicketsAutomationForm-section > h3 {
+	margin: 0;
+	font-size: 1rem;
+	font-weight: 500;
+}
+
+.ProcessTickets .TicketsAutomationFields {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	align-items: start;
+	gap: var(--tickets-space-md);
+}
+
+.ProcessTickets .TicketsAutomationField {
+	display: grid;
+	align-content: start;
+	gap: .35rem;
+	min-width: 0;
+	margin: 0;
+}
+
+.ProcessTickets .TicketsAutomationField .uk-form-label {
+	margin: 0;
+}
+
+.ProcessTickets .TicketsAutomationField > small {
+	min-height: 1.2em;
+	color: var(--pw-muted-color);
+}
+
+.ProcessTickets .TicketsAutomationInput {
+	position: relative;
+	display: block;
+}
+
+.ProcessTickets .TicketsAutomationInput > span {
+	position: absolute;
+	top: 50%;
+	right: var(--tickets-space-sm);
+	transform: translateY(-50%);
+	color: var(--pw-muted-color);
+	pointer-events: none;
+}
+
+.ProcessTickets .TicketsAutomationInput:has(> span) .uk-input {
+	padding-right: 4.75rem;
+}
+
+.ProcessTickets .TicketsAutomationActions {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: var(--tickets-space-md);
+	padding-top: var(--tickets-space-md);
+	border-top: 1px solid var(--pw-color-border, #d7d7d7);
+}
+
+.ProcessTickets .TicketsAutomationActions label {
+	display: inline-flex;
+	align-items: center;
+	gap: var(--tickets-space-xs);
+	margin: 0;
+}
+.ProcessTickets .TicketsMessage-attachmentPreview > .fa { font-size: 2rem; }
+@media (max-width: 959px) {
+	.ProcessTickets .TicketsAutomationGrid { grid-template-columns: minmax(0, 1fr); }
+	.ProcessTickets .TicketsAutomationSummary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+	.ProcessTickets .TicketsAutomationSummary > p { grid-column: 1 / -1; }
+	.ProcessTickets .TicketsAutomationRun { justify-items: start; }
+}
+
+@media (max-width: 639px) {
+	.ProcessTickets .TicketsAutomationSummary,
+	.ProcessTickets .TicketsAutomationFields { grid-template-columns: minmax(0, 1fr); }
+	.ProcessTickets .TicketsAutomationSummary > p { grid-column: auto; }
+	.ProcessTickets .TicketsAutomationPanel-header,
+	.ProcessTickets .TicketsAutomationActions { align-items: stretch; flex-direction: column; }
+	.ProcessTickets .TicketsAutomationActions .uk-button { width: 100%; }
+}
+
+.ProcessTickets .TicketsFormsIntro,
+.ProcessTickets .TicketsFormFieldsHead {
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	gap: 1.5rem;
+}
+
+.ProcessTickets .TicketsFormsIntro {
+	align-items: flex-end;
+	margin-bottom: var(--tickets-space-lg);
+}
+
+.ProcessTickets .TicketsFormsIntro h2 {
+	margin: .25rem 0 .5rem;
+	font-weight: 500;
+}
+
+.ProcessTickets .TicketsFormsIntro p:last-child {
+	margin-bottom: 0;
+}
+
+.ProcessTickets .TicketsFormsGrid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(min(22rem, 100%), 1fr));
+	gap: var(--tickets-space-md);
+	margin-top: 0;
+}
+.ProcessTickets .TicketsFormActions { display: inline-flex; flex-wrap: wrap; gap: var(--tickets-space-xs); }
+.ProcessTickets .TicketsImportForms { display: grid; gap: var(--tickets-space-md); }
+.ProcessTickets .TicketsImportForms-list { display: grid; gap: var(--tickets-space-xs); }
+.ProcessTickets .TicketsImportForm { display: flex; align-items: flex-start; gap: var(--tickets-space-sm); padding: var(--tickets-space-md); border: 1px solid #d7d7d7; border-radius: 4px; background: #fff; cursor: pointer; }
+.ProcessTickets .TicketsImportForm > input { flex: 0 0 auto; margin-top: .2rem; }
+.ProcessTickets .TicketsImportForm > span { display: grid; min-width: 0; gap: .25rem; }
+.ProcessTickets .TicketsImportForm strong { font-weight: 500; }
+.ProcessTickets .TicketsImportForm small { display: block; color: #666; }
+.ProcessTickets .TicketsImportForm-warning { color: #8a5a00 !important; }
+
+.ProcessTickets .TicketsFormCard {
+	display: flex;
+	flex-direction: column;
+	gap: var(--tickets-space-sm);
+	padding: 1.25rem;
+	border: 1px solid #d7d7d7;
+	border-radius: 4px;
+	background: #fff;
+}
+
+.ProcessTickets .TicketsFormCard header,
+.ProcessTickets .TicketsFormCard footer {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 1rem;
+}
+
+.ProcessTickets .TicketsFormCard h3,
+.ProcessTickets .TicketsFormCard p { margin: 0; }
+.ProcessTickets .TicketsFormCard h3 { font-weight: 500; }
+.ProcessTickets .TicketsFormCard p { flex: 1; color: #666; }
+.ProcessTickets .TicketsFormCard footer { margin-top: auto; padding-top: var(--tickets-space-xs); }
+.ProcessTickets .TicketsFormCard code,
+.ProcessTickets .TicketsEmbedCode { display: block; max-width: 100%; padding: .65rem .75rem; overflow-wrap: anywhere; white-space: pre-wrap; word-break: break-word; background: #f4f4f4; }
+
+.ProcessTickets .TicketsFormEditor {
+	display: grid;
+	grid-template-columns: minmax(0, 1.8fr) minmax(17rem, .8fr);
+	gap: var(--tickets-space-md);
+	align-items: start;
+	width: 100%;
+	max-width: 100%;
+	overflow: clip;
+}
+
+.ProcessTickets .TicketsFormEditor-main,
+.ProcessTickets .TicketsFormEditor-side { display: grid; min-width: 0; max-width: 100%; gap: var(--tickets-space-md); }
+.ProcessTickets .TicketsFormEditor-side { position: sticky; top: 1rem; }
+.ProcessTickets .TicketsFormEditor .uk-card { min-width: 0; max-width: 100%; padding: var(--tickets-space-lg); }
+.ProcessTickets .TicketsFormEditor-side .uk-card label { display: block; margin-top: var(--tickets-space-sm); }
+.ProcessTickets .TicketsFormEditor-side .uk-card label:has(.uk-checkbox) { display: flex; align-items: center; gap: .55rem; }
+.ProcessTickets .TicketsFormEditor-side .uk-card label:has(.uk-checkbox) .uk-checkbox { flex: 0 0 auto; margin: 0; }
+.ProcessTickets .TicketsFormEditor h2 { margin: 0 0 var(--tickets-space-lg); font-weight: 500; }
+.ProcessTickets .TicketsFormFields { display: grid; gap: var(--tickets-space-sm); margin-top: var(--tickets-space-md); }
+.ProcessTickets .TicketsFormField { border: 1px solid #d7d7d7; border-radius: 4px; background: #fafafa; }
+.ProcessTickets .TicketsFormField header { display: flex; align-items: center; gap: .65rem; padding: .65rem .8rem; border-bottom: 1px solid #d7d7d7; background: #f4f4f4; }
+.ProcessTickets .TicketsFormField header strong { flex: 1; font-weight: 500; }
+.ProcessTickets .TicketsFormField-actions { display: flex; gap: .25rem; }
+.ProcessTickets .TicketsFormField-actions button { width: 2rem; height: 2rem; padding: 0; border: 0; border-radius: 3px; background: transparent; cursor: pointer; }
+.ProcessTickets .TicketsFormField-actions button:hover { background: #e5e5e5; }
+.ProcessTickets .TicketsFormField-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--tickets-space-sm); padding: var(--tickets-space-md); }
+.ProcessTickets .TicketsFormField-grid > *,
+.ProcessTickets .TicketsFormEditor input,
+.ProcessTickets .TicketsFormEditor select,
+.ProcessTickets .TicketsFormEditor textarea { min-width: 0; max-width: 100%; }
+.ProcessTickets .TicketsFormField-options { grid-column: 1 / -1; }
+.ProcessTickets .TicketsFormField-required { align-self: end; }
+.ProcessTickets .TicketsFormDelete { margin-top: 1rem; text-align: right; }
+.ProcessTickets .TicketsFormPreview-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--tickets-space-md); }
+.ProcessTickets .TicketsFormPreview-grid label { display: grid; gap: .4rem; min-width: 0; font-weight: 500; }
+.ProcessTickets .TicketsFormPreview-grid label:not(.is-half) { grid-column: 1 / -1; }
+.ProcessTickets .TicketsFormPreview-section { grid-column: 1 / -1; padding-top: var(--tickets-space-sm); border-top: 1px solid #d7d7d7; }
+.ProcessTickets .TicketsFormPreview-section h3 { margin: 0 0 .25rem; font-weight: 500; }
+.ProcessTickets .TicketsFormPreview-grid input:not([type="checkbox"]),
+.ProcessTickets .TicketsFormPreview-grid select,
+.ProcessTickets .TicketsFormPreview-grid textarea { width: 100%; min-height: 2.65rem; box-sizing: border-box; border: 1px solid #b8b8b8; border-radius: 4px; background: #fff; padding: .65rem .75rem; }
+.ProcessTickets .TicketsFormPreview-grid small { color: #666; font-weight: 400; }
+.ProcessTickets .TicketsBulkBar { display: inline-flex; align-items: center; flex-wrap: wrap; gap: var(--tickets-space-xs); width: fit-content; max-width: 100%; padding: var(--tickets-space-xs); margin: var(--tickets-space-md) 0; border: 1px solid #d7d7d7; border-radius: 4px; background: #f8f8f8; }
+.ProcessTickets .TicketsBulkBar > strong { padding-inline: var(--tickets-space-xs); white-space: nowrap; }
+.ProcessTickets .TicketsBulkBar > .uk-select { width: clamp(14rem, 28vw, 22rem); }
+.ProcessTickets .TicketsBulkBar > .uk-button { white-space: nowrap; }
+.ProcessTickets .TicketsQueueTable td small { display: block; margin-top: .2rem; color: #666; }
+.ProcessTickets .TicketsPagination { display: flex; flex-wrap: wrap; gap: .35rem; justify-content: center; margin-top: var(--tickets-space-lg); }
+.ProcessTickets .TicketsPagination a { min-width: 2.4rem; min-height: 2.4rem; display: inline-grid; place-items: center; border-radius: 4px; text-decoration: none; }
+.ProcessTickets .TicketsPagination a:hover,
+.ProcessTickets .TicketsPagination a[aria-current="page"] { background: #f4f4f4; color: inherit; }
+.ProcessTickets .TicketsOpsHealth { display: flex; align-items: center; justify-content: space-between; gap: var(--tickets-space-lg); margin-top: var(--tickets-space-lg); padding: var(--tickets-space-lg); }
+.ProcessTickets .TicketsOpsHealth h2,
+.ProcessTickets .TicketsOpsHealth p { margin-top: 0; }
+.ProcessTickets .TicketsOpsActions { display: flex; flex-wrap: wrap; gap: var(--tickets-space-sm); flex: 0 0 auto; }
+.ProcessTickets .TicketsBacklog { margin-top: var(--tickets-space-lg); padding: var(--tickets-space-lg); }
+
+@media (max-width: 959px) {
+	.ProcessTickets .TicketsFormEditor { grid-template-columns: minmax(0, 1fr); }
+	.ProcessTickets .TicketsFormEditor-side { position: static; }
+}
+
+@media (max-width: 639px) {
+	.ProcessTickets .TicketsFormsIntro,
+	.ProcessTickets .TicketsFormFieldsHead { flex-direction: column; }
+	.ProcessTickets .TicketsFormField-grid { grid-template-columns: minmax(0, 1fr); }
+	.ProcessTickets .TicketsFormField-options { grid-column: auto; }
+	.ProcessTickets .TicketsFormPreview-grid { grid-template-columns: minmax(0, 1fr); }
+	.ProcessTickets .TicketsBulkBar { align-items: stretch; flex-direction: column; width: 100%; }
+	.ProcessTickets .TicketsBulkBar > .uk-select,
+	.ProcessTickets .TicketsBulkBar > .uk-button { width: 100%; }
+	.ProcessTickets .TicketsFormPreview-grid label { grid-column: auto !important; }
+	.ProcessTickets .TicketsOpsHealth { align-items: stretch; flex-direction: column; }
+}
+
+@media (min-width: 640px) and (max-width: 1199px) {
+	.ProcessTickets .TicketsMetricGrid {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+
+	.ProcessTickets .TicketsInsightGrid {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+
+	.ProcessTickets .TicketsTrend {
+		grid-column: 1 / -1;
+	}
+
+	.ProcessTickets .TicketsFilters {
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+	}
+
+	.ProcessTickets .TicketsFilterSearch {
+		grid-column: span 2;
+	}
+}
+
+@media (max-width: 1199px) {
+	.ProcessTickets .TicketsFormEditor {
+		grid-template-columns: minmax(0, 1fr);
+		overflow: visible;
+	}
+
+	.ProcessTickets .TicketsFormEditor-side {
+		position: static;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+
+	.ProcessTickets .TicketsFormEditor-side > :last-child {
+		grid-column: 1 / -1;
+	}
+
+	.ProcessTickets .TicketsViewLayout {
+		grid-template-columns: minmax(0, 1fr);
+	}
+
+	.ProcessTickets .TicketsViewAside {
+		position: static;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+
+	.ProcessTickets .TicketsCaseDates {
+		grid-column: 1 / -1;
+	}
+}
+
+@media (max-width: 639px) {
+	.ProcessTickets .TicketsAdminNavigation {
+		margin-bottom: var(--tickets-space-lg) !important;
+	}
+
+	.ProcessTickets .TicketsMetricGrid,
+	.ProcessTickets .TicketsFormEditor-side {
+		grid-template-columns: minmax(0, 1fr);
+	}
+
+	.ProcessTickets .TicketsFormEditor-side > :last-child {
+		grid-column: auto;
+	}
+
+	.ProcessTickets .TicketsViewAside {
+		grid-template-columns: minmax(0, 1fr);
+	}
+
+	.ProcessTickets .TicketsCaseDates {
+		grid-column: auto;
+	}
+}

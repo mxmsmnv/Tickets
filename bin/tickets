@@ -1,0 +1,53 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+$args = array_slice($argv, 1);
+$command = $args[0] ?? 'help';
+$root = '';
+$dryRun = in_array('--dry-run', $args, true);
+$execute = in_array('--execute', $args, true);
+$limit = 25;
+foreach ($args as $arg) {
+	if (str_starts_with($arg, '--root=')) $root = rtrim(substr($arg, 7), '/');
+	if (str_starts_with($arg, '--limit=')) $limit = max(1, min(100, (int)substr($arg, 8)));
+}
+
+if ($command === 'help' || in_array($command, ['-h', '--help'], true)) {
+	fwrite(STDOUT, "Tickets CLI\n\n  automation [--dry-run] [--root=/path/to/processwire]\n  retention [--dry-run] [--root=/path/to/processwire]\n  mailbox-import [--limit=25] [--execute] [--root=/path/to/processwire]\n");
+	exit(0);
+}
+if (!in_array($command, ['automation', 'retention', 'mailbox-import'], true)) {
+	fwrite(STDERR, "Unknown command: {$command}\n");
+	exit(2);
+}
+
+if ($root === '') {
+	$candidate = getcwd();
+	while ($candidate && $candidate !== dirname($candidate)) {
+		if (is_file($candidate . '/index.php') && is_dir($candidate . '/wire')) { $root = $candidate; break; }
+		$candidate = dirname($candidate);
+	}
+}
+if ($root === '' || !is_file($root . '/index.php')) {
+	fwrite(STDERR, "ProcessWire root not found. Run inside the site or pass --root=/path/to/site.\n");
+	exit(2);
+}
+
+chdir($root);
+require $root . '/index.php';
+$tickets = $wire->modules->get('Tickets');
+if (!$tickets instanceof \ProcessWire\Tickets) {
+	fwrite(STDERR, "Tickets is not installed.\n");
+	exit(1);
+}
+
+try {
+	if ($command === 'mailbox-import') $result = $tickets->importMailboxInbox($limit, $execute);
+	else $result = $command === 'retention' ? $tickets->runRetention($dryRun) : $tickets->runAutomation($dryRun);
+	fwrite(STDOUT, json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . PHP_EOL);
+} catch (Throwable $error) {
+	fwrite(STDERR, $error->getMessage() . PHP_EOL);
+	exit(1);
+}

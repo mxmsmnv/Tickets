@@ -1,0 +1,16 @@
+.TicketsFormEmbed { width: 100%; }
+.TicketsFormEmbed.is-loading { min-height: 8rem; opacity: .65; }
+.TicketsCustomForm { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--ds-size-5, 1rem); width: 100%; }
+.TicketsCustomForm-head, .TicketsCustomForm-full, .TicketsCustomForm-success, .TicketsCustomForm-section { grid-column: 1 / -1; }
+.TicketsCustomForm-head > :first-child, .TicketsCustomForm-success > :first-child { margin-top: 0; }
+.TicketsCustomForm-head > :last-child, .TicketsCustomForm-success > :last-child { margin-bottom: 0; }
+.TicketsCustomForm-half { min-width: 0; }
+.TicketsCustomForm-section { margin-top: var(--ds-size-3, .75rem); padding-top: var(--ds-size-5, 1rem); border-top: 1px solid var(--ds-color-neutral-border-subtle, #d7d7d7); }
+.TicketsCustomForm-section h3 { margin: 0; }
+.TicketsCustomForm-help { margin-block: .35rem 0; color: var(--ds-color-neutral-text-subtle, #5d5d5d); font-size: .875rem; }
+.TicketsCustomForm-actions { display: flex; align-items: center; flex-wrap: wrap; gap: var(--ds-size-3, .75rem); }
+.TicketsCustomForm-actions [data-error="true"], .TicketsCustomForm-error { color: var(--ds-color-danger-text-default, #b3261e); }
+.TicketsCustomForm-checkbox { display: flex; align-items: flex-start; gap: .65rem; }
+.TicketsCustomForm-checkbox input { margin-top: .25rem; }
+.TicketsCustomForm-honeypot { position: absolute !important; left: -10000px !important; width: 1px !important; height: 1px !important; overflow: hidden !important; }
+@media (max-width: 44rem) { .TicketsCustomForm { grid-template-columns: minmax(0, 1fr); } .TicketsCustomForm-half { grid-column: 1 / -1; } }

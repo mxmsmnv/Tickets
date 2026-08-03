@@ -1,0 +1,31 @@
+en,es,description,file,hash
+"Customer portal",Portal de clientes,,site/modules/Tickets/Tickets.module.php,513a0531c70cf969ddb5cb8a0bf17cd1
+"Frontend framework",Framework frontend,,site/modules/Tickets/Tickets.module.php,c887185c6013adddafbfdf72db7b6822
+"Ticket taxonomy",Taxonomía de tickets,,site/modules/Tickets/Tickets.module.php,a55545653278f7f5877a25844301227c
+"Ticket types",Tipos de ticket,,site/modules/Tickets/Tickets.module.php,939b44bfe0c5071cc838ad41555e50e9
+"Ticket topics",Temas de tickets,,site/modules/Tickets/Tickets.module.php,12736fc96da05a7ea54f699efb0f44ba
+"Ticket priorities",Prioridades de tickets,,site/modules/Tickets/Tickets.module.php,e135c674e63027a884fa64bf03275640
+"Transactional mail",Correo transaccional,,site/modules/Tickets/Tickets.module.php,4eddcb0e22df4a64ae094f7b2b0471e3
+"Attachments and guest protection","Adjuntos y protección de invitados",,site/modules/Tickets/Tickets.module.php,df6c0162bafdf5edeaa9744c48078b45
+"Support hours",Horario de soporte,,site/modules/Tickets/Tickets.module.php,d356d8d155fdb0958b718bd2483c07a9
+"Reply assistance",Asistencia de respuesta,,site/modules/Tickets/Tickets.module.php,cbb23b628371c9f1a5347a18569c2c3c
+Localization,Localización,,site/modules/Tickets/Tickets.module.php,369686331c93d55e587441143ccdf427
+"Support tickets",Tickets de soporte,,site/modules/Tickets/Tickets.module.php,b2c288b845626895ce6e716753dce694
+Support,Soporte,,site/modules/Tickets/Tickets.module.php,db5eb84117d06047c97c9a0191b5fffe
+"Create a support ticket","Crear un ticket de soporte",,site/modules/Tickets/Tickets.module.php,8a7cb32326fc1cdbfac0ed203dd40991
+"Request details",Detalles de la solicitud,,site/modules/Tickets/Tickets.module.php,255b76dbab47a0dbb4f8b13264e4615a
+"What do you need help with?","¿Con qué necesitas ayuda?",,site/modules/Tickets/Tickets.module.php,32a7de8254961a06baa2507d6ca1ad0f
+Email,Correo electrónico,,site/modules/Tickets/Tickets.module.php,ce8ae9da5b7cd6c3df2929543a9af92d
+Subject,Asunto,,site/modules/Tickets/Tickets.module.php,c7892ebbb139886662c6f2fc8c450710
+Type,Tipo,,site/modules/Tickets/Tickets.module.php,a1fa27779242b4902f7ae3bdd5c6d508
+Topic,Tema,,site/modules/Tickets/Tickets.module.php,25812bf456959aa5f28dc570f341a3ba
+Priority,Prioridad,,site/modules/Tickets/Tickets.module.php,502996d9790340c5fd7b86a5b93b1c9f
+Details,Detalles,,site/modules/Tickets/Tickets.module.php,3ec365dd533ddb7ef3d1c111186ce872
+Screenshot,Captura de pantalla,,site/modules/Tickets/Tickets.module.php,3afbd9828e011526955ca93b48b57524
+optional,opcional,,site/modules/Tickets/Tickets.module.php,d57c24f3fe52d16e7169b912dd647f0d
+Cancel,Cancelar,,site/modules/Tickets/Tickets.module.php,ea4788705e6873b424c65e91c2846b19
+"Open now","Abierto ahora",,site/modules/Tickets/Tickets.module.php,d5542204a83bcfff17f90ffdbf9711da
+"Currently closed","Actualmente cerrado",,site/modules/Tickets/Tickets.module.php,0cc98f56b557829546ee0bf65cf95314
+Reply,Responder,,site/modules/Tickets/Tickets.module.php,25d8df6e580905091a0d5ef5b9e05bf0
+Message,Mensaje,,site/modules/Tickets/Tickets.module.php,4c2a8fe7eaf24721cc7a9f0175115bd4
+"Send reply","Enviar respuesta",,site/modules/Tickets/Tickets.module.php,662f371ef2b68e76380e0d3f7d6320c8
