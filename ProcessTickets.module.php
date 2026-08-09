@@ -4,6 +4,10 @@
 class ProcessTickets extends Process {
 	public function init(): void {
 		parent::init();
+		if ((string)$this->wire('input')->urlSegment1 === 'templates') {
+			$editor = $this->wire('modules')->get('InputfieldTinyMCE');
+			if ($editor) $editor->renderReady();
+		}
 		$assetVersion = Tickets::VERSION . '-' . max(
 			(int)@filemtime($this->wire('config')->paths->Tickets . 'assets/tickets-admin.css'),
 			(int)@filemtime($this->wire('config')->paths->Tickets . 'assets/tickets-admin.js')

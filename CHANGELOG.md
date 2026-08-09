@@ -6,6 +6,8 @@
   active ProcessWire AdminTheme light, dark, or automatic color scheme.
 - Added live editor reinitialization when the administrator changes theme,
   while preserving unsaved editor content.
+- Ensured TinyMCE loads before the Tickets theme adapter on the Templates page
+  without adding editor assets to the rest of the admin workspace.
 
 ## 1.0.37 - 2026-08-09
 

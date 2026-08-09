@@ -33,7 +33,9 @@ $checks = [
 		&& str_contains($javascript, "settings.skin = dark ? 'oxide-dark' : 'oxide'")
 		&& str_contains($javascript, "settings.content_css = dark ? 'dark' : 'default'")
 		&& str_contains($javascript, 'InputfieldTinyMCE.resetEditors(editors)')
-		&& str_contains($css, '.TicketsTemplateTinyMCE .tox-tinymce'),
+		&& str_contains($css, '.TicketsTemplateTinyMCE .tox-tinymce')
+		&& str_contains($process, "urlSegment1 === 'templates'")
+		&& strpos($process, "get('InputfieldTinyMCE')") < strpos($process, "assets/tickets-admin.js"),
 ];
 
 foreach($checks as $label => $ok) {
