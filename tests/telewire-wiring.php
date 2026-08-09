@@ -12,6 +12,7 @@ $checks = [
 	'sla trigger' => str_contains($module, "sendTeleWireTicketNotification('sla_breach', \$ticket)"),
 	'public TeleWire API only' => str_contains($integration, "->send(\$this->buildTeleWireNotification") && !str_contains($integration, 'TelegramAPI'),
 	'no credential storage' => !str_contains($module, 'telewire_bot') && !str_contains($module, 'telewire_chat') && !str_contains($integration, "'botToken' =>") && !str_contains($integration, "'chatIds' =>"),
+	'public readiness API' => str_contains($integration, "method_exists(\$telewire, 'isConfigured')") && str_contains($integration, '$telewire->isConfigured()'),
 	'privacy copy' => str_contains($integration, 'Customer email, message text, guest access tokens, custom fields, and attachments are excluded.'),
 	'failure isolation' => str_contains($integration, 'catch (\\Throwable $error)') && str_contains($integration, 'return false;'),
 ];

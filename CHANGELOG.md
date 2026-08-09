@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.27 - 2026-08-09
+
+- Prefer TeleWire 1.0.1's public, network-free `isConfigured()` readiness API while retaining a fail-closed compatibility fallback for TeleWire 1.0.0.
+
 ## 1.0.26 - 2026-08-09
 
 - Added opt-in administrator Telegram notifications through mxmsmnv/TeleWire

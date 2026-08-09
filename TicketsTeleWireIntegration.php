@@ -8,9 +8,14 @@ trait TicketsTeleWireIntegration {
 		$installed = $modules->isInstalled('TeleWire');
 		$telewire = $installed ? $modules->get('TeleWire') : null;
 		$compatible = is_object($telewire) && method_exists($telewire, 'send');
-		$configured = $compatible
-			&& trim((string)$telewire->get('botToken')) !== ''
-			&& trim((string)$telewire->get('chatIds')) !== '';
+		$configured = false;
+		if ($compatible && method_exists($telewire, 'isConfigured')) {
+			$configured = (bool)$telewire->isConfigured();
+		} elseif ($compatible) {
+			// TeleWire 1.0.0 compatibility; newer releases expose isConfigured().
+			$configured = trim((string)$telewire->get('botToken')) !== ''
+				&& trim((string)$telewire->get('chatIds')) !== '';
+		}
 		return [
 			'installed' => $installed,
 			'compatible' => $compatible,
