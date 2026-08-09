@@ -449,6 +449,8 @@ class ProcessTickets extends Process {
 		$tickets->markMessagesRead($id, $this->wire('user'), true);
 		$messages = $tickets->ticketMessages($id, true);
 		$conversationOrder = strtolower((string)$tickets->admin_conversation_order) === 'desc' ? 'desc' : 'asc';
+		$desktopSidebar = strtolower((string)$tickets->admin_sidebar_desktop) === 'left' ? 'left' : 'right';
+		$tabletSidebar = strtolower((string)$tickets->admin_sidebar_tablet) === 'left' ? 'left' : 'right';
 		if ($conversationOrder === 'desc') $messages = array_reverse($messages);
 		$macros = $tickets->macros(true, $ticket);
 		$links = $tickets->ticketLinks($id);
@@ -513,7 +515,7 @@ class ProcessTickets extends Process {
 			. ($tickets->ai_assist_enabled ? '<button class="uk-button uk-button-text" type="button" data-ticket-polish data-endpoint="' . $this->e($this->wire('page')->url . 'view/?id=' . $id) . '"><i class="fa fa-pencil" aria-hidden="true"></i>' . $this->_('Fix writing') . '</button>' : '')
 			. '</div><button class="uk-button uk-button-primary" type="submit"><i class="fa fa-paper-plane uk-margin-small-right"></i>' . $this->_('Send reply') . '</button></div></form>';
 		$composerOut .= '<details class="TicketsInternalNote"><summary><i class="fa fa-lock" aria-hidden="true"></i>' . $this->_('Add internal note') . '</summary><form class="TicketsInternalNoteForm" method="post"><input type="hidden" name="ticket_action" value="note">' . $this->csrf() . '<textarea class="uk-textarea" name="body" rows="5" required placeholder="' . $this->_('Visible only to support staff…') . '"></textarea><button class="uk-button uk-button-default" type="submit">' . $this->_('Save internal note') . '</button></form></details></section>';
-		$out .= '<div class="TicketsViewLayout"><main class="TicketsViewMain">' . ($conversationOrder === 'desc' ? $composerOut . $conversationOut : $conversationOut . $composerOut) . '</main>';
+		$out .= '<div class="TicketsViewLayout" data-desktop-sidebar="' . $desktopSidebar . '" data-tablet-sidebar="' . $tabletSidebar . '"><main class="TicketsViewMain">' . ($conversationOrder === 'desc' ? $composerOut . $conversationOut : $conversationOut . $composerOut) . '</main>';
 
 		$out .= '<aside class="TicketsViewAside"><form class="TicketsSidePanel" method="post"><input type="hidden" name="ticket_action" value="update">' . $this->csrf() . '<header><span class="TicketsSidePanel-icon"><i class="fa fa-sliders"></i></span><div><h2>' . $this->_('Workflow') . '</h2><p>' . $this->_('Route and resolve this request.') . '</p></div></header>' . $this->select('status', $this->_('Status'), $tickets->statuses(), (string)$ticket['status']) . $this->select('priority', $this->_('Priority'), $tickets->priorities(), (string)$ticket['priority']) . $this->select('assigned_user_id', $this->_('Assigned to'), $this->staffOptions(), (string)(int)$ticket['assigned_user_id']) . '<button class="uk-button uk-button-primary uk-width-1-1" type="submit">' . $this->_('Save workflow') . '</button></form>';
 		$slaLabel = $sla['due_at'] !== '' ? date('M j, Y · H:i', strtotime($sla['due_at'])) : $this->_('Not set');

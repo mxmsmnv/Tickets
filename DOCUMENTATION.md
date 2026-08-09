@@ -132,6 +132,11 @@ the reply composer below the thread. DESC places the composer first and lists
 the newest message first. This affects admin presentation only; public APIs and
 AI context remain chronological.
 
+The same Staff workspace section controls sidebar placement independently for
+desktop (1200px and wider) and tablet (768–1199px). On phones below 768px the
+workspace always uses one column with the conversation first, reply composer
+second, and operational cards afterward, regardless of the desktop settings.
+
 The PHP and REST channels require an actor with both `tickets-api` and
 `tickets-manage`. Report and form-definition reads additionally require
 `tickets-admin`. REST accepts either the existing ProcessWire session or one

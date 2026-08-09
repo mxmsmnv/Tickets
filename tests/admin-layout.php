@@ -25,6 +25,13 @@ $checks = [
 	'telegram reuses interface components' => str_contains($process, "interfaceOverviewCard('telegram'") && str_contains($process, 'TicketsInterfaceSettings') && str_contains($process, 'TicketsInterfaceSafety'),
 	'email reuses interface components' => str_contains($process, "interfaceOverviewCard('envelope'") && str_contains($process, 'mailProviderLabel()') && str_contains($process, 'Selected provider'),
 	'conversation order moves composer semantically' => str_contains($process, "array_reverse(\$messages)") && str_contains($process, "\$conversationOrder === 'desc' ? \$composerOut . \$conversationOut : \$conversationOut . \$composerOut"),
+	'configurable responsive sidebar' => str_contains($process, 'data-desktop-sidebar=')
+		&& str_contains($process, 'data-tablet-sidebar=')
+		&& str_contains($css, '[data-desktop-sidebar="left"]')
+		&& str_contains($css, '[data-tablet-sidebar="left"]'),
+	'mobile conversation remains first' => str_contains($css, '@media (max-width: 767px)')
+		&& str_contains($css, '.TicketsViewMain > .TicketsConversation { order: 1; }')
+		&& str_contains($css, '.TicketsViewMain > .TicketsReplyComposer { order: 2; }'),
 	'attachment selection feedback' => str_contains($process, 'data-ticket-attachment-selection')
 		&& str_contains($process, 'data-ticket-attachment-clear')
 		&& str_contains($javascript, 'syncAttachmentSelection')

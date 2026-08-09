@@ -1306,6 +1306,22 @@
 	top: 1rem;
 }
 
+@media (min-width: 1200px) {
+	.ProcessTickets .TicketsViewLayout[data-desktop-sidebar="left"] {
+		grid-template-columns: minmax(19rem, .7fr) minmax(0, 1.7fr);
+	}
+
+	.ProcessTickets .TicketsViewLayout[data-desktop-sidebar="left"] > .TicketsViewAside {
+		grid-column: 1;
+		grid-row: 1;
+	}
+
+	.ProcessTickets .TicketsViewLayout[data-desktop-sidebar="left"] > .TicketsViewMain {
+		grid-column: 2;
+		grid-row: 1;
+	}
+}
+
 .ProcessTickets .TicketsConversation,
 .ProcessTickets .TicketsReplyComposer,
 .ProcessTickets .TicketsSidePanel {
@@ -2733,9 +2749,45 @@
 		grid-column: 1 / -1;
 	}
 
+}
+
+@media (min-width: 768px) and (max-width: 1199px) {
+	.ProcessTickets .TicketsViewLayout {
+		grid-template-columns: minmax(0, 1.4fr) minmax(17rem, .8fr);
+	}
+
+	.ProcessTickets .TicketsViewAside {
+		position: static;
+	}
+
+	.ProcessTickets .TicketsViewLayout[data-tablet-sidebar="left"] {
+		grid-template-columns: minmax(17rem, .8fr) minmax(0, 1.4fr);
+	}
+
+	.ProcessTickets .TicketsViewLayout[data-tablet-sidebar="left"] > .TicketsViewAside {
+		grid-column: 1;
+		grid-row: 1;
+	}
+
+	.ProcessTickets .TicketsViewLayout[data-tablet-sidebar="left"] > .TicketsViewMain {
+		grid-column: 2;
+		grid-row: 1;
+	}
+}
+
+@media (max-width: 767px) {
 	.ProcessTickets .TicketsViewLayout {
 		grid-template-columns: minmax(0, 1fr);
 	}
+
+	.ProcessTickets .TicketsViewMain,
+	.ProcessTickets .TicketsViewAside {
+		grid-column: 1;
+		grid-row: auto;
+	}
+
+	.ProcessTickets .TicketsViewMain > .TicketsConversation { order: 1; }
+	.ProcessTickets .TicketsViewMain > .TicketsReplyComposer { order: 2; }
 
 	.ProcessTickets .TicketsViewAside {
 		position: static;

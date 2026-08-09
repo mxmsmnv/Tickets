@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.0.43 - 2026-08-09
+
+- Added independent left/right staff-sidebar settings for desktop and tablet.
+- Kept a two-column ticket workspace on tablets while respecting the selected
+  sidebar side.
+- Made the phone layout deterministic and compact: conversation first, reply
+  composer second, then workflow and customer context cards.
+
 ## 1.0.42 - 2026-08-09
 
 - Restored the design-system spacing between the active-queue header and its
