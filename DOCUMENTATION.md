@@ -361,9 +361,11 @@ commitments. Provider credentials remain in Squad.
 
 When the optional GeoIP module is installed, Tickets stores the resolved
 country, region, city and valid IANA timezone at creation. Tickets does not add
-a raw IP field. Staff see the customer-local clock in the ticket workspace when
-their timezone is known; failures or unavailable GeoIP data never block ticket
-creation.
+a raw IP field. Account country and timezone are used as non-sensitive
+fallbacks for authenticated customers and older tickets without a GeoIP
+snapshot. Staff see the customer-local clock only when its timezone differs
+from the configured support timezone; failures or unavailable GeoIP data never
+block ticket creation.
 
 ## Permissions and Privacy
 

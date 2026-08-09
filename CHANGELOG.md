@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.45 - 2026-08-09
+
+- Added account-country and timezone fallbacks for older authenticated tickets
+  without a GeoIP snapshot.
+- Show customer geography in the ticket context and show the customer-local
+  clock, timezone identifier included, only when it differs from support time.
+
 ## 1.0.44 - 2026-08-09
 
 - Fixed ticket-subject editing so both Enter and the explicit save button

@@ -26,4 +26,19 @@ if ((string)($runtimeDefaults['admin_sidebar_desktop'] ?? '') !== 'right') throw
 if ((string)($runtimeDefaults['admin_sidebar_tablet'] ?? '') !== 'right') throw new \RuntimeException('Fresh installations must keep the tablet sidebar on the right by default.');
 if (!str_contains((string)($templates['ticket_reply_customer']['html_body'] ?? ''), '{{support_name}}')) throw new \RuntimeException('The staff reply template does not use the configurable support name.');
 
+$previousSupportTimezone = (string)$tickets->support_timezone;
+$tickets->support_timezone = 'America/New_York';
+$foreignContext = $tickets->customerContext([
+	'user_id' => 0,
+	'customer_city' => 'Paris',
+	'customer_region' => 'Île-de-France',
+	'customer_country' => 'France',
+	'customer_timezone' => 'Europe/Paris',
+]);
+$sameContext = $tickets->customerContext(['user_id' => 0, 'customer_timezone' => 'America/New_York']);
+$tickets->support_timezone = $previousSupportTimezone;
+if (($foreignContext['location'] ?? '') !== 'Paris, Île-de-France, France') throw new \RuntimeException('Customer geography is incomplete.');
+if (empty($foreignContext['different_timezone'])) throw new \RuntimeException('A different customer timezone must be visible to staff.');
+if (!empty($sameContext['different_timezone'])) throw new \RuntimeException('The support timezone must not be presented as a customer time difference.');
+
 fwrite(STDOUT, "Tickets generic defaults: OK\n");

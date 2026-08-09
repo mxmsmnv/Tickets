@@ -36,6 +36,10 @@ $checks = [
 		&& str_contains($process, "'subject' => (string)\$this->wire('input')->post('subject')")
 		&& str_contains($process, 'name="ticket_action" value="update_subject"')
 		&& !preg_match('/<form class="TicketsSubjectForm"[^>]*>.*?name="status"/s', $process),
+	'customer geography and timezone context' => str_contains($module, 'public function customerContext(array $ticket)')
+		&& str_contains($process, "\$tickets->customerContext(\$ticket)")
+		&& str_contains($process, "\$this->_('Geography')")
+		&& str_contains($process, "customerContext['different_timezone']"),
 	'attachment selection feedback' => str_contains($process, 'data-ticket-attachment-selection')
 		&& str_contains($process, 'data-ticket-attachment-clear')
 		&& str_contains($javascript, 'syncAttachmentSelection')

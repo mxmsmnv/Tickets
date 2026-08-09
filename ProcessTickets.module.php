@@ -556,12 +556,12 @@ class ProcessTickets extends Process {
 		}
 		$out .= '</section>';
 		$out .= '<section class="TicketsSidePanel"><header><span class="TicketsSidePanel-avatar">' . $this->e($customerInitial) . '</span><div><h2>' . $this->e($ticket['customer_name']) . '</h2><p>' . $this->_('Customer') . '</p></div></header><dl><dt>' . $this->_('Email') . '</dt><dd><a href="mailto:' . $this->e($ticket['customer_email']) . '">' . $this->e($ticket['customer_email']) . '</a></dd><dt>' . $this->_('Type') . '</dt><dd>' . $this->e($tickets->types()[$ticket['category']] ?? $ticket['category']) . '</dd><dt>' . $this->_('Topic') . '</dt><dd>' . $this->e($tickets->topics()[(string)($ticket['topic'] ?? 'general')] ?? (string)($ticket['topic'] ?? 'general')) . '</dd>';
-		$place = implode(', ', array_filter([(string)($ticket['customer_city'] ?? ''), (string)($ticket['customer_region'] ?? ''), (string)($ticket['customer_country'] ?? '')]));
-		if ($place !== '') $out .= '<dt>' . $this->_('Location') . '</dt><dd>' . $this->e($place) . '</dd>';
-		$customerZone = (string)($ticket['customer_timezone'] ?? '');
-		if ($customerZone !== '' && in_array($customerZone, timezone_identifiers_list(), true)) {
+		$customerContext = $tickets->customerContext($ticket);
+		if ($customerContext['location'] !== '') $out .= '<dt>' . $this->_('Geography') . '</dt><dd>' . $this->e($customerContext['location']) . '</dd>';
+		$customerZone = (string)$customerContext['timezone'];
+		if (!empty($customerContext['different_timezone'])) {
 			$customerNow = new \DateTimeImmutable('now', new \DateTimeZone($customerZone));
-			$out .= '<dt>' . $this->_('Customer local time') . '</dt><dd><strong>' . $this->e($customerNow->format('g:i A')) . '</strong><br><small>' . $this->e($customerNow->format('D, M j · T')) . '</small></dd>';
+			$out .= '<dt>' . $this->_('Customer local time') . '</dt><dd><strong>' . $this->e($customerNow->format('g:i A')) . '</strong><br><small>' . $this->e($customerNow->format('D, M j · T')) . '<br>' . $this->e($customerZone) . '</small></dd>';
 		}
 		if (!empty($ticket['context_url'])) $out .= '<dt>' . $this->_('Related record') . '</dt><dd><a href="' . $this->e($ticket['context_url']) . '" target="_blank" rel="noopener">' . $this->e($ticket['context_type'] ?: $ticket['context_url']) . '</a></dd>';
 		$labels = [];
