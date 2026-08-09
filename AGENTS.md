@@ -171,6 +171,10 @@ accept a user and must never be exposed directly to an untrusted request:
 
 - `getTicket()` returns a record by numeric ID without ownership validation;
 - `ticketMessages()` does not independently authorize the ticket;
+- guest browser access must use `unlockGuestTicketByEmail()`,
+  `issueGuestBrowserAccessToken()`, and `unlockGuestTicketFromBrowser()` rather
+  than treating a stored email address or the private email-link token as a
+  reusable browser credential;
 - `ticketLinks()`, `queue()`, `queuePage()`, `dashboardStats()` and
   `reportData()` do not enforce staff permission;
 - `customForms()`, `mailTemplates()`, `routingRules()` and `macros()` may expose

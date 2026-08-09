@@ -189,6 +189,28 @@ access flag and returns the decorated ticket. Returns `[]` on failure. The
 access route must be private/no-store and should redirect to a token-free URL
 after success.
 
+### `unlockGuestTicketByEmail(string $key, string $email): array`
+
+Validates the normalized customer email for a guest-owned ticket, applies a
+bounded session attempt limit, grants session access, and returns the decorated
+ticket. Returns `[]` for a mismatch. Public templates must use one generic
+failure message so they do not disclose whether the ticket key or email exists.
+
+### `issueGuestBrowserAccessToken(string $key, User $user, int $ttlDays = 30): string`
+
+After a guest ticket has been unlocked in the current session, returns a
+ticket-scoped, HMAC-signed browser grant valid for at most 30 days. It contains
+no email or private email-link credential and becomes invalid when the ticket's
+private access hash changes. Returns an empty string for logged-in users or an
+unauthorized ticket.
+
+### `unlockGuestTicketFromBrowser(string $key, string $token): array`
+
+Validates a browser grant, expiry, ticket binding, signature, and current guest
+access hash before restoring session access. Returns `[]` on any mismatch.
+Store this scoped grant rather than the email-link token for remembered browser
+access.
+
 ### `canViewTicket(array $ticket, User $user): bool`
 
 True for support staff, the owning logged-in user or a session with guest access

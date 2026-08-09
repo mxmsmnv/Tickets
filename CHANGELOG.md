@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.33 - 2026-08-09
+
+- Added rate-limited guest access by matching customer email and a separate
+  HMAC-signed, ticket-scoped browser grant for remembered access.
+- Browser grants contain no email or private email-link token, expire within 30
+  days, and fail closed after the ticket access hash changes.
+
 ## 1.0.32 - 2026-08-09
 
 - Added immediate attachment feedback to the staff reply composer: selected

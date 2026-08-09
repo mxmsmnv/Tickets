@@ -23,6 +23,8 @@ If this project helps your work, consider supporting future development:
 
 - Creates private support tickets for authenticated accounts and guests.
 - Gives guests hashed private-access links without requiring registration.
+- Supports remembered guest access after one email check or private-link visit
+  using a scoped signed browser grant rather than the email address as a token.
 - Keeps replies, sent/delivered/read timestamps, staff-only notes, attachments
   and workflow history together.
 - Provides statuses, priorities, assignment, bulk actions and ticket merging.
