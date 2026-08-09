@@ -18,6 +18,9 @@ if(!$tickets || !$admin instanceof User || !$admin->id) throw new \RuntimeExcept
 $oldAgentApi = (int)$tickets->enable_agent_api;
 $oldRestApi = (int)$tickets->enable_rest_api;
 $oldCli = (int)$tickets->enable_cli;
+$oldBearerHash = (string)$tickets->rest_bearer_token_hash;
+$oldBearerUser = (int)$tickets->rest_bearer_user_id;
+$oldBearerCreated = (string)$tickets->rest_bearer_token_created_at;
 $oldMail = (int)$tickets->mail_enabled;
 $created = 0;
 try {
@@ -30,6 +33,31 @@ try {
 	if(!$api->canRead() || !$api->canWrite() || !$api->canAdmin()) throw new \RuntimeException('Superuser API capabilities were not granted.');
 	$manifest = $api->capabilities();
 	if(empty($manifest['channels']['php_api']) || empty($manifest['channels']['rest']) || empty($manifest['channels']['cli'])) throw new \RuntimeException('Capability channels are incomplete.');
+	if(($manifest['api_version'] ?? '') !== Tickets::REST_API_VERSION) throw new \RuntimeException('REST API version is missing from capabilities.');
+
+	$bearerToken = 'tickets_v1_abcdefghijklmnopqrstuvwxyz0123456789ABCDEFG';
+	$tickets->rest_bearer_token_hash = hash('sha256', $bearerToken);
+	$tickets->rest_bearer_user_id = (int)$admin->id;
+	$tickets->rest_bearer_token_created_at = date('Y-m-d H:i:s');
+	require_once dirname(__DIR__) . '/TicketsRestApi.php';
+	$rest = $wire->wire(new TicketsRestApi($tickets));
+	$authentication = new \ReflectionMethod($rest, 'authentication');
+	$authentication->setAccessible(true);
+	$_SERVER['HTTP_AUTHORIZATION'] = 'Bearer ' . $bearerToken;
+	[, $authMode] = $authentication->invoke($rest);
+	if($authMode !== 'bearer') throw new \RuntimeException('Valid Bearer authentication was not selected.');
+	$_SERVER['HTTP_AUTHORIZATION'] = 'Bearer ' . $bearerToken . 'tampered';
+	try {
+		$authentication->invoke($rest);
+		throw new \RuntimeException('Tampered Bearer credential unexpectedly succeeded.');
+	} catch(\ReflectionException $error) {
+		throw $error;
+	} catch(\Throwable $expected) {
+		$previous = $expected instanceof \ReflectionException ? $expected : $expected->getPrevious();
+		$cause = $previous ?: $expected;
+		if(!$cause instanceof TicketsRestAuthException) throw $expected;
+	}
+	unset($_SERVER['HTTP_AUTHORIZATION']);
 
 	$ticket = $tickets->createTicket($admin, [
 		'subject' => 'Interfaces security test',
@@ -63,7 +91,11 @@ try {
 	$tickets->enable_agent_api = $oldAgentApi;
 	$tickets->enable_rest_api = $oldRestApi;
 	$tickets->enable_cli = $oldCli;
+	$tickets->rest_bearer_token_hash = $oldBearerHash;
+	$tickets->rest_bearer_user_id = $oldBearerUser;
+	$tickets->rest_bearer_token_created_at = $oldBearerCreated;
 	$tickets->mail_enabled = $oldMail;
+	unset($_SERVER['HTTP_AUTHORIZATION'], $_SERVER['REDIRECT_HTTP_AUTHORIZATION']);
 	if($created > 0) {
 		foreach([Tickets::TABLE_ATTACHMENTS, Tickets::TABLE_MESSAGES, Tickets::TABLE_EVENTS] as $table) $wire->database->exec('DELETE FROM `' . $table . '` WHERE ticket_id=' . $created);
 		$wire->database->exec('DELETE FROM `' . Tickets::TABLE_LINKS . '` WHERE ticket_id=' . $created . ' OR related_ticket_id=' . $created);

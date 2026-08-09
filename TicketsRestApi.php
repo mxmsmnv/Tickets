@@ -1,6 +1,6 @@
 <?php namespace ProcessWire;
 
-/** Same-origin, session-authenticated JSON transport for TicketsAgentApi. */
+/** Versioned JSON transport for session or explicitly configured Bearer authentication. */
 final class TicketsRestApi extends Wire {
 
 	private const MAX_BODY_BYTES = 65536;
@@ -11,19 +11,21 @@ final class TicketsRestApi extends Wire {
 		$this->tickets = $tickets;
 	}
 
-	public function handle(string $resource): string {
+	public function handle(string $version, string $resource): string {
 		$this->headers();
 		try {
+			$version = strtolower(trim($version));
+			if($version !== Tickets::REST_API_VERSION) return $this->response(404, null, 'Unsupported API version.');
 			$method = strtoupper((string)($_SERVER['REQUEST_METHOD'] ?? 'GET'));
 			$resource = strtolower(trim($resource));
 			if(!preg_match('/^[a-z-]{2,32}$/', $resource)) return $this->response(404, null, 'Not found.');
-			$this->rateLimit($method !== 'GET');
 			if($resource === 'session') return $this->sessionResponse($method);
 
-			$api = $this->tickets->api($this->wire()->user);
+			[$api, $authMode, $rateKey] = $this->authentication();
+			$this->rateLimit($method !== 'GET', $authMode, $rateKey);
 			if(!$api->canRead()) throw new WirePermissionException('Tickets API access denied.');
 			$body = $method === 'POST' ? $this->jsonBody() : [];
-			if($method === 'POST') $this->validateCsrf($body);
+			if($method === 'POST' && $authMode === 'session') $this->validateCsrf($body);
 
 			switch($resource) {
 				case 'capabilities':
@@ -70,6 +72,9 @@ final class TicketsRestApi extends Wire {
 					return $this->response(404, null, 'Not found.');
 			}
 			return $this->response(200, $result);
+		} catch(TicketsRestAuthException $error) {
+			header('WWW-Authenticate: Bearer realm="Tickets API", error="invalid_token"');
+			return $this->response(401, null, $error->getMessage());
 		} catch(WirePermissionException $error) {
 			return $this->response(403, null, $error->getMessage());
 		} catch(TicketsRestException $error) {
@@ -82,6 +87,21 @@ final class TicketsRestApi extends Wire {
 			$this->wire()->log->save('tickets', 'REST request failed (' . get_class($error) . ').');
 			return $this->response(500, null, 'Tickets request failed.');
 		}
+	}
+
+	private function authentication(): array {
+		$authorization = trim((string)($_SERVER['HTTP_AUTHORIZATION'] ?? $_SERVER['REDIRECT_HTTP_AUTHORIZATION'] ?? ''));
+		if($authorization === '') return [$this->tickets->api($this->wire()->user), 'session', (string)$this->wire()->session->id];
+		if(!preg_match('/^Bearer\s+([A-Za-z0-9_-]{32,128})$/i', $authorization, $match)) throw new TicketsRestAuthException('Invalid Bearer token.');
+
+		$storedHash = trim((string)$this->tickets->rest_bearer_token_hash);
+		$actorId = (int)$this->tickets->rest_bearer_user_id;
+		if($storedHash === '' || $actorId < 1 || !hash_equals($storedHash, hash('sha256', $match[1]))) throw new TicketsRestAuthException('Invalid Bearer token.');
+		$actor = $this->wire()->users->get($actorId);
+		if(!$actor instanceof User || !$actor->id || !$actor->isLoggedin()) throw new TicketsRestAuthException('Bearer token actor is unavailable.');
+		$api = new TicketsAgentApi($this->tickets, $actor, 'php_api');
+		if(!$api->canRead()) throw new TicketsRestAuthException('Bearer token actor no longer has API access.');
+		return [$api, 'bearer', substr($storedHash, 0, 24)];
 	}
 
 	private function sessionResponse(string $method): string {
@@ -155,7 +175,15 @@ final class TicketsRestApi extends Wire {
 		if($provided === '' || !hash_equals((string)$token['value'], $provided)) throw new WirePermissionException('Invalid CSRF token.');
 	}
 
-	private function rateLimit(bool $mutation): void {
+	private function rateLimit(bool $mutation, string $authMode, string $rateKey): void {
+		if($authMode === 'bearer') {
+			$window = (int)floor(time() / 60);
+			$key = 'TicketsRestBearer:' . $rateKey . ':' . $window . ':' . ($mutation ? 'w' : 'r');
+			$count = (int)$this->wire()->cache->get($key) + 1;
+			$this->wire()->cache->save($key, $count, 120);
+			if($count > ($mutation ? 30 : 120)) throw new TicketsRestException('Tickets API rate limit exceeded.', 429);
+			return;
+		}
 		$state = $this->wire()->session->get(self::RATE_SESSION_KEY);
 		$now = time();
 		if(!is_array($state) || (int)($state['started'] ?? 0) <= $now - 60) $state = ['started' => $now, 'reads' => 0, 'writes' => 0];
@@ -182,10 +210,12 @@ final class TicketsRestApi extends Wire {
 
 	private function response(int $status, $result = null, string $error = ''): string {
 		http_response_code($status);
-		$payload = $error === '' ? ['ok' => true, 'result' => $result] : ['ok' => false, 'error' => $error];
+		$payload = $error === '' ? ['ok' => true, 'api_version' => Tickets::REST_API_VERSION, 'result' => $result] : ['ok' => false, 'api_version' => Tickets::REST_API_VERSION, 'error' => $error];
 		return (string)json_encode($payload, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 	}
 }
+
+final class TicketsRestAuthException extends \RuntimeException {}
 
 final class TicketsRestException extends \RuntimeException {
 	private int $httpStatus;

@@ -1,7 +1,7 @@
 # Tickets public API
 
-This document describes the verified public interface of Tickets 1.0.22
-(`version` 122). It is stronger than README for method usage, but the installed
+This document describes the verified public interface of Tickets 1.0.23
+(`version` 123). It is stronger than README for method usage, but the installed
 module version and live site configuration remain authoritative for a specific
 ProcessWire site.
 
@@ -58,6 +58,38 @@ Returns a dependency-free manifest describing the PHP API, REST, and CLI
 channels and the stable `tickets.*` capability names. A channel marked enabled
 still requires its documented user permission, session, CSRF, or local-host
 boundary.
+
+## Versioned REST and CLI transports
+
+REST is disabled by default and currently exposes version `v1` below
+`/tickets-api/v1/`. The supported GET resources are `session`, `capabilities`,
+`dashboard`, `queue`, `ticket`, `messages`, `report`, and `forms`. The supported
+POST resources are `update`, `reply`, and `note`. Unsupported API versions fail
+with HTTP 404, and every JSON envelope includes `api_version`.
+
+Browser integrations may use the current ProcessWire session. Read the CSRF
+credential from `GET /tickets-api/v1/session/` and send it with every POST.
+Trusted non-browser clients may instead use the single optional credential
+managed under **Setup → Tickets → Interfaces → API**:
+
+```text
+Authorization: Bearer tickets_v1_<one-time-secret>
+Content-Type: application/json
+```
+
+The Bearer credential inherits its assigned ProcessWire actor's permissions,
+is accepted only from the Authorization header, and is independently
+rate-limited. Rotation invalidates the previous value immediately. Tickets does
+not emit CORS headers and never accepts the token in URLs or request bodies.
+The `session` resource remains session-only and does not exchange Bearer tokens.
+
+The CLI is disabled by default and runs locally as
+`php site/modules/Tickets/bin/tickets <command>`. Use `help` for the current
+catalogue. Reads include `capabilities`, `dashboard`, `queue`, `ticket`,
+`messages`, `report`, and `forms`; writes include `update`, `reply`, and `note`.
+Maintenance commands include `automation`, `retention`, and `mailbox-import`.
+Mutations require `--execute`; text writes accept bounded JSON through stdin
+instead of command-line credentials.
 
 ## Labels and frontend presentation
 
@@ -483,6 +515,9 @@ retention_batch_size
 enable_agent_api
 enable_rest_api
 enable_cli
+rest_bearer_token_hash
+rest_bearer_user_id
+rest_bearer_token_created_at
 resend_inbound_enabled
 resend_inbound_address
 resend_webhook_secret
@@ -503,6 +538,11 @@ ai_knowledge_base_limit
 Use ProcessWire's module configuration UI/API rather than setting properties in
 a request. Configuration changes can affect privacy, delivery, routes and data
 lifecycle and therefore require the approval rules in `AGENTS.md`.
+
+The three `rest_bearer_*` values are internal credential metadata managed from
+**Setup → Tickets → Interfaces → API**. Do not write or display them in a site
+template. Tickets stores only a SHA-256 hash, actor ID, and rotation timestamp;
+the raw token is shown once and belongs in a secret manager.
 
 ## Hooks and internal APIs
 

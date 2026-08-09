@@ -133,25 +133,66 @@ class ProcessTickets extends Process {
 	public function ___executeInterfaces(): string {
 		$tickets = $this->tickets();
 		if (!$tickets->canAdmin($this->wire('user'))) throw new WirePermissionException('You cannot manage Tickets interfaces.');
-		$this->headline($this->_('API and CLI'));
-		$root = rtrim((string)$this->wire('config')->paths->root, '/');
-		$moduleCommand = 'php site/modules/Tickets/bin/tickets';
-		$apiBase = rtrim((string)$this->wire('config')->urls->root, '/') . '/tickets-api/v1/';
+		$this->headline($this->_('Interfaces'));
 		$channels = $tickets->capabilities()['channels'];
-		$status = static fn(bool $enabled): string => $enabled ? 'enabled' : 'disabled';
-		$settings = $this->wire('config')->urls->admin . 'module/edit?name=Tickets&collapse_info=1#Inputfield_enable_agent_api';
-		$summary = '<div class="TicketsInterfaceSummary">'
-			. '<span class="TicketsInterfaceState" data-state="' . $status((bool)$channels['php_api']) . '"><i></i>PHP API <strong>' . ucfirst($status((bool)$channels['php_api'])) . '</strong></span>'
-			. '<span class="TicketsInterfaceState" data-state="' . $status((bool)$channels['rest']) . '"><i></i>REST <strong>' . ucfirst($status((bool)$channels['rest'])) . '</strong></span>'
-			. '<span class="TicketsInterfaceState" data-state="' . $status((bool)$channels['cli']) . '"><i></i>CLI <strong>' . ucfirst($status((bool)$channels['cli'])) . '</strong></span></div>';
+		$summary = '<div class="TicketsInterfaceSummary">' . $this->interfaceState('API', (bool)$channels['rest']) . $this->interfaceState('CLI', (bool)$channels['cli']) . '</div>';
 		$out = $this->adminNav('interfaces')
-			. $this->pageIntro($this->_('Operational interfaces'), $this->_('API and CLI'), $this->_('Use the same permission-gated ticket operations from trusted PHP code, same-origin tools, local agents, and cron.'), $summary)
-			. '<section class="TicketsInterfaceGrid">'
-			. '<article class="TicketsInterfaceCard"><header><span class="TicketsInterfaceIcon"><i class="fa fa-code" aria-hidden="true"></i></span><div><p>PHP API</p><h2>' . $this->_('Trusted integrations') . '</h2></div></header><p>' . $this->_('Call a typed facade instead of exposing low-level ticket records. The actor needs tickets-api and tickets-manage; administrator-only data keeps its stronger boundary.') . '</p><pre><code>' . $this->e('$api = $modules->get(\'Tickets\')->api($user);') . "\n" . $this->e('$result = $api->queue([], 1, 50, \'active\');') . '</code></pre></article>'
-			. '<article class="TicketsInterfaceCard"><header><span class="TicketsInterfaceIcon"><i class="fa fa-exchange" aria-hidden="true"></i></span><div><p>JSON REST</p><h2>' . $this->_('Same-origin session API') . '</h2></div></header><p>' . $this->_('REST never enables CORS or bearer credentials. Start with the session endpoint, then send its CSRF token with every POST request.') . '</p><pre><code>' . $this->e($apiBase . 'session/') . "\n" . $this->e($apiBase . 'queue/?scope=active&limit=25') . '</code></pre></article>'
-			. '<article class="TicketsInterfaceCard"><header><span class="TicketsInterfaceIcon"><i class="fa fa-terminal" aria-hidden="true"></i></span><div><p>CLI</p><h2>' . $this->_('Local operations') . '</h2></div></header><p>' . $this->_('Commands emit a stable JSON envelope. Reads are bounded; every write, import, automation, or retention run requires --execute.') . '</p><pre><code>' . $this->e($moduleCommand . ' capabilities') . "\n" . $this->e($moduleCommand . ' queue --scope=active --limit=25') . "\n" . $this->e($moduleCommand . ' automation --dry-run') . '</code></pre></article>'
-			. '</section><section class="TicketsInterfaceSafety"><div><p class="uk-text-meta uk-text-uppercase uk-margin-remove">' . $this->_('Security boundary') . '</p><h2>' . $this->_('Private ticket data stays private') . '</h2><p>' . $this->_('API payloads omit guest access hashes, attachment tokens, and private storage names. REST requires an authenticated ProcessWire session and rate-limits reads and writes independently.') . '</p></div><a class="uk-button uk-button-primary" href="' . $this->e($settings) . '">' . $this->_('Configure interfaces') . '</a></section>'
-			. '<p class="TicketsInterfacePath"><strong>' . $this->_('ProcessWire root') . '</strong><code>' . $this->e($root) . '</code></p>';
+			. $this->interfaceNav('overview')
+			. $this->pageIntro($this->_('Operational interfaces'), $this->_('Interfaces'), $this->_('Inspect status, authentication, routes, and commands without mixing API and CLI workflows.'), $summary)
+			. '<section class="TicketsInterfaceGrid TicketsInterfaceGrid--overview">'
+			. $this->interfaceOverviewCard('exchange', 'API ' . Tickets::REST_API_VERSION, $this->_('Versioned JSON API'), $this->_('Review session and Bearer authentication, token status, and every supported route.'), $this->wire('page')->url . 'api/', (bool)$channels['rest'])
+			. $this->interfaceOverviewCard('terminal', 'CLI', $this->_('Local command line'), $this->_('Review channel status, safety requirements, and the complete command catalogue.'), $this->wire('page')->url . 'cli/', (bool)$channels['cli'])
+			. '</section>';
+		return $this->workspace($out);
+	}
+
+	public function ___executeApi(): string {
+		$tickets = $this->tickets();
+		if (!$tickets->canAdmin($this->wire('user'))) throw new WirePermissionException('You cannot manage Tickets API access.');
+		if ($this->wire('input')->requestMethod('POST')) $this->handleBearerTokenAction($tickets);
+		$this->headline($this->_('Tickets API'));
+		$channels = $tickets->capabilities()['channels'];
+		$apiBase = rtrim((string)$this->wire('config')->urls->root, '/') . '/tickets-api/' . Tickets::REST_API_VERSION . '/';
+		$actor = (int)$tickets->rest_bearer_user_id ? $this->wire('users')->get((int)$tickets->rest_bearer_user_id) : null;
+		$actorLabel = $actor instanceof User && $actor->id ? (string)$actor->name : $this->_('Not assigned');
+		$tokenOnce = trim((string)$this->wire('session')->get('tickets_bearer_token_once'));
+		$this->wire('session')->remove('tickets_bearer_token_once');
+		$summary = '<div class="TicketsInterfaceSummary">' . $this->interfaceState('PHP API', (bool)$channels['php_api']) . $this->interfaceState('REST', (bool)$channels['rest']) . $this->interfaceState('Bearer', (bool)$channels['bearer']) . '</div>';
+		$out = $this->adminNav('interfaces') . $this->interfaceNav('api')
+			. $this->pageIntro($this->_('API ' . Tickets::REST_API_VERSION), $this->_('Tickets API'), $this->_('Use a ProcessWire session with CSRF or an explicitly rotated Bearer token assigned to a permitted actor.'), $summary);
+		if ($tokenOnce !== '') $out .= '<section class="TicketsTokenOnce" role="status"><div><p class="uk-text-meta uk-text-uppercase uk-margin-remove">' . $this->_('Copy now') . '</p><h2>' . $this->_('New Bearer token') . '</h2><p>' . $this->_('This token is shown once. Store it in a secret manager; Tickets keeps only its SHA-256 hash.') . '</p></div><code>' . $this->e($tokenOnce) . '</code></section>';
+		$out .= '<section class="TicketsInterfaceSettings"><header><div><p class="uk-text-meta uk-text-uppercase uk-margin-remove">' . $this->_('Current settings') . '</p><h2>' . $this->_('API access') . '</h2></div><a class="uk-button uk-button-default" href="' . $this->e($this->interfaceSettingsUrl()) . '">' . $this->_('Module settings') . '</a></header><dl>'
+			. '<div><dt>' . $this->_('Version') . '</dt><dd><code>' . Tickets::REST_API_VERSION . '</code></dd></div>'
+			. '<div><dt>' . $this->_('PHP facade') . '</dt><dd>' . ((bool)$channels['php_api'] ? $this->_('Enabled') : $this->_('Disabled')) . '</dd></div>'
+			. '<div><dt>' . $this->_('REST routes') . '</dt><dd>' . ((bool)$channels['rest'] ? $this->_('Enabled') : $this->_('Disabled')) . '</dd></div>'
+			. '<div><dt>' . $this->_('Bearer token') . '</dt><dd>' . ((string)$tickets->rest_bearer_token_hash !== '' ? $this->_('Configured') : $this->_('Not configured')) . '</dd></div>'
+			. '<div><dt>' . $this->_('Token actor') . '</dt><dd>' . $this->e($actorLabel) . '</dd></div>'
+			. '<div><dt>' . $this->_('Rotated') . '</dt><dd>' . $this->e((string)$tickets->rest_bearer_token_created_at ?: $this->_('Never')) . '</dd></div>'
+			. '</dl></section>';
+		$out .= $this->renderBearerTokenPanel($tickets);
+		$out .= '<section class="TicketsInterfaceTable"><header><div><p class="uk-text-meta uk-text-uppercase uk-margin-remove">REST</p><h2>' . $this->_('Routes') . '</h2></div><code>' . $this->e($apiBase) . '</code></header><div class="uk-overflow-auto"><table class="uk-table uk-table-divider uk-table-middle"><thead><tr><th>' . $this->_('Method') . '</th><th>' . $this->_('Route') . '</th><th>' . $this->_('Access') . '</th><th>' . $this->_('Purpose') . '</th></tr></thead><tbody>';
+		foreach ($this->apiRoutes() as $route) $out .= '<tr><td><span class="TicketsMethod" data-method="' . strtolower($route[0]) . '">' . $route[0] . '</span></td><td><code>' . $this->e($apiBase . $route[1]) . '</code></td><td>' . $this->e($route[2]) . '</td><td>' . $this->e($route[3]) . '</td></tr>';
+		$out .= '</tbody></table></div></section><section class="TicketsInterfaceSafety"><div><p class="uk-text-meta uk-text-uppercase uk-margin-remove">' . $this->_('Security boundary') . '</p><h2>' . $this->_('Two authentication modes, one permission model') . '</h2><p>' . $this->_('Session mutations require tickets-rest CSRF. Bearer credentials are accepted only in the Authorization header, receive no CORS opt-in, are independently rate-limited, and inherit the assigned actor permissions.') . '</p></div></section>';
+		return $this->workspace($out);
+	}
+
+	public function ___executeCli(): string {
+		$tickets = $this->tickets();
+		if (!$tickets->canAdmin($this->wire('user'))) throw new WirePermissionException('You cannot inspect Tickets CLI access.');
+		$this->headline($this->_('Tickets CLI'));
+		$enabled = (bool)$tickets->enable_cli;
+		$command = 'php site/modules/Tickets/bin/tickets';
+		$summary = '<div class="TicketsInterfaceSummary">' . $this->interfaceState('CLI', $enabled) . '</div>';
+		$out = $this->adminNav('interfaces') . $this->interfaceNav('cli')
+			. $this->pageIntro($this->_('Local interface'), $this->_('Tickets CLI'), $this->_('Run bounded JSON commands on the ProcessWire host; mutations require an explicit --execute flag.'), $summary)
+			. '<section class="TicketsInterfaceSettings"><header><div><p class="uk-text-meta uk-text-uppercase uk-margin-remove">' . $this->_('Current settings') . '</p><h2>' . $this->_('Command-line access') . '</h2></div><a class="uk-button uk-button-default" href="' . $this->e($this->interfaceSettingsUrl()) . '">' . $this->_('Module settings') . '</a></header><dl>'
+			. '<div><dt>' . $this->_('CLI') . '</dt><dd>' . ($enabled ? $this->_('Enabled') : $this->_('Disabled')) . '</dd></div>'
+			. '<div><dt>' . $this->_('Executable') . '</dt><dd><code>site/modules/Tickets/bin/tickets</code></dd></div>'
+			. '<div><dt>' . $this->_('ProcessWire root') . '</dt><dd><code>' . $this->e(rtrim((string)$this->wire('config')->paths->root, '/')) . '</code></dd></div>'
+			. '<div><dt>' . $this->_('Output') . '</dt><dd>JSON</dd></div></dl></section>'
+			. '<section class="TicketsInterfaceTable"><header><div><p class="uk-text-meta uk-text-uppercase uk-margin-remove">CLI</p><h2>' . $this->_('Commands') . '</h2></div><code>' . $this->e($command . ' help') . '</code></header><div class="uk-overflow-auto"><table class="uk-table uk-table-divider uk-table-middle"><thead><tr><th>' . $this->_('Mode') . '</th><th>' . $this->_('Command') . '</th><th>' . $this->_('Purpose') . '</th></tr></thead><tbody>';
+		foreach ($this->cliCommands() as $row) $out .= '<tr><td><span class="TicketsCommandMode" data-mode="' . $this->e($row[0]) . '">' . ucfirst($row[0]) . '</span></td><td><code>' . $this->e($command . ' ' . $row[1]) . '</code></td><td>' . $this->e($row[2]) . '</td></tr>';
+		$out .= '</tbody></table></div></section><section class="TicketsInterfaceSafety"><div><p class="uk-text-meta uk-text-uppercase uk-margin-remove">' . $this->_('Execution safety') . '</p><h2>' . $this->_('Preview first, mutate explicitly') . '</h2><p>' . $this->_('CLI never accepts a password or API token argument. Ticket writes and real maintenance require --execute; automation and retention expose --dry-run previews.') . '</p></div></section>';
 		return $this->workspace($out);
 	}
 
@@ -691,7 +732,7 @@ class ProcessTickets extends Process {
 	private function adminNav(string $active): string {
 		$base = $this->wire('page')->url;
 		$settings = $this->wire('config')->urls->admin . 'module/edit?name=Tickets&collapse_info=1';
-		$items = ['queue' => [$base, $this->_('Queue')], 'tickets' => [$base . 'tickets/', $this->_('Tickets')], 'reports' => [$base . 'reports/', $this->_('Reports')], 'forms' => [$base . 'forms/', $this->_('Forms')], 'automation' => [$base . 'automation/', $this->_('Automation')], 'templates' => [$base . 'templates/', $this->_('Templates')], 'interfaces' => [$base . 'interfaces/', $this->_('API + CLI')]];
+		$items = ['queue' => [$base, $this->_('Queue')], 'tickets' => [$base . 'tickets/', $this->_('Tickets')], 'reports' => [$base . 'reports/', $this->_('Reports')], 'forms' => [$base . 'forms/', $this->_('Forms')], 'automation' => [$base . 'automation/', $this->_('Automation')], 'templates' => [$base . 'templates/', $this->_('Templates')], 'interfaces' => [$base . 'interfaces/', $this->_('Interfaces')]];
 		$out = '<div class="TicketsAdminNavigation uk-margin-medium-bottom uk-flex uk-flex-top"><div class="uk-width-expand"><ul class="uk-subnav uk-subnav-pill TicketsAdmin-nav" aria-label="Ticket module sections">';
 		foreach ($items as $key => [$url, $label]) $out .= '<li' . (($active === $key || ($active === 'view' && $key === 'queue')) ? ' class="uk-active"' : '') . '><a href="' . $this->e($url) . '">' . $this->e($label) . '</a></li>';
 		return $out . '</ul></div><div class="uk-width-auto"><a class="TicketsAdminSettings uk-link-muted uk-display-inline-flex uk-flex-middle" href="' . $this->e($settings) . '" title="' . $this->_('Tickets settings') . '" aria-label="' . $this->_('Tickets settings') . '">' . $this->settingsIcon() . '</a></div></div>';
@@ -786,6 +827,111 @@ class ProcessTickets extends Process {
 		if ($minutes < 60) return sprintf($this->_('%d min'), $minutes);
 		if ($minutes < 1440) return sprintf($this->_('%d h %d min'), intdiv($minutes, 60), $minutes % 60);
 		return sprintf($this->_('%d d %d h'), intdiv($minutes, 1440), intdiv($minutes % 1440, 60));
+	}
+
+	private function interfaceNav(string $active): string {
+		$base = $this->wire('page')->url;
+		$items = [
+			'overview' => [$base . 'interfaces/', $this->_('Overview')],
+			'api' => [$base . 'api/', $this->_('API')],
+			'cli' => [$base . 'cli/', $this->_('CLI')],
+		];
+		$out = '<nav class="TicketsInterfaceNav" aria-label="' . $this->_('Interface sections') . '"><ul class="uk-subnav uk-subnav-pill">';
+		foreach ($items as $key => [$url, $label]) $out .= '<li' . ($key === $active ? ' class="uk-active"' : '') . '><a href="' . $this->e($url) . '"' . ($key === $active ? ' aria-current="page"' : '') . '>' . $this->e($label) . '</a></li>';
+		return $out . '</ul></nav>';
+	}
+
+	private function interfaceState(string $label, bool $enabled): string {
+		$state = $enabled ? 'enabled' : 'disabled';
+		return '<span class="TicketsInterfaceState" data-state="' . $state . '"><i></i>' . $this->e($label) . ' <strong>' . ($enabled ? $this->_('Enabled') : $this->_('Disabled')) . '</strong></span>';
+	}
+
+	private function interfaceOverviewCard(string $icon, string $eyebrow, string $title, string $description, string $url, bool $enabled): string {
+		return '<article class="TicketsInterfaceCard"><header><span class="TicketsInterfaceIcon"><i class="fa fa-' . $this->e($icon) . '" aria-hidden="true"></i></span><div><p>' . $this->e($eyebrow) . '</p><h2>' . $this->e($title) . '</h2></div></header><p>' . $this->e($description) . '</p><footer>' . $this->interfaceState($this->_('Status'), $enabled) . '<a class="uk-button uk-button-default" href="' . $this->e($url) . '">' . $this->_('Open') . '</a></footer></article>';
+	}
+
+	private function interfaceSettingsUrl(): string {
+		return $this->wire('config')->urls->admin . 'module/edit?name=Tickets&collapse_info=1#Inputfield_enable_agent_api';
+	}
+
+	private function apiRoutes(): array {
+		return [
+			['GET', 'session/', 'Session', $this->_('Session capabilities and mutation CSRF token.')],
+			['GET', 'capabilities/', 'Session or Bearer', $this->_('API version, channels, and supported capabilities.')],
+			['GET', 'dashboard/', 'Session or Bearer', $this->_('Operational queue summary.')],
+			['GET', 'queue/?scope=active&limit=25', 'Session or Bearer', $this->_('Bounded filtered ticket queue.')],
+			['GET', 'ticket/?id={id}', 'Session or Bearer', $this->_('One redacted ticket record.')],
+			['GET', 'messages/?id={id}', 'Session or Bearer', $this->_('Redacted public and internal conversation for staff.')],
+			['GET', 'report/?days=30', 'Admin Session or Bearer', $this->_('Bounded operational report.')],
+			['GET', 'forms/', 'Admin Session or Bearer', $this->_('Administrative form definitions.')],
+			['POST', 'update/', 'Session CSRF or Bearer', $this->_('Update status, priority, or assignment.')],
+			['POST', 'reply/', 'Session CSRF or Bearer', $this->_('Add a staff reply.')],
+			['POST', 'note/', 'Session CSRF or Bearer', $this->_('Add an internal note.')],
+		];
+	}
+
+	private function cliCommands(): array {
+		return [
+			['read', 'capabilities', $this->_('Show channel status and capabilities.')],
+			['read', 'dashboard', $this->_('Show queue and response summary.')],
+			['read', 'queue --scope=active --limit=25', $this->_('Read a bounded queue page.')],
+			['read', 'ticket --id=123', $this->_('Read one redacted ticket.')],
+			['read', 'messages --id=123', $this->_('Read one ticket conversation.')],
+			['read', 'report --days=30', $this->_('Read a bounded operational report.')],
+			['read', 'forms', $this->_('Read administrative form definitions.')],
+			['write', 'update --id=123 --status=resolved --execute', $this->_('Update ticket workflow.')],
+			['write', 'reply --id=123 --stdin --execute', $this->_('Add a staff reply from JSON stdin.')],
+			['write', 'note --id=123 --stdin --execute', $this->_('Add an internal note from JSON stdin.')],
+			['preview', 'automation --dry-run', $this->_('Preview SLA and auto-close automation.')],
+			['write', 'automation --execute', $this->_('Run bounded automation.')],
+			['preview', 'retention --dry-run', $this->_('Preview configured retention.')],
+			['write', 'retention --execute', $this->_('Run configured retention.')],
+			['preview', 'mailbox-import --limit=25', $this->_('Preview bounded Mailbox ingestion.')],
+			['write', 'mailbox-import --limit=25 --execute', $this->_('Import a bounded Mailbox batch.')],
+		];
+	}
+
+	private function renderBearerTokenPanel(Tickets $tickets): string {
+		$options = '';
+		foreach ($this->wire('users')->find('include=all, sort=name, limit=200') as $candidate) {
+			$allowed = $candidate->isSuperuser() || ($candidate->hasPermission(Tickets::PERMISSION_API) && $candidate->hasPermission(Tickets::PERMISSION_MANAGE));
+			if (!$candidate->id || !$allowed) continue;
+			$options .= '<option value="' . (int)$candidate->id . '"' . ((int)$tickets->rest_bearer_user_id === (int)$candidate->id ? ' selected' : '') . '>' . $this->e((string)$candidate->name) . '</option>';
+		}
+		$out = '<section class="TicketsTokenPanel"><header><div><p class="uk-text-meta uk-text-uppercase uk-margin-remove">Bearer</p><h2>' . $this->_('Token credential') . '</h2></div>' . $this->interfaceState($this->_('Token'), (string)$tickets->rest_bearer_token_hash !== '') . '</header><p>' . $this->_('Generate a scoped token for one ProcessWire actor with tickets-api and tickets-manage. Rotating immediately invalidates the previous token.') . '</p>';
+		if ($options === '') return $out . '<div class="uk-alert-warning" uk-alert><p>' . $this->_('No eligible API actor exists. Grant tickets-api and tickets-manage to a dedicated user first.') . '</p></div></section>';
+		$out .= '<div class="TicketsTokenActions"><form method="post"><input type="hidden" name="interface_action" value="rotate_bearer">' . $this->csrf() . '<label><span class="uk-form-label">' . $this->_('Token actor') . '</span><select class="uk-select" name="bearer_user_id" required>' . $options . '</select></label><button class="uk-button uk-button-primary" type="submit">' . ((string)$tickets->rest_bearer_token_hash !== '' ? $this->_('Rotate token') : $this->_('Generate token')) . '</button></form>';
+		if ((string)$tickets->rest_bearer_token_hash !== '') $out .= '<form method="post" onsubmit="return confirm(\'' . $this->_('Revoke the current Bearer token? API clients using it will stop immediately.') . '\')"><input type="hidden" name="interface_action" value="revoke_bearer">' . $this->csrf() . '<button class="uk-button uk-button-danger" type="submit">' . $this->_('Revoke token') . '</button></form>';
+		return $out . '</div></section>';
+	}
+
+	private function handleBearerTokenAction(Tickets $tickets): void {
+		$this->wire('session')->CSRF->validate();
+		$action = (string)$this->wire('input')->post('interface_action');
+		$config = (array)$this->wire('modules')->getConfig('Tickets');
+		if ($action === 'rotate_bearer') {
+			$actorId = (int)$this->wire('input')->post('bearer_user_id');
+			$actor = $this->wire('users')->get($actorId);
+			$allowed = $actor instanceof User && $actor->id && ($actor->isSuperuser() || ($actor->hasPermission(Tickets::PERMISSION_API) && $actor->hasPermission(Tickets::PERMISSION_MANAGE)));
+			if (!$allowed) throw new WirePermissionException('The selected Bearer actor is not eligible.');
+			$token = 'tickets_' . Tickets::REST_API_VERSION . '_' . rtrim(strtr(base64_encode(random_bytes(32)), '+/', '-_'), '=');
+			$config['rest_bearer_token_hash'] = hash('sha256', $token);
+			$config['rest_bearer_user_id'] = $actorId;
+			$config['rest_bearer_token_created_at'] = date('Y-m-d H:i:s');
+			$this->wire('modules')->saveConfig('Tickets', $config);
+			$this->wire('session')->set('tickets_bearer_token_once', $token);
+			$this->message($this->_('Bearer token rotated. Copy it from the next screen.'));
+		} elseif ($action === 'revoke_bearer') {
+			$config['rest_bearer_token_hash'] = '';
+			$config['rest_bearer_user_id'] = 0;
+			$config['rest_bearer_token_created_at'] = '';
+			$this->wire('modules')->saveConfig('Tickets', $config);
+			$this->wire('session')->remove('tickets_bearer_token_once');
+			$this->message($this->_('Bearer token revoked.'));
+		} else {
+			throw new WireException('Unsupported interface action.');
+		}
+		$this->wire('session')->redirect($this->wire('page')->url . 'api/');
 	}
 
 	private function age(string $date): string {

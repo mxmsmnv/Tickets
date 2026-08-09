@@ -1,6 +1,6 @@
 # Tickets Documentation
 
-This document describes the integration contract implemented by Tickets 1.0.22
+This document describes the integration contract implemented by Tickets 1.0.23
 for ProcessWire.
 
 ## Configuration
@@ -118,18 +118,24 @@ Tickets exposes three independent operational channels. Fresh installations
 and upgrades keep all of them disabled:
 
 - the PHP facade from `$tickets->api($actor)`;
-- same-origin JSON REST under `/tickets-api/v1/`;
+- versioned JSON REST under `/tickets-api/v1/`;
 - the local `site/modules/Tickets/bin/tickets` executable.
 
-The PHP and REST channels require a logged-in actor with both `tickets-api` and
+The PHP and REST channels require an actor with both `tickets-api` and
 `tickets-manage`. Report and form-definition reads additionally require
-`tickets-admin`. REST uses the existing ProcessWire session, deliberately emits
-no CORS headers, and requires the CSRF token returned by
-`GET /tickets-api/v1/session/` on every POST.
+`tickets-admin`. REST accepts either the existing ProcessWire session or one
+explicitly generated Bearer credential assigned to an eligible ProcessWire
+actor. Session POSTs require the CSRF token returned by
+`GET /tickets-api/v1/session/`. Bearer POSTs authenticate through the
+`Authorization: Bearer …` header and inherit the assigned actor's permissions.
+Tickets stores only the SHA-256 token hash, shows the raw credential once, and
+invalidates it immediately on rotation or revocation. Tokens are never accepted
+from query strings or JSON bodies. The API deliberately emits no CORS headers.
 
 Available REST resources are `session`, `capabilities`, `dashboard`, `queue`,
 `ticket`, `messages`, `report`, `forms`, `update`, `reply`, and `note`. Responses
-use either `{"ok":true,"result":...}` or `{"ok":false,"error":"..."}`.
+use either `{"ok":true,"api_version":"v1","result":...}` or
+`{"ok":false,"api_version":"v1","error":"..."}`.
 The transport is private/no-store and separately rate-limits reads and writes.
 It never returns guest access hashes, attachment access tokens, or private
 storage names.

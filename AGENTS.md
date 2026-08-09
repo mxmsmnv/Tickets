@@ -158,7 +158,7 @@ The stable call groups are:
   `importMailboxNotification()`, `importMailboxMessage()` and the bounded
   `importMailboxInbox()` maintenance helper.
 - operational interfaces: `capabilities()` and the permission-gated
-  `$tickets->api($actor)` facade; same-origin REST and local CLI must each be
+  `$tickets->api($actor)` facade; versioned REST and local CLI must each be
   explicitly enabled before use.
 
 Exact signatures, return shapes, permission boundaries and edge cases are in
@@ -204,9 +204,11 @@ not a public browser endpoint.
 - Never expose low-level `getTicket()` or `ticketMessages()` records through a
   new transport. Use `TicketsAgentApi`, which strips guest hashes, attachment
   tokens, and storage names.
-- Keep REST same-origin and session-authenticated. Do not add CORS or bearer
-  authentication implicitly; validate the `tickets-rest` CSRF token for every
-  mutation.
+- Keep REST free of CORS headers. Session mutations validate the `tickets-rest`
+  CSRF token. Optional Bearer authentication must remain explicit and
+  fail-closed: accept credentials only from the Authorization header, store
+  only a SHA-256 hash, bind one token to one eligible actor, rate-limit it
+  independently, and invalidate it immediately on rotation or revocation.
 - Keep attachment storage private and do not replace module validation with a
   public `/site/assets/files/` upload.
 - Map exceptions to generic frontend messages; keep details in protected logs.

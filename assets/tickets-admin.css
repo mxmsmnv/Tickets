@@ -107,6 +107,36 @@
 	gap: .5rem;
 }
 
+.ProcessTickets .TicketsInterfaceNav {
+	margin: 0 0 var(--tickets-space-xl);
+	padding-bottom: .75rem;
+	overflow-x: auto;
+	border-bottom: 1px solid var(--pw-border-color);
+	scrollbar-width: thin;
+}
+
+.ProcessTickets .TicketsInterfaceNav .uk-subnav {
+	display: flex;
+	flex-wrap: nowrap;
+	gap: .5rem;
+	width: max-content;
+	margin: 0;
+}
+
+.ProcessTickets .TicketsInterfaceNav .uk-subnav > * { padding: 0; }
+
+.ProcessTickets .TicketsInterfaceNav .uk-subnav-pill > * > a {
+	min-height: 2.5rem;
+	padding: .55rem 1rem;
+	border: 1px solid transparent;
+	border-radius: 999px;
+	text-decoration: none;
+}
+
+.ProcessTickets .TicketsInterfaceNav .uk-subnav-pill > .uk-active > a {
+	border-color: var(--pw-button-background);
+}
+
 .ProcessTickets .TicketsInterfaceState {
 	display: inline-flex;
 	align-items: center;
@@ -137,6 +167,10 @@
 	display: grid;
 	grid-template-columns: repeat(3, minmax(0, 1fr));
 	gap: var(--tickets-space-md);
+}
+
+.ProcessTickets .TicketsInterfaceGrid--overview {
+	grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .ProcessTickets .TicketsInterfaceCard {
@@ -176,6 +210,152 @@
 	padding-block: 1rem;
 	color: var(--pw-muted-color);
 	line-height: 1.5;
+}
+
+.ProcessTickets .TicketsInterfaceCard footer {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 1rem;
+	padding-top: 1rem;
+	border-top: 1px solid var(--pw-border-color);
+}
+
+.ProcessTickets .TicketsInterfaceSettings,
+.ProcessTickets .TicketsInterfaceTable,
+.ProcessTickets .TicketsTokenPanel,
+.ProcessTickets .TicketsTokenOnce {
+	margin-bottom: var(--tickets-space-md);
+	border: 1px solid var(--pw-border-color);
+	border-radius: var(--pw-input-radius);
+	background: var(--pw-blocks-background);
+}
+
+.ProcessTickets .TicketsInterfaceSettings,
+.ProcessTickets .TicketsTokenPanel,
+.ProcessTickets .TicketsTokenOnce { padding: var(--tickets-space-lg); }
+
+.ProcessTickets .TicketsInterfaceSettings > header,
+.ProcessTickets .TicketsInterfaceTable > header,
+.ProcessTickets .TicketsTokenPanel > header,
+.ProcessTickets .TicketsTokenOnce {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: var(--tickets-space-md);
+}
+
+.ProcessTickets .TicketsInterfaceSettings h2,
+.ProcessTickets .TicketsInterfaceTable h2,
+.ProcessTickets .TicketsTokenPanel h2,
+.ProcessTickets .TicketsTokenOnce h2 { margin: .25rem 0 0; }
+
+.ProcessTickets .TicketsInterfaceSettings dl {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: 1px;
+	margin: var(--tickets-space-lg) 0 0;
+	border: 1px solid var(--pw-border-color);
+	background: var(--pw-border-color);
+}
+
+.ProcessTickets .TicketsInterfaceSettings dl > div {
+	min-width: 0;
+	padding: 1rem;
+	background: var(--pw-blocks-background);
+}
+
+.ProcessTickets .TicketsInterfaceSettings dt {
+	margin-bottom: .35rem;
+	color: var(--pw-muted-color);
+	font-size: .76rem;
+	font-weight: 600;
+	letter-spacing: .04em;
+	text-transform: uppercase;
+}
+
+.ProcessTickets .TicketsInterfaceSettings dd {
+	margin: 0;
+	font-weight: 600;
+	overflow-wrap: anywhere;
+}
+
+.ProcessTickets .TicketsInterfaceTable > header {
+	padding: var(--tickets-space-lg);
+	border-bottom: 1px solid var(--pw-border-color);
+}
+
+.ProcessTickets .TicketsInterfaceTable > header > code {
+	max-width: 50%;
+	overflow-wrap: anywhere;
+	text-align: right;
+}
+
+.ProcessTickets .TicketsInterfaceTable table { margin: 0; }
+.ProcessTickets .TicketsInterfaceTable th:first-child { width: 6.5rem; }
+.ProcessTickets .TicketsInterfaceTable td code { white-space: nowrap; }
+
+.ProcessTickets .TicketsMethod,
+.ProcessTickets .TicketsCommandMode {
+	display: inline-flex;
+	min-width: 3.75rem;
+	justify-content: center;
+	padding: .25rem .55rem;
+	border-radius: 999px;
+	background: color-mix(in srgb, var(--pw-muted-color) 12%, transparent);
+	font-size: .72rem;
+	font-weight: 700;
+	letter-spacing: .04em;
+	text-transform: uppercase;
+}
+
+.ProcessTickets .TicketsMethod[data-method="post"],
+.ProcessTickets .TicketsCommandMode[data-mode="write"] {
+	background: color-mix(in srgb, var(--pw-button-background) 15%, transparent);
+	color: var(--pw-button-background);
+}
+
+.ProcessTickets .TicketsCommandMode[data-mode="preview"] {
+	background: color-mix(in srgb, #b7791f 16%, transparent);
+	color: #8a5a12;
+}
+
+.ProcessTickets .TicketsTokenPanel > p {
+	max-width: 58rem;
+	color: var(--pw-muted-color);
+}
+
+.ProcessTickets .TicketsTokenActions,
+.ProcessTickets .TicketsTokenActions > form:first-child {
+	display: flex;
+	align-items: flex-end;
+	gap: .75rem;
+}
+
+.ProcessTickets .TicketsTokenActions > form:first-child { flex: 1; }
+
+.ProcessTickets .TicketsTokenActions label {
+	flex: 1;
+	max-width: 28rem;
+}
+
+.ProcessTickets .TicketsTokenActions .uk-form-label {
+	display: block;
+	margin-bottom: .35rem;
+}
+
+.ProcessTickets .TicketsTokenOnce {
+	border-color: color-mix(in srgb, #b7791f 55%, var(--pw-border-color));
+	background: color-mix(in srgb, #f6e7c1 40%, var(--pw-blocks-background));
+}
+
+.ProcessTickets .TicketsTokenOnce code {
+	max-width: 55%;
+	padding: .75rem;
+	border-radius: var(--pw-input-radius);
+	background: var(--pw-blocks-background);
+	overflow-wrap: anywhere;
+	user-select: all;
 }
 
 .ProcessTickets .TicketsInterfaceIcon {
@@ -245,6 +425,24 @@
 	.ProcessTickets .TicketsInterfaceGrid { grid-template-columns: minmax(0, 1fr); }
 	.ProcessTickets .TicketsInterfaceCard > p { min-height: 0; }
 	.ProcessTickets .TicketsInterfaceSafety { align-items: stretch; flex-direction: column; }
+	.ProcessTickets .TicketsInterfaceSettings dl { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+	.ProcessTickets .TicketsInterfaceTable > header { align-items: flex-start; flex-direction: column; }
+	.ProcessTickets .TicketsInterfaceTable > header > code { max-width: 100%; text-align: left; }
+}
+
+@media (max-width: 639px) {
+	.ProcessTickets .TicketsInterfaceSettings,
+	.ProcessTickets .TicketsTokenPanel,
+	.ProcessTickets .TicketsTokenOnce { padding: 1rem; }
+	.ProcessTickets .TicketsInterfaceSettings > header,
+	.ProcessTickets .TicketsTokenPanel > header,
+	.ProcessTickets .TicketsTokenOnce { align-items: flex-start; flex-direction: column; }
+	.ProcessTickets .TicketsInterfaceSettings dl { grid-template-columns: minmax(0, 1fr); }
+	.ProcessTickets .TicketsTokenActions,
+	.ProcessTickets .TicketsTokenActions > form:first-child { align-items: stretch; flex-direction: column; }
+	.ProcessTickets .TicketsTokenActions label { max-width: none; }
+	.ProcessTickets .TicketsTokenActions .uk-button { width: 100%; }
+	.ProcessTickets .TicketsTokenOnce code { max-width: 100%; }
 }
 
 .ProcessTickets .TicketsPageIntro {

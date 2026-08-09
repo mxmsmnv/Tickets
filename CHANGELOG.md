@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.0.23 - 2026-08-09
+
+- Split the operational interface workspace into dedicated API and CLI pages
+  with channel status, versioned REST route documentation, and a complete CLI
+  command catalogue.
+- Added opt-in Bearer authentication for REST with one-time credential display,
+  SHA-256 hash-at-rest storage, actor-scoped permissions, independent rate
+  limiting, immediate rotation/revocation, and header-only token acceptance.
+- Added explicit REST API version dispatch and version metadata to every JSON
+  response while preserving session authentication and CSRF for browser writes.
+
 ## 1.0.22 - 2026-08-09
 
 - Stacked the report-chart heading and legend on mobile so both series remain

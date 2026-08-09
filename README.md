@@ -13,7 +13,7 @@ private files publicly.
 - **Author:** Maxim Semenov
 - **Website:** [smnv.org](https://smnv.org)
 - **Email:** [maxim@smnv.org](mailto:maxim@smnv.org)
-- **Release:** 1.0.22 (`version` 122)
+- **Release:** 1.0.23 (`version` 123)
 
 If this project helps your work, consider supporting future development:
 [GitHub Sponsors](https://github.com/sponsors/mxmsmnv) or
@@ -40,8 +40,10 @@ If this project helps your work, consider supporting future development:
   drafts use the complete public conversation and can be copy-edited separately.
 - Records a non-IP location and timezone snapshot when GeoIP is installed, so
   staff can see customer-local time without storing a new raw IP field.
-- Provides independently disabled, permission-gated PHP API, same-origin JSON
+- Provides independently disabled, permission-gated PHP API, versioned JSON
   REST, and local JSON CLI channels for trusted integrations and agents.
+- Supports session/CSRF REST authentication and an optional scoped Bearer
+  credential stored only as a hash and assigned to one permitted actor.
 - Uses neutral installation defaults and creates no sample tickets or customers.
 
 ## Admin Area
@@ -58,8 +60,9 @@ Tickets adds a dedicated **Setup → Tickets** workspace where support staff can
 - build reusable intake forms and preview them before publishing;
 - edit transactional email templates;
 - review reports, customer ratings and retention runs.
-- inspect API and CLI availability, security requirements, endpoints, and
-  ready-to-run local commands.
+- inspect API and CLI availability in separate workspaces, including versioned
+  routes, Bearer credential state, security requirements, and ready-to-run
+  local commands.
 
 Staff need the `tickets-manage` permission. Configuration and destructive
 administration can be restricted with `tickets-admin`.
