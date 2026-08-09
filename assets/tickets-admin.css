@@ -743,6 +743,7 @@
 	align-items: end;
 	justify-content: space-between;
 	gap: 1rem;
+	margin-bottom: var(--tickets-space-sm);
 }
 
 .ProcessTickets .TicketsQueueHeader h2 {

@@ -42,7 +42,9 @@ $checks = [
 	'dashboard has operational title and actions' => str_contains($process, "headline(\$this->_('Support dashboard'))")
 		&& str_contains($process, 'TicketsQueueHeader-actions')
 		&& str_contains($process, "\$this->_('Manage queue')")
-		&& str_contains($process, "\$this->_n('%d ticket', '%d tickets'"),
+		&& str_contains($process, "\$this->_n('%d ticket', '%d tickets'")
+		&& str_contains($css, '.TicketsQueueHeader {')
+		&& str_contains($css, 'margin-bottom: var(--tickets-space-sm);'),
 	'dashboard health reflects live SLA deadlines' => str_contains($module, 'first_response_due_at<NOW()')
 		&& str_contains($module, 'resolution_due_at<NOW()')
 		&& str_contains($process, 'data-state="\' . $healthState . \'"')

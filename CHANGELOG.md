@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.42 - 2026-08-09
+
+- Restored the design-system spacing between the active-queue header and its
+  table after moving queue actions into the header.
+
 ## 1.0.41 - 2026-08-09
 
 - Replaced manual related and primary Ticket ID fields with bounded ticket
