@@ -66,7 +66,8 @@ try {
 	$initialMessages = $tickets->ticketMessages((int)$first['id']);
 	$check(!empty($initialMessages[0]['read_at']), 'Customer message read receipt was not stored.');
 
-	$tickets->addInternalNote((int)$first['id'], $admin, 'Private diagnostic note.');
+	$noteResult = $tickets->addInternalNote((int)$first['id'], $admin, 'Private diagnostic note.');
+	$check((int)($noteResult['internal_note_message_id'] ?? 0) > 0, 'Internal note did not return a persisted message identifier.');
 	$check(count($tickets->ticketMessages((int)$first['id'])) === 1, 'Internal note leaked into the customer thread.');
 	$check(count($tickets->ticketMessages((int)$first['id'], true)) === 2, 'Staff thread does not include internal note.');
 	$tickets->addReply((int)$first['id'], $admin, 'Public staff reply.', null, true);

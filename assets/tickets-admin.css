@@ -1362,6 +1362,12 @@
 	grid-template-columns: 2.5rem minmax(0, 1fr);
 	gap: .8rem;
 	padding: 1.15rem 1.25rem;
+	scroll-margin-top: 1rem;
+}
+
+.ProcessTickets .TicketsMessage:target {
+	background: color-mix(in srgb, var(--pw-primary-color, #e83561) 10%, var(--pw-blocks-background));
+	box-shadow: inset .2rem 0 0 var(--pw-primary-color, #e83561);
 }
 
 .ProcessTickets .TicketsThread > * + * {

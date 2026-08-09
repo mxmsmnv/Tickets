@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.47 - 2026-08-09
+
+- Made internal-note persistence atomic and update ticket activity time.
+- Redirect staff directly to the newly saved note and highlight it in the
+  Conversation timeline so successful persistence is immediately visible.
+
 ## 1.0.46 - 2026-08-09
 
 - Added existing and future SLA-extension audit events to the staff Conversation

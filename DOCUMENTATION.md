@@ -135,6 +135,11 @@ SLA activity is not exposed as a customer message or sent as a transactional
 notification. This affects admin presentation only; public APIs and AI context
 remain chronological.
 
+Saving an internal note is transactional: the private message, audit event and
+ticket activity timestamp succeed or fail together. After saving, the staff
+workspace returns directly to the new highlighted note in Conversation so the
+result is visible without searching the thread.
+
 The same Staff workspace section controls sidebar placement independently for
 desktop (1200px and wider) and tablet (768–1199px). On phones below 768px the
 workspace always uses one column with the conversation first, reply composer

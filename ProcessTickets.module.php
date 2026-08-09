@@ -396,6 +396,7 @@ class ProcessTickets extends Process {
 
 		if ($this->wire('input')->requestMethod('POST')) {
 			$isAjaxDraft = (bool)$this->wire('input')->post('tickets_ajax') && in_array((string)$this->wire('input')->post('ticket_action'), ['draft', 'polish'], true);
+			$redirectFragment = '';
 			try {
 				$this->wire('session')->CSRF->validate();
 				$action = $this->wire('sanitizer')->name((string)$this->wire('input')->post('ticket_action'));
@@ -434,7 +435,8 @@ class ProcessTickets extends Process {
 					$tickets->extendSla($id, $this->wire('user'), (int)$this->wire('input')->post('minutes'));
 					$this->message($this->_('SLA deadline extended.'));
 				} elseif ($action === 'note') {
-					$tickets->addInternalNote($id, $this->wire('user'), (string)$this->wire('input')->post('body'));
+					$noteResult = $tickets->addInternalNote($id, $this->wire('user'), (string)$this->wire('input')->post('body'));
+					$redirectFragment = '#ticket-message-' . (int)($noteResult['internal_note_message_id'] ?? 0);
 					$this->message($this->_('Internal note added.'));
 				} elseif ($action === 'link') {
 					$tickets->linkTicket($id, (int)$this->wire('input')->post('related_ticket_id'), (string)$this->wire('input')->post('link_type'), $this->wire('user'));
@@ -447,7 +449,7 @@ class ProcessTickets extends Process {
 				if ($isAjaxDraft) $this->jsonResponse(['ok' => false, 'message' => $error->getMessage()], 422);
 				$this->error($error->getMessage());
 			}
-			$this->wire('session')->redirect($this->wire('page')->url . 'view/?id=' . $id);
+			$this->wire('session')->redirect($this->wire('page')->url . 'view/?id=' . $id . $redirectFragment);
 		}
 
 		$ticket = $tickets->getTicket($id);
@@ -506,7 +508,7 @@ class ProcessTickets extends Process {
 				$receiptLabel = $receiptState === 'read' ? $this->_('Read') : ($receiptState === 'delivered' ? $this->_('Delivered') : $this->_('Sent'));
 				$receipt = '<details class="TicketsMessageReceipt" data-state="' . $receiptState . '"><summary aria-label="' . $this->e($receiptLabel) . '"><i class="fa ' . ($receiptState === 'sent' ? 'fa-check' : 'fa-check-circle') . '" aria-hidden="true"></i><span>' . $this->e($receiptLabel) . '</span></summary><dl><dt>' . $this->_('Sent') . '</dt><dd>' . $this->e($this->dateTime((string)$message['created_at'])) . '</dd><dt>' . $this->_('Delivered') . '</dt><dd>' . $this->e(!empty($message['delivered_at']) ? $this->dateTime((string)$message['delivered_at']) : $this->_('Not confirmed')) . '</dd><dt>' . $this->_('Read') . '</dt><dd>' . $this->e(!empty($message['read_at']) ? $this->dateTime((string)$message['read_at']) : $this->_('Not yet')) . '</dd></dl></details>';
 			}
-			$conversationOut .= '<article class="TicketsMessage" data-author="' . ($isInternal ? 'internal' : ($isStaff ? 'staff' : 'customer')) . '"><div class="TicketsMessage-avatar" aria-hidden="true">' . ($isInternal ? '<i class="fa fa-lock"></i>' : ($isStaff ? '<i class="fa fa-life-ring"></i>' : $this->e($customerInitial))) . '</div><div class="TicketsMessage-content"><header><div><strong>' . $this->e($author) . '</strong>' . ($staffName !== '' ? '<span>' . $this->e($staffName) . '</span>' : '<span>' . $this->_('Customer') . '</span>') . '</div><div class="TicketsMessage-time"><time datetime="' . $this->e(date(DATE_ATOM, strtotime((string)$message['created_at']))) . '">' . $this->e($this->dateTime((string)$message['created_at'])) . '</time>' . $receipt . '</div></header><div class="TicketsMessage-text">' . nl2br($this->e($message['body'])) . '</div>';
+			$conversationOut .= '<article class="TicketsMessage" id="ticket-message-' . (int)$message['id'] . '" data-author="' . ($isInternal ? 'internal' : ($isStaff ? 'staff' : 'customer')) . '"><div class="TicketsMessage-avatar" aria-hidden="true">' . ($isInternal ? '<i class="fa fa-lock"></i>' : ($isStaff ? '<i class="fa fa-life-ring"></i>' : $this->e($customerInitial))) . '</div><div class="TicketsMessage-content"><header><div><strong>' . $this->e($author) . '</strong>' . ($staffName !== '' ? '<span>' . $this->e($staffName) . '</span>' : '<span>' . $this->_('Customer') . '</span>') . '</div><div class="TicketsMessage-time"><time datetime="' . $this->e(date(DATE_ATOM, strtotime((string)$message['created_at']))) . '">' . $this->e($this->dateTime((string)$message['created_at'])) . '</time>' . $receipt . '</div></header><div class="TicketsMessage-text">' . nl2br($this->e($message['body'])) . '</div>';
 			if (!empty($message['attachments'])) $conversationOut .= '<div class="TicketsMessage-attachments">';
 			foreach ($message['attachments'] as $attachment) {
 				$url = $tickets->attachmentUrl($ticket, $attachment);
