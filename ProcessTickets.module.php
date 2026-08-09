@@ -57,17 +57,39 @@ class ProcessTickets extends Process {
 		$queue = $queueResult['items'];
 		$stats = $tickets->dashboardStats();
 		$summary = (array)$stats['summary'];
-		$this->headline($this->_('Queue overview'));
+		$this->headline($this->_('Support dashboard'));
 
-		$health = '<div class="TicketsDashboardHealth"><span class="TicketsDashboardHealth-dot"></span><div><strong>' . ((int)($summary['waiting_staff'] ?? 0) > 0 ? $this->_('Customer replies need attention') : $this->_('Queue is under control')) . '</strong><small>' . sprintf($this->_('%d active · %d unassigned'), (int)($summary['active'] ?? 0), (int)($summary['unassigned'] ?? 0)) . '</small></div></div>';
+		$breached = (int)($summary['sla_breached'] ?? 0);
+		$waitingStaff = (int)($summary['waiting_staff'] ?? 0);
+		$unassigned = (int)($summary['unassigned'] ?? 0);
+		if ($breached > 0) {
+			$healthState = 'danger';
+			$healthTitle = $this->_('SLA attention required');
+			$healthNote = sprintf($this->_n('%d overdue ticket', '%d overdue tickets', $breached), $breached);
+		} elseif ($waitingStaff > 0) {
+			$healthState = 'warning';
+			$healthTitle = $this->_('Customer replies need attention');
+			$healthNote = sprintf($this->_n('%d ticket waiting for support', '%d tickets waiting for support', $waitingStaff), $waitingStaff);
+		} elseif ($unassigned > 0) {
+			$healthState = 'warning';
+			$healthTitle = $this->_('Assignment needed');
+			$healthNote = sprintf($this->_n('%d unassigned ticket', '%d unassigned tickets', $unassigned), $unassigned);
+		} else {
+			$healthState = 'success';
+			$healthTitle = $this->_('Queue is under control');
+			$healthNote = sprintf($this->_n('%d active ticket', '%d active tickets', (int)($summary['active'] ?? 0)), (int)($summary['active'] ?? 0));
+		}
+		$health = '<div class="TicketsDashboardHealth" data-state="' . $healthState . '"><span class="TicketsDashboardHealth-dot"></span><div><strong>' . $healthTitle . '</strong><small>' . $healthNote . '</small></div></div>';
 		$out = $this->adminNav('queue')
-			. $this->pageIntro($this->_('Support operations'), $this->_('Queue overview'), $this->_('Monitor demand, response health, and the work that needs attention now.'), $health);
+			. $this->pageIntro($this->_('Tickets'), $this->_('Support dashboard'), $this->_('Review conversations that need attention, response health, workload, and recent support demand.'), $health);
 
-		$out .= '<section class="TicketsQueue"><div class="TicketsQueueHeader"><div><p class="uk-text-meta uk-text-uppercase uk-margin-remove">' . $this->_('Work queue') . '</p><h2>' . $this->_('Active tickets') . '</h2><span>' . sprintf($this->_('%d results'), (int)$queueResult['total']) . '</span></div>';
+		$resultCount = (int)$queueResult['total'];
+		$resultLabel = sprintf($this->_n('%d ticket', '%d tickets', $resultCount), $resultCount);
+		$out .= '<section class="TicketsQueue"><div class="TicketsQueueHeader"><div><p class="uk-text-meta uk-text-uppercase uk-margin-remove">' . $this->_('Work queue') . '</p><h2>' . $this->_('Active queue') . '</h2><span>' . $resultLabel . '</span></div><div class="TicketsQueueHeader-actions">';
 		if (!empty($summary['oldest_active_at'])) $out .= '<p><i class="fa fa-clock-o" aria-hidden="true"></i> ' . $this->_('Oldest active') . ': <strong>' . $this->e($this->age((string)$summary['oldest_active_at'])) . '</strong></p>';
-		$out .= '</div><p class="TicketsQueueTools"><a class="uk-button uk-button-default" href="' . $this->e($this->wire('page')->url . 'tickets/') . '"><i class="fa fa-filter uk-margin-small-right"></i>' . $this->_('Open filters and bulk actions') . '</a></p>';
+		$out .= '<a class="uk-button uk-button-default" href="' . $this->e($this->wire('page')->url . 'tickets/') . '"><i class="fa fa-filter uk-margin-small-right"></i>' . $this->_('Manage queue') . '</a></div></div>';
 		if (!$queue) {
-			$out .= '<div class="TicketsEmpty"><i class="fa fa-search" aria-hidden="true"></i><h3>' . $this->_('No tickets match these filters') . '</h3><p>' . $this->_('Change or reset the filters to return to the full queue.') . '</p></div></section>';
+			$out .= '<div class="TicketsEmpty"><i class="fa fa-check-circle" aria-hidden="true"></i><h3>' . $this->_('No active tickets') . '</h3><p>' . $this->_('New and reopened requests will appear here when they need attention.') . '</p></div></section>';
 		} else {
 			$out .= '<div class="uk-overflow-auto TicketsQueueTable TicketsQueueTable--dashboard"><table class="uk-table uk-table-divider uk-table-hover uk-table-middle"><thead><tr><th>' . $this->_('Priority') . '</th><th>' . $this->_('Status') . '</th><th>' . $this->_('Ticket') . '</th><th>' . $this->_('Activity') . '</th><th><span class="uk-hidden">' . $this->_('Action') . '</span></th></tr></thead><tbody>';
 			foreach ($queue as $ticket) {
@@ -90,7 +112,7 @@ class ProcessTickets extends Process {
 			['label' => $this->_('Created in 7 days'), 'value' => (int)($summary['created_7d'] ?? 0), 'note' => sprintf($this->_('%d in 30 days · %d guests'), (int)($summary['created_30d'] ?? 0), (int)($summary['guests'] ?? 0)), 'icon' => 'calendar'],
 			['label' => $this->_('First response'), 'value' => $this->duration($summary['avg_first_response_minutes'] ?? null), 'note' => $this->_('Average across answered tickets'), 'icon' => 'reply'],
 			['label' => $this->_('Resolution time'), 'value' => $this->duration($summary['avg_resolution_minutes'] ?? null), 'note' => sprintf($this->_('%d resolved in 30 days'), (int)($summary['resolved_30d'] ?? 0)), 'icon' => 'resolved'],
-			['label' => $this->_('Urgent'), 'value' => (int)($summary['urgent'] ?? 0), 'note' => sprintf($this->_('%d tickets unassigned'), (int)($summary['unassigned'] ?? 0)), 'icon' => 'alert'],
+			['label' => $this->_('Urgent'), 'value' => (int)($summary['urgent'] ?? 0), 'note' => sprintf($this->_n('%d ticket unassigned', '%d tickets unassigned', $unassigned), $unassigned), 'icon' => 'alert'],
 			['label' => $this->_('Conversation volume'), 'value' => (int)($summary['messages'] ?? 0), 'note' => sprintf($this->_('Private files: %d'), (int)($summary['attachments'] ?? 0)), 'icon' => 'conversation'],
 			['label' => $this->_('SLA breaches'), 'value' => (int)($summary['sla_breached'] ?? 0), 'note' => $this->_('Active tickets requiring escalation'), 'icon' => 'timer'],
 			['label' => $this->_('Customer rating'), 'value' => !empty($summary['avg_rating']) ? number_format((float)$summary['avg_rating'], 1) . '/5' : $this->_('No data'), 'note' => $this->_('Average resolved-ticket rating'), 'icon' => 'rating'],

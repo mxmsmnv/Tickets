@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.0.40 - 2026-08-09
+
+- Renamed the main screen to Support dashboard and tightened its operational
+  copy, active-queue heading, actions, pluralization, and empty state.
+- Moved queue management and oldest-ticket context into one responsive header.
+- Made dashboard health and SLA metrics reflect live deadlines, with semantic
+  success, warning, and danger indicators instead of stale automation flags.
+
 ## 1.0.39 - 2026-08-09
 
 - Removed the redundant TinyMCE menubar from email templates while retaining

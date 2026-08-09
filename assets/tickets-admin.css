@@ -498,6 +498,16 @@
 	box-shadow: 0 0 0 .25rem color-mix(in srgb, var(--tickets-color-success) 18%, transparent);
 }
 
+.ProcessTickets .TicketsDashboardHealth[data-state="warning"] .TicketsDashboardHealth-dot {
+	background: var(--tickets-color-warning);
+	box-shadow: 0 0 0 .25rem color-mix(in srgb, var(--tickets-color-warning) 18%, transparent);
+}
+
+.ProcessTickets .TicketsDashboardHealth[data-state="danger"] .TicketsDashboardHealth-dot {
+	background: var(--tickets-color-danger);
+	box-shadow: 0 0 0 .25rem color-mix(in srgb, var(--tickets-color-danger) 18%, transparent);
+}
+
 .ProcessTickets .TicketsDashboardHealth strong,
 .ProcessTickets .TicketsDashboardHealth small {
 	display: block;
@@ -741,9 +751,20 @@
 	font-size: 1.7rem;
 }
 
-.ProcessTickets .TicketsQueueHeader > div > span,
-.ProcessTickets .TicketsQueueHeader > p {
+.ProcessTickets .TicketsQueueHeader > div:first-child > span,
+.ProcessTickets .TicketsQueueHeader-actions > p {
 	color: var(--pw-muted-color);
+}
+
+.ProcessTickets .TicketsQueueHeader-actions {
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+	gap: 1rem;
+}
+
+.ProcessTickets .TicketsQueueHeader-actions > p {
+	margin: 0;
 }
 
 .ProcessTickets .TicketsFilters {
@@ -2135,6 +2156,17 @@
 	.ProcessTickets .TicketsQueueHeader {
 		align-items: flex-start;
 		flex-direction: column;
+	}
+
+	.ProcessTickets .TicketsQueueHeader-actions {
+		align-items: stretch;
+		flex-direction: column;
+		width: 100%;
+	}
+
+	.ProcessTickets .TicketsQueueHeader-actions .uk-button {
+		width: 100%;
+		box-sizing: border-box;
 	}
 
 	.ProcessTickets .TicketsPageIntro-actions,

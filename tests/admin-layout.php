@@ -1,6 +1,7 @@
 <?php declare(strict_types=1);
 
 $root = dirname(__DIR__);
+$module = (string)file_get_contents($root . '/Tickets.module.php');
 $process = (string)file_get_contents($root . '/ProcessTickets.module.php');
 $css = (string)file_get_contents($root . '/assets/tickets-admin.css');
 $javascript = (string)file_get_contents($root . '/assets/tickets-admin.js');
@@ -38,6 +39,14 @@ $checks = [
 		&& strpos($process, "get('InputfieldTinyMCE')") < strpos($process, "assets/tickets-admin.js"),
 	'TinyMCE uses compact toolbar' => str_contains($process, "'menubar' => false")
 		&& !str_contains($process, "['toolbar', 'menubar', 'statusbar'"),
+	'dashboard has operational title and actions' => str_contains($process, "headline(\$this->_('Support dashboard'))")
+		&& str_contains($process, 'TicketsQueueHeader-actions')
+		&& str_contains($process, "\$this->_('Manage queue')")
+		&& str_contains($process, "\$this->_n('%d ticket', '%d tickets'"),
+	'dashboard health reflects live SLA deadlines' => str_contains($module, 'first_response_due_at<NOW()')
+		&& str_contains($module, 'resolution_due_at<NOW()')
+		&& str_contains($process, 'data-state="\' . $healthState . \'"')
+		&& str_contains($css, '.TicketsDashboardHealth[data-state="danger"]'),
 ];
 
 foreach($checks as $label => $ok) {
