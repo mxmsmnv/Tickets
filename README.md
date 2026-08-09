@@ -13,7 +13,7 @@ private files publicly.
 - **Author:** Maxim Semenov
 - **Website:** [smnv.org](https://smnv.org)
 - **Email:** [maxim@smnv.org](mailto:maxim@smnv.org)
-- **Release:** 1.0.38 (`version` 138)
+- **Release:** 1.0.39 (`version` 139)
 
 If this project helps your work, consider supporting future development:
 [GitHub Sponsors](https://github.com/sponsors/mxmsmnv) or

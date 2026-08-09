@@ -791,14 +791,14 @@ class ProcessTickets extends Process {
 			'resize' => true,
 			'plugins' => 'anchor code link lists table',
 			'toolbar' => 'undo redo | blocks | bold italic | link blockquote | bullist numlist | table hr | removeformat | code',
-			'menubar' => 'edit view insert format table tools',
+			'menubar' => false,
 			'contextmenu' => 'link unlink lists table removeformat',
 		];
 		$editor->attr('name', $name);
 		$editor->attr('id', $id);
 		$editor->val($value);
 		$editor->height = 360;
-		$editor->features = ['toolbar', 'menubar', 'statusbar', 'stickybars', 'purifier', 'pasteFilter'];
+		$editor->features = ['toolbar', 'statusbar', 'stickybars', 'purifier', 'pasteFilter'];
 		$editor->settingsJSON = json_encode($settings);
 		$editor->renderReady();
 		$rendered = $editor->render();

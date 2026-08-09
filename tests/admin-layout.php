@@ -36,6 +36,8 @@ $checks = [
 		&& str_contains($css, '.TicketsTemplateTinyMCE .tox-tinymce')
 		&& str_contains($process, "urlSegment1 === 'templates'")
 		&& strpos($process, "get('InputfieldTinyMCE')") < strpos($process, "assets/tickets-admin.js"),
+	'TinyMCE uses compact toolbar' => str_contains($process, "'menubar' => false")
+		&& !str_contains($process, "['toolbar', 'menubar', 'statusbar'"),
 ];
 
 foreach($checks as $label => $ok) {

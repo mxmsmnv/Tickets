@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.39 - 2026-08-09
+
+- Removed the redundant TinyMCE menubar from email templates while retaining
+  the focused formatting toolbar and source-code action.
+
 ## 1.0.38 - 2026-08-09
 
 - Made the email-template TinyMCE toolbar and editable document follow the
