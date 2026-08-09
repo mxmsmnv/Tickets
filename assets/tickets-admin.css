@@ -2294,6 +2294,15 @@
 .ProcessTickets .TicketsRelated { list-style: none; margin: 0 0 1rem; padding: 0; display: grid; gap: .5rem; }
 .ProcessTickets .TicketsRelated li { display: grid; gap: .15rem; }
 .ProcessTickets .TicketsRelated small { color: var(--pw-muted-color); text-transform: capitalize; }
+.ProcessTickets .TicketsLinkForm { display: grid; gap: .65rem; }
+.ProcessTickets .TicketsLinkForm .uk-form-label,
+.ProcessTickets .TicketsMergePanel .uk-form-label { margin: 0; }
+.ProcessTickets .TicketsTicketSelect { min-width: 0; width: 100%; }
+.ProcessTickets .TicketsMergePanel { margin-top: 1rem; border-top: 1px solid var(--pw-border-color); padding-top: .85rem; }
+.ProcessTickets .TicketsMergePanel summary { color: var(--tickets-color-danger); cursor: pointer; font-weight: 500; }
+.ProcessTickets .TicketsMergePanel form { display: grid; gap: .65rem; margin-top: .85rem; }
+.ProcessTickets .TicketsMergePanel form > p,
+.ProcessTickets .TicketsRelationships-empty { margin: 0; color: var(--pw-muted-color); font-size: .8rem; line-height: 1.45; }
 .ProcessTickets .TicketsAutomationRun {
 	display: grid;
 	justify-items: end;

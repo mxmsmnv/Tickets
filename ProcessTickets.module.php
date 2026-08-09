@@ -452,6 +452,7 @@ class ProcessTickets extends Process {
 		if ($conversationOrder === 'desc') $messages = array_reverse($messages);
 		$macros = $tickets->macros(true, $ticket);
 		$links = $tickets->ticketLinks($id);
+		$ticketOptions = $tickets->ticketSelectionOptions($id, $this->wire('user'));
 		$sla = $tickets->slaState($ticket);
 		$draft = (string)$this->wire('session')->get('tickets_draft_' . $id);
 		$draftSources = (array)$this->wire('session')->get('tickets_sources_' . $id);
@@ -533,9 +534,20 @@ class ProcessTickets extends Process {
 			}
 			$out .= '<section class="TicketsSidePanel TicketsCustomerFeedback"><header><span class="TicketsSidePanel-icon">' . $this->metricIcon('rating') . '</span><div><h2>' . $this->_('Customer feedback') . '</h2><p>' . $this->_('Post-resolution support rating') . '</p></div></header>' . $feedbackBody . '</section>';
 		}
-		$out .= '<section class="TicketsSidePanel"><h2>' . $this->_('Related tickets') . '</h2>';
+		$out .= '<section class="TicketsSidePanel TicketsRelationships"><header><span class="TicketsSidePanel-icon"><i class="fa fa-link" aria-hidden="true"></i></span><div><h2>' . $this->_('Related tickets') . '</h2><p>' . $this->_('Connect this conversation to another support request.') . '</p></div></header>';
 		if ($links) { $out .= '<ul class="TicketsRelated">'; foreach ($links as $link) $out .= '<li><a href="' . $this->e($this->wire('page')->url . 'view/?id=' . (int)$link['related_ticket_id']) . '">#' . $this->e($link['public_key']) . ' · ' . $this->e($link['subject']) . '</a><small>' . $this->e($link['link_type']) . '</small></li>'; $out .= '</ul>'; }
-		$out .= '<form method="post" class="TicketsLinkForm"><input type="hidden" name="ticket_action" value="link">' . $this->csrf() . '<label class="uk-form-label">' . $this->_('Ticket ID') . '</label><input class="uk-input" type="number" min="1" name="related_ticket_id" required><select class="uk-select uk-margin-small-top" name="link_type"><option value="related">' . $this->_('Related') . '</option><option value="duplicate">' . $this->_('Duplicate') . '</option><option value="parent">' . $this->_('Parent') . '</option><option value="child">' . $this->_('Child') . '</option></select><button class="uk-button uk-button-default uk-width-1-1 uk-margin-small-top" type="submit">' . $this->_('Link ticket') . '</button></form><form method="post" class="uk-margin-small-top" onsubmit="return confirm(\'' . $this->_('Close this duplicate and merge it into the selected primary ticket?') . '\')"><input type="hidden" name="ticket_action" value="merge">' . $this->csrf() . '<input class="uk-input" type="number" min="1" name="related_ticket_id" required placeholder="' . $this->_('Primary ticket ID') . '"><button class="uk-button uk-button-danger uk-width-1-1 uk-margin-small-top" type="submit">' . $this->_('Merge duplicate') . '</button></form></section>';
+		if ($ticketOptions) {
+			$out .= '<form method="post" class="TicketsLinkForm"><input type="hidden" name="ticket_action" value="link">' . $this->csrf()
+				. $this->ticketChoiceSelect('related_ticket_id', $this->_('Ticket'), $this->_('Choose a ticket'), $ticketOptions, $tickets->statuses())
+				. '<label class="uk-form-label" for="ticket-link-type">' . $this->_('Relationship') . '</label><select class="uk-select" id="ticket-link-type" name="link_type"><option value="related">' . $this->_('Related') . '</option><option value="duplicate">' . $this->_('Duplicate') . '</option><option value="parent">' . $this->_('Parent') . '</option><option value="child">' . $this->_('Child') . '</option></select><button class="uk-button uk-button-default uk-width-1-1" type="submit">' . $this->_('Link ticket') . '</button></form>'
+				. '<details class="TicketsMergePanel"><summary>' . $this->_('Merge duplicate') . '</summary><form method="post" onsubmit="return confirm(\'' . $this->_('Close this duplicate and merge it into the selected primary ticket?') . '\')"><input type="hidden" name="ticket_action" value="merge">' . $this->csrf()
+				. '<p>' . $this->_('The current ticket will be closed and linked to the selected primary ticket.') . '</p>'
+				. $this->ticketChoiceSelect('related_ticket_id', $this->_('Primary ticket'), $this->_('Choose the primary ticket'), $ticketOptions, $tickets->statuses(), 'ticket-merge-target')
+				. '<button class="uk-button uk-button-danger uk-width-1-1" type="submit">' . $this->_('Merge duplicate') . '</button></form></details>';
+		} else {
+			$out .= '<p class="TicketsRelationships-empty">' . $this->_('No other tickets are available yet.') . '</p>';
+		}
+		$out .= '</section>';
 		$out .= '<section class="TicketsSidePanel"><header><span class="TicketsSidePanel-avatar">' . $this->e($customerInitial) . '</span><div><h2>' . $this->e($ticket['customer_name']) . '</h2><p>' . $this->_('Customer') . '</p></div></header><dl><dt>' . $this->_('Email') . '</dt><dd><a href="mailto:' . $this->e($ticket['customer_email']) . '">' . $this->e($ticket['customer_email']) . '</a></dd><dt>' . $this->_('Type') . '</dt><dd>' . $this->e($tickets->types()[$ticket['category']] ?? $ticket['category']) . '</dd><dt>' . $this->_('Topic') . '</dt><dd>' . $this->e($tickets->topics()[(string)($ticket['topic'] ?? 'general')] ?? (string)($ticket['topic'] ?? 'general')) . '</dd>';
 		$place = implode(', ', array_filter([(string)($ticket['customer_city'] ?? ''), (string)($ticket['customer_region'] ?? ''), (string)($ticket['customer_country'] ?? '')]));
 		if ($place !== '') $out .= '<dt>' . $this->_('Location') . '</dt><dd>' . $this->e($place) . '</dd>';
@@ -862,6 +874,16 @@ class ProcessTickets extends Process {
 
 	private function settingsIcon(): string {
 		return '<svg data-slot="icon" aria-hidden="true" fill="none" stroke-width="1.5" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M10.343 3.94c.09-.542.56-.94 1.11-.94h1.093c.55 0 1.02.398 1.11.94l.149.894c.07.424.384.764.78.93.398.164.855.142 1.205-.108l.737-.527a1.125 1.125 0 0 1 1.45.12l.773.774c.39.389.44 1.002.12 1.45l-.527.737c-.25.35-.272.806-.107 1.204.165.397.505.71.93.78l.893.15c.543.09.94.559.94 1.109v1.094c0 .55-.397 1.02-.94 1.11l-.894.149c-.424.07-.764.383-.929.78-.165.398-.143.854.107 1.204l.527.738c.32.447.269 1.06-.12 1.45l-.774.773a1.125 1.125 0 0 1-1.449.12l-.738-.527c-.35-.25-.806-.272-1.203-.107-.398.165-.71.505-.781.929l-.149.894c-.09.542-.56.94-1.11.94h-1.094c-.55 0-1.019-.398-1.11-.94l-.148-.894c-.071-.424-.384-.764-.781-.93-.398-.164-.854-.142-1.204.108l-.738.527c-.447.32-1.06.269-1.45-.12l-.773-.774a1.125 1.125 0 0 1-.12-1.45l.527-.737c.25-.35.272-.806.108-1.204-.165-.397-.506-.71-.93-.78l-.894-.15c-.542-.09-.94-.56-.94-1.109v-1.094c0-.55.398-1.02.94-1.11l.894-.149c.424-.07.765-.383.93-.78.165-.398.143-.854-.108-1.204l-.526-.738a1.125 1.125 0 0 1 .12-1.45l.773-.773a1.125 1.125 0 0 1 1.45-.12l.737.527c.35.25.807.272 1.204.107.397-.165.71-.505.78-.929l.15-.894Z" stroke-linecap="round" stroke-linejoin="round"></path><path d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" stroke-linecap="round" stroke-linejoin="round"></path></svg>';
+	}
+
+	private function ticketChoiceSelect(string $name, string $label, string $placeholder, array $tickets, array $statuses, string $id = 'ticket-link-target'): string {
+		$out = '<label class="uk-form-label" for="' . $this->e($id) . '">' . $this->e($label) . '</label><select class="uk-select TicketsTicketSelect" id="' . $this->e($id) . '" name="' . $this->e($name) . '" required><option value="">' . $this->e($placeholder) . '</option>';
+		foreach ($tickets as $ticket) {
+			$status = (string)($statuses[(string)$ticket['status']] ?? $ticket['status']);
+			$text = '#' . (string)$ticket['public_key'] . ' — ' . (string)$ticket['subject'] . ' · ' . $status;
+			$out .= '<option value="' . (int)$ticket['id'] . '">' . $this->e($text) . '</option>';
+		}
+		return $out . '</select>';
 	}
 
 	private function pagination(int $page, int $pages): string {

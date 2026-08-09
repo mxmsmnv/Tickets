@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.41 - 2026-08-09
+
+- Replaced manual related and primary Ticket ID fields with bounded ticket
+  selectors showing public key, subject, and workflow status.
+- Moved the destructive duplicate merge action into a disclosed warning area
+  and added clear labels, placeholders, and an empty state.
+
 ## 1.0.40 - 2026-08-09
 
 - Renamed the main screen to Support dashboard and tightened its operational

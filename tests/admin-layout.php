@@ -47,6 +47,11 @@ $checks = [
 		&& str_contains($module, 'resolution_due_at<NOW()')
 		&& str_contains($process, 'data-state="\' . $healthState . \'"')
 		&& str_contains($css, '.TicketsDashboardHealth[data-state="danger"]'),
+	'related tickets use bounded selectors' => str_contains($module, 'ticketSelectionOptions')
+		&& str_contains($module, 'min(200, $limit)')
+		&& str_contains($process, 'ticketChoiceSelect')
+		&& str_contains($process, 'TicketsMergePanel')
+		&& !str_contains($process, 'type="number" min="1" name="related_ticket_id"'),
 ];
 
 foreach($checks as $label => $ok) {
