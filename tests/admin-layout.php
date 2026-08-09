@@ -10,6 +10,8 @@ $checks = [
 	'workspace SLA width' => str_contains($css, '.TicketsQueueTable--workspace th:nth-child(6) { width: 10rem; }'),
 	'dashboard mobile scope' => str_contains($css, '.TicketsQueueTable--dashboard table,') && str_contains($css, '.TicketsQueueTable--dashboard tr {'),
 	'no shared fixed columns' => !str_contains($css, '.TicketsQueueTable th:nth-child('),
+	'report legend semantics' => str_contains($process, "aria-label=\"' . \$this->_('Chart legend') . '\"") && str_contains($process, 'TicketsChartLegend-value'),
+	'report legend layout' => str_contains($css, '.TicketsChartLegend li {') && str_contains($css, 'grid-template-areas: "swatch label" "swatch value";'),
 ];
 
 foreach($checks as $label => $ok) {

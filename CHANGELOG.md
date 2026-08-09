@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.21 - 2026-08-09
+
+- Replaced the subtle volume-chart key with a prominent accessible legend that
+  shows each series color, label, and total for the selected reporting period.
+
 ## 1.0.20 - 2026-08-09
 
 - Isolated the dashboard and All tickets table layouts so their different
