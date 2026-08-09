@@ -82,6 +82,7 @@ try {
 		if($candidate->isSuperuser()) { $actor = $candidate; break; }
 	}
 	if(!$actor instanceof \ProcessWire\User || !$actor->id) throw new RuntimeException('A ProcessWire superuser is required for local CLI operations.');
+	$wire->users->setCurrentUser($actor);
 	$api = new \ProcessWire\TicketsAgentApi($tickets, $actor, 'cli');
 	$identifier = static function() use ($options) {
 		$value = trim((string)($options['key'] ?? $options['id'] ?? ''));

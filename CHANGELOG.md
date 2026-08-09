@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.9 - 2026-08-08
+
+- Fixed local CLI authorization by explicitly making the discovered superuser
+  the current ProcessWire CLI actor before entering the gated facade.
+
 ## 1.0.8 - 2026-08-08
 
 - Fixed API and CLI workspace labels and command examples so ampersands and
