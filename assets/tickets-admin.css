@@ -1895,7 +1895,7 @@
 	}
 
 	.ProcessTickets .TicketsMessage-time {
-		align-items: flex-start;
+		align-items: baseline;
 		justify-content: flex-start;
 		flex-wrap: wrap;
 	}
