@@ -1,7 +1,7 @@
 # Tickets public API
 
-This document describes the verified public interface of Tickets 1.0.10
-(`version` 110). It is stronger than README for method usage, but the installed
+This document describes the verified public interface of Tickets 1.0.11
+(`version` 111). It is stronger than README for method usage, but the installed
 module version and live site configuration remain authoritative for a specific
 ProcessWire site.
 

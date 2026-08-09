@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.0.11 - 2026-08-08
+
+- Moved the active-ticket work queue directly below the dashboard introduction
+  so support staff reach actionable requests before metrics and reports,
+  especially on narrow mobile screens.
+- Kept dashboard metrics visible when the active queue is empty instead of
+  returning early from the page renderer.
+
 ## 1.0.10 - 2026-08-08
 
 - Registered the opt-in REST route from Tickets' conditional autoload instead
