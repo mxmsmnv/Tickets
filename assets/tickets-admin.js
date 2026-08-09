@@ -30,7 +30,7 @@
 		var frame = form.querySelector('[data-ticket-preview-frame]');
 		if (!subject || !subjectPreview || !frame) return;
 		subjectPreview.textContent = replaceVariables(subject.value) || 'Email subject';
-		var body = replaceVariables(editorContent(form));
+		var body = replaceVariables((form.dataset.ticketMailHeader || '') + editorContent(form) + (form.dataset.ticketMailFooter || ''));
 		frame.srcdoc = '<!doctype html><html><head><meta charset="utf-8"><style>'
 			+ 'body{margin:0;padding:24px;background:#fff;color:#242424;font:16px/1.55 Arial,sans-serif}a{color:#72203f}blockquote{margin:16px 0;padding:12px 16px;border-left:3px solid #72203f;background:#f4f4f4}img{max-width:100%;height:auto}'
 			+ '</style></head><body>' + body + '</body></html>';
@@ -109,6 +109,42 @@
 		});
 	}
 
+	function polishReply(button) {
+		var reply = document.querySelector('[data-ticket-reply]');
+		var replyForm = reply && reply.closest('form');
+		if (!reply || !replyForm || !reply.value.trim() || !window.fetch) {
+			if (reply) reply.focus();
+			return;
+		}
+		var original = button.innerHTML;
+		var data = new FormData(replyForm);
+		data.set('ticket_action', 'polish');
+		data.set('tickets_ajax', '1');
+		data.set('body', reply.value);
+		button.disabled = true;
+		button.setAttribute('aria-busy', 'true');
+		button.textContent = 'Improving…';
+		window.fetch(button.dataset.endpoint || window.location.href, {
+			method: 'POST', body: data, credentials: 'same-origin',
+			headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
+		}).then(function (response) {
+			return response.json().catch(function () { throw new Error('The server returned an invalid response.'); }).then(function (payload) {
+				if (!response.ok || !payload.ok) throw new Error(payload.message || 'The reply could not be improved.');
+				return payload;
+			});
+		}).then(function (payload) {
+			reply.value = payload.draft || reply.value;
+			reply.dispatchEvent(new Event('input', { bubbles: true }));
+			reply.focus();
+		}).catch(function (error) {
+			window.alert(error.message || 'The reply could not be improved.');
+		}).finally(function () {
+			button.disabled = false;
+			button.removeAttribute('aria-busy');
+			button.innerHTML = original;
+		});
+	}
+
 	var queueRowsMedia = window.matchMedia ? window.matchMedia('(max-width: 959px)') : null;
 
 	function syncQueueRows() {
@@ -141,6 +177,12 @@
 	document.addEventListener('keydown', openQueueRow);
 
 	document.addEventListener('click', function (event) {
+		var polish = event.target.closest('[data-ticket-polish]');
+		if (polish) {
+			event.preventDefault();
+			polishReply(polish);
+			return;
+		}
 		var button = event.target.closest('[data-ticket-variable]');
 		if (!button) return;
 		insertVariable(button);

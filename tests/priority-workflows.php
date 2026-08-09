@@ -43,6 +43,18 @@ try {
 	$ticketIds[] = (int)$first['id'];
 	$check((int)$first['assigned_user_id'] === (int)$admin->id, 'Routing did not assign the ticket.');
 	$check(!empty($first['first_response_due_at']) && !empty($first['resolution_due_at']), 'SLA dates are missing.');
+	$staffUrl = $tickets->notificationTicketUrl($first, true);
+	$customerUrl = $tickets->notificationTicketUrl($first, false, str_repeat('a', 64));
+	$check(str_contains($staffUrl, '/setup/tickets/view/?id=' . (int)$first['id']), 'Staff notification URL does not open the admin ticket.');
+	$check(str_contains($customerUrl, '/support/' . $first['public_key'] . '/access/'), 'Customer notification URL does not open the private portal ticket.');
+	$renamed = $tickets->updateTicket((int)$first['id'], $admin, ['subject' => 'Updated priority workflow ' . $suffix]);
+	$check(str_starts_with((string)$renamed['subject'], 'Updated priority workflow'), 'Ticket subject was not updated.');
+	$oldDue = strtotime((string)$renamed['first_response_due_at']);
+	$extended = $tickets->extendSla((int)$first['id'], $admin, 60);
+	$check(strtotime((string)$extended['first_response_due_at']) > $oldDue, 'First-response SLA was not extended.');
+	$tickets->markMessagesRead((int)$first['id'], $admin, true);
+	$initialMessages = $tickets->ticketMessages((int)$first['id']);
+	$check(!empty($initialMessages[0]['read_at']), 'Customer message read receipt was not stored.');
 
 	$tickets->addInternalNote((int)$first['id'], $admin, 'Private diagnostic note.');
 	$check(count($tickets->ticketMessages((int)$first['id'])) === 1, 'Internal note leaked into the customer thread.');
@@ -68,6 +80,8 @@ try {
 
 	$result = $tickets->runAutomation(true);
 	$check(isset($result['sla_breaches'], $result['auto_closed']), 'Automation result is incomplete.');
+	$report = $tickets->reportData(['days' => 7]);
+	$check(isset($report['daily'], $report['statuses'], $report['priorities']), 'Report chart data is incomplete.');
 	echo "Tickets priority workflows: OK\n";
 } finally {
 	$db = wire('database');

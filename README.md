@@ -13,7 +13,7 @@ private files publicly.
 - **Author:** Maxim Semenov
 - **Website:** [smnv.org](https://smnv.org)
 - **Email:** [maxim@smnv.org](mailto:maxim@smnv.org)
-- **Release:** 1.0.12 (`version` 112)
+- **Release:** 1.0.13 (`version` 113)
 
 If this project helps your work, consider supporting future development:
 [GitHub Sponsors](https://github.com/sponsors/mxmsmnv) or
@@ -23,17 +23,23 @@ If this project helps your work, consider supporting future development:
 
 - Creates private support tickets for authenticated accounts and guests.
 - Gives guests hashed private-access links without requiring registration.
-- Keeps replies, staff-only notes, attachments and workflow history together.
+- Keeps replies, sent/delivered/read timestamps, staff-only notes, attachments
+  and workflow history together.
 - Provides statuses, priorities, assignment, bulk actions and ticket merging.
 - Includes SLA targets, routing rules, reusable replies and scheduled automation.
-- Includes operational reports, CSV export and customer satisfaction ratings.
+- Includes operational charts, reports, CSV export and customer satisfaction ratings.
 - Provides reusable custom forms with validation, live preview and rich-text embeds.
 - Can copy existing Pro FormBuilder definitions into independent, reviewable Tickets form drafts when FormBuilder is installed.
 - Supports configurable consent, spam protection, retention and attachment rules.
-- Sends editable transactional messages through a selectable ProcessWire WireMail provider.
+- Sends editable transactional messages with recipient-correct links and
+  customizable shared headers and footers through a selectable ProcessWire
+  WireMail provider.
 - Supports optional authenticated Resend inbound replies.
 - Supports optional Mailbox ingestion for new support email and Mailbox SMTP delivery for ticket notifications and linked thread replies.
-- Supports optional Squad reply drafts grounded by Atlas and Knowledge Base.
+- Supports optional Squad reply drafts grounded by Atlas and Knowledge Base;
+  drafts use the complete public conversation and can be copy-edited separately.
+- Records a non-IP location and timezone snapshot when GeoIP is installed, so
+  staff can see customer-local time without storing a new raw IP field.
 - Provides independently disabled, permission-gated PHP API, same-origin JSON
   REST, and local JSON CLI channels for trusted integrations and agents.
 - Uses neutral installation defaults and creates no sample tickets or customers.
@@ -46,7 +52,8 @@ Tickets adds a dedicated **Setup → Tickets** workspace where support staff can
 - search and filter active, resolved and closed tickets;
 - work tickets in priority, active-state and SLA-risk order;
 - assign, prioritize and update requests individually or in bulk;
-- reply, add internal notes, link duplicates and inspect private attachments;
+- reply, improve writing, inspect message receipts, edit subjects, extend SLA,
+  add internal notes, link duplicates and inspect private attachments;
 - manage routing rules, SLA overrides and reusable replies;
 - build reusable intake forms and preview them before publishing;
 - edit transactional email templates;

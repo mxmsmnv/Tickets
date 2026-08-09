@@ -211,6 +211,22 @@ tagging APIs. Other providers use the standard ProcessWire WireMail contract.
 Delivery failures are written to `site/assets/logs/tickets.txt` and never roll
 back the ticket write.
 
+Staff notification links open the authenticated admin ticket. Customer
+notifications open the configured public portal and include a rotating private
+access token only for guest tickets. The shared header and footer are configured
+in **Modules → Tickets → Transactional mail**, are applied to every template,
+and should use inline CSS for broad email-client support. Dangerous embedded
+elements and inline event handlers are removed before sending.
+
+`delivered_at` records acceptance by the configured outbound transport; it does
+not claim inbox placement. `read_at` is recorded when the intended participant
+opens the conversation in the staff workspace or customer portal. Consuming
+portal templates should call:
+
+```php
+$tickets->markMessagesRead((int)$ticket['id'], $user, false);
+```
+
 ### Resend inbound replies
 
 Enable inbound replies, set the receiving address and webhook signing secret,
@@ -256,6 +272,10 @@ php site/modules/Tickets/bin/tickets automation --execute --root=/path/to/proces
 Repeated runs are idempotent. A five-minute interval is appropriate for normal
 support queues.
 
+Staff may extend the currently active first-response or resolution deadline by
+a bounded interval from the ticket workspace. The previous breach marker is
+cleared and the change is recorded in the ticket event log.
+
 ## Retention
 
 Retention is disabled by default. Preview a bounded batch before enabling a
@@ -277,8 +297,21 @@ Tickets can retrieve and deduplicate evidence from Atlas and Knowledge Base;
 either source can be disabled or temporarily unavailable without disabling the
 other. Customer email addresses and attachments are excluded from the prompt.
 
-Drafts are placed in the reply composer for staff review and are never sent
-automatically. Provider credentials remain in Squad.
+Every non-internal message is supplied in chronological order. For unusually
+large threads, each message remains represented while its excerpt is reduced to
+keep the total prompt bounded. Internal notes are never included. Drafts are
+placed in the reply composer for staff review and are never sent automatically.
+The separate **Fix writing** action corrects the current proposed reply using
+the complete public conversation as context while preserving facts, links and
+commitments. Provider credentials remain in Squad.
+
+## GeoIP Context and Local Time
+
+When the optional GeoIP module is installed, Tickets stores the resolved
+country, region, city and valid IANA timezone at creation. Tickets does not add
+a raw IP field. Staff see the customer-local clock in the ticket workspace when
+their timezone is known; failures or unavailable GeoIP data never block ticket
+creation.
 
 ## Permissions and Privacy
 

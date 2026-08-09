@@ -191,7 +191,9 @@ class ProcessTickets extends Process {
 		$metrics = [[$this->_('Created'), (int)($summary['created'] ?? 0)], [$this->_('Completed'), (int)($summary['completed'] ?? 0)], [$this->_('SLA breaches'), (int)($summary['breached'] ?? 0)], [$this->_('Average rating'), !empty($summary['rating']) ? number_format((float)$summary['rating'], 1) . '/5' : $this->_('No data')], [$this->_('First response'), $this->duration($summary['first_response_minutes'] ?? null)], [$this->_('Resolution time'), $this->duration($summary['resolution_minutes'] ?? null)]];
 		$out .= '<section class="TicketsMetricGrid">';
 		foreach ($metrics as [$label, $value]) $out .= '<article class="TicketsMetric"><div><span>' . $this->e($label) . '</span><strong>' . $this->e($value) . '</strong></div></article>';
-		$out .= '</section><div class="TicketsReportGrid"><section class="uk-card uk-card-default TicketsReportPanel"><h2>' . $this->_('By agent') . '</h2>' . $this->reportTable($report['agents'], 'agent') . '</section><section class="uk-card uk-card-default TicketsReportPanel"><h2>' . $this->_('By ticket type') . '</h2>' . $this->reportTable($report['types'], 'type') . '</section></div>';
+		$out .= '</section><section class="TicketsPanel TicketsReportTrend"><header><div><p class="uk-text-meta uk-text-uppercase uk-margin-remove">' . $this->_('Volume') . '</p><h2>' . $this->_('Created and completed') . '</h2></div><div class="TicketsChartLegend"><span data-series="created">' . $this->_('Created') . '</span><span data-series="completed">' . $this->_('Completed') . '</span></div></header>' . $this->reportTrendChart((array)$report['daily']) . '</section>';
+		$out .= '<div class="TicketsReportGrid"><section class="uk-card uk-card-default TicketsReportPanel"><h2>' . $this->_('By agent') . '</h2>' . $this->reportTable($report['agents'], 'agent') . '</section><section class="uk-card uk-card-default TicketsReportPanel"><h2>' . $this->_('By ticket type') . '</h2>' . $this->reportTable($report['types'], 'type') . '</section></div>';
+		$out .= '<div class="TicketsReportGrid">' . $this->breakdownPanel($this->_('Status mix'), (array)$report['statuses'], $tickets->statuses(), 'status') . $this->breakdownPanel($this->_('Priority mix'), (array)$report['priorities'], $tickets->priorities(), 'priority') . '</div>';
 		$out .= '<section class="TicketsPanel TicketsBacklog"><h2>' . $this->_('Active backlog age') . '</h2><div class="TicketsMetricGrid">';
 		foreach (['under_24h' => $this->_('Under 24 hours'), 'one_to_three_days' => $this->_('1–3 days'), 'three_to_seven_days' => $this->_('3–7 days'), 'over_seven_days' => $this->_('Over 7 days')] as $key => $label) $out .= '<article class="TicketsMetric"><div><span>' . $this->e($label) . '</span><strong>' . (int)($report['backlog'][$key] ?? 0) . '</strong></div></article>';
 		$out .= '</div></section>';
@@ -260,7 +262,7 @@ class ProcessTickets extends Process {
 		if (!$ticket) throw new Wire404Exception('Ticket not found.');
 
 		if ($this->wire('input')->requestMethod('POST')) {
-			$isAjaxDraft = (bool)$this->wire('input')->post('tickets_ajax') && (string)$this->wire('input')->post('ticket_action') === 'draft';
+			$isAjaxDraft = (bool)$this->wire('input')->post('tickets_ajax') && in_array((string)$this->wire('input')->post('ticket_action'), ['draft', 'polish'], true);
 			try {
 				$this->wire('session')->CSRF->validate();
 				$action = $this->wire('sanitizer')->name((string)$this->wire('input')->post('ticket_action'));
@@ -285,6 +287,14 @@ class ProcessTickets extends Process {
 					$this->wire('session')->set('tickets_draft_' . $id, (string)$result['draft']);
 					$this->wire('session')->set('tickets_sources_' . $id, (array)$result['sources']);
 					$this->message($this->_('A grounded draft was prepared. Review it before sending.'));
+				} elseif ($action === 'polish') {
+					$polished = $tickets->polishReply($ticket, $tickets->ticketMessages($id), $this->wire('user'), (string)$this->wire('input')->post('body'));
+					if ($isAjaxDraft) $this->jsonResponse(['ok' => true, 'draft' => $polished, 'sources' => [], 'message' => $this->_('Grammar and clarity improved. Review the result before sending.')]);
+					$this->wire('session')->set('tickets_draft_' . $id, $polished);
+					$this->message($this->_('Grammar and clarity improved. Review the result before sending.'));
+				} elseif ($action === 'extend_sla') {
+					$tickets->extendSla($id, $this->wire('user'), (int)$this->wire('input')->post('minutes'));
+					$this->message($this->_('SLA deadline extended.'));
 				} elseif ($action === 'note') {
 					$tickets->addInternalNote($id, $this->wire('user'), (string)$this->wire('input')->post('body'));
 					$this->message($this->_('Internal note added.'));
@@ -303,6 +313,7 @@ class ProcessTickets extends Process {
 		}
 
 		$ticket = $tickets->getTicket($id);
+		$tickets->markMessagesRead($id, $this->wire('user'), true);
 		$messages = $tickets->ticketMessages($id, true);
 		$macros = $tickets->macros(true, $ticket);
 		$links = $tickets->ticketLinks($id);
@@ -315,7 +326,7 @@ class ProcessTickets extends Process {
 		$customerInitial = mb_strtoupper(mb_substr(trim((string)$ticket['customer_name']), 0, 1)) ?: 'C';
 		$this->headline($this->_('Ticket workspace'));
 		$out = $this->adminNav('view') . '<div class="TicketsViewBack"><a href="' . $this->e($this->wire('page')->url) . '"><i class="fa fa-arrow-left" aria-hidden="true"></i>' . $this->_('Back to queue') . '</a></div>';
-		$out .= '<header class="TicketsCaseHeader"><div class="TicketsCaseHeader-main"><div class="TicketsCaseHeader-eyebrow"><span>' . $this->_('Support ticket') . '</span><code>#' . $this->e($ticket['public_key']) . '</code></div><h2>' . $this->e($ticket['subject']) . '</h2><div class="TicketsCaseHeader-meta"><span><i class="fa fa-user-o" aria-hidden="true"></i>' . $this->e($ticket['customer_name']) . '</span><span><i class="fa fa-clock-o" aria-hidden="true"></i>' . $this->_('Updated') . ' ' . $this->e($this->age((string)$ticket['updated_at'])) . '</span><span><i class="fa fa-comments-o" aria-hidden="true"></i>' . count($messages) . ' ' . $this->_('messages') . '</span></div></div><div class="TicketsCaseHeader-state"><span class="TicketsBadge" data-color="' . $statusColor . '">' . $this->e($tickets->statuses()[$ticket['status']] ?? $ticket['status']) . '</span><span class="TicketsPriority" data-priority="' . $this->e($ticket['priority']) . '"><i></i>' . $this->e($tickets->priorities()[$ticket['priority']] ?? $ticket['priority']) . '</span></div></header>';
+		$out .= '<header class="TicketsCaseHeader"><div class="TicketsCaseHeader-main"><div class="TicketsCaseHeader-eyebrow"><span>' . $this->_('Support ticket') . '</span><code>#' . $this->e($ticket['public_key']) . '</code></div><form class="TicketsSubjectForm" method="post"><input type="hidden" name="ticket_action" value="update">' . $this->csrf() . '<input type="hidden" name="status" value="' . $this->e($ticket['status']) . '"><input type="hidden" name="priority" value="' . $this->e($ticket['priority']) . '"><input type="hidden" name="assigned_user_id" value="' . (int)$ticket['assigned_user_id'] . '"><label class="uk-form-label" for="ticket-subject">' . $this->_('Subject') . '</label><div><input class="uk-input" id="ticket-subject" name="subject" value="' . $this->e($ticket['subject']) . '" maxlength="180" required><button class="uk-button uk-button-default" type="submit"><i class="fa fa-check" aria-hidden="true"></i><span>' . $this->_('Save subject') . '</span></button></div></form><div class="TicketsCaseHeader-meta"><span><i class="fa fa-user-o" aria-hidden="true"></i>' . $this->e($ticket['customer_name']) . '</span><span><i class="fa fa-clock-o" aria-hidden="true"></i>' . $this->_('Updated') . ' ' . $this->e($this->age((string)$ticket['updated_at'])) . '</span><span><i class="fa fa-comments-o" aria-hidden="true"></i>' . count($messages) . ' ' . $this->_('messages') . '</span></div></div><div class="TicketsCaseHeader-state"><span class="TicketsBadge" data-color="' . $statusColor . '">' . $this->e($tickets->statuses()[$ticket['status']] ?? $ticket['status']) . '</span><span class="TicketsPriority" data-priority="' . $this->e($ticket['priority']) . '"><i></i>' . $this->e($tickets->priorities()[$ticket['priority']] ?? $ticket['priority']) . '</span></div></header>';
 
 		$out .= '<div class="TicketsViewLayout"><main class="TicketsViewMain"><section class="TicketsConversation" aria-labelledby="tickets-conversation-title"><header><div><p class="uk-text-meta uk-text-uppercase uk-margin-remove">' . $this->_('Conversation') . '</p><h2 id="tickets-conversation-title">' . $this->_('Messages') . '</h2></div><span>' . count($messages) . ' ' . $this->_('total') . '</span></header><div class="TicketsThread">';
 		foreach ($messages as $message) {
@@ -323,7 +334,13 @@ class ProcessTickets extends Process {
 			$isInternal = !empty($message['is_internal']);
 			$author = $isInternal ? $this->_('Internal note') : ($isStaff ? (trim((string)$tickets->from_name) ?: $this->_('Support team')) : (string)$ticket['customer_name']);
 			$staffName = $isStaff ? (string)($message['user_name'] ?: 'staff') : '';
-			$out .= '<article class="TicketsMessage" data-author="' . ($isInternal ? 'internal' : ($isStaff ? 'staff' : 'customer')) . '"><div class="TicketsMessage-avatar" aria-hidden="true">' . ($isInternal ? '<i class="fa fa-lock"></i>' : ($isStaff ? '<i class="fa fa-life-ring"></i>' : $this->e($customerInitial))) . '</div><div class="TicketsMessage-content"><header><div><strong>' . $this->e($author) . '</strong>' . ($staffName !== '' ? '<span>' . $this->e($staffName) . '</span>' : '<span>' . $this->_('Customer') . '</span>') . '</div><time datetime="' . $this->e(date(DATE_ATOM, strtotime((string)$message['created_at']))) . '">' . $this->e(date('M j, Y · H:i', strtotime((string)$message['created_at']))) . '</time></header><div class="TicketsMessage-text">' . nl2br($this->e($message['body'])) . '</div>';
+			$receipt = '';
+			if (!$isInternal) {
+				$receiptState = !empty($message['read_at']) ? 'read' : (!empty($message['delivered_at']) ? 'delivered' : 'sent');
+				$receiptLabel = $receiptState === 'read' ? $this->_('Read') : ($receiptState === 'delivered' ? $this->_('Delivered') : $this->_('Sent'));
+				$receipt = '<details class="TicketsMessageReceipt" data-state="' . $receiptState . '"><summary aria-label="' . $this->e($receiptLabel) . '"><i class="fa ' . ($receiptState === 'sent' ? 'fa-check' : 'fa-check-circle') . '" aria-hidden="true"></i><span>' . $this->e($receiptLabel) . '</span></summary><dl><dt>' . $this->_('Sent') . '</dt><dd>' . $this->e($this->dateTime((string)$message['created_at'])) . '</dd><dt>' . $this->_('Delivered') . '</dt><dd>' . $this->e(!empty($message['delivered_at']) ? $this->dateTime((string)$message['delivered_at']) : $this->_('Not confirmed')) . '</dd><dt>' . $this->_('Read') . '</dt><dd>' . $this->e(!empty($message['read_at']) ? $this->dateTime((string)$message['read_at']) : $this->_('Not yet')) . '</dd></dl></details>';
+			}
+			$out .= '<article class="TicketsMessage" data-author="' . ($isInternal ? 'internal' : ($isStaff ? 'staff' : 'customer')) . '"><div class="TicketsMessage-avatar" aria-hidden="true">' . ($isInternal ? '<i class="fa fa-lock"></i>' : ($isStaff ? '<i class="fa fa-life-ring"></i>' : $this->e($customerInitial))) . '</div><div class="TicketsMessage-content"><header><div><strong>' . $this->e($author) . '</strong>' . ($staffName !== '' ? '<span>' . $this->e($staffName) . '</span>' : '<span>' . $this->_('Customer') . '</span>') . '</div><div class="TicketsMessage-time"><time datetime="' . $this->e(date(DATE_ATOM, strtotime((string)$message['created_at']))) . '">' . $this->e($this->dateTime((string)$message['created_at'])) . '</time>' . $receipt . '</div></header><div class="TicketsMessage-text">' . nl2br($this->e($message['body'])) . '</div>';
 			if (!empty($message['attachments'])) $out .= '<div class="TicketsMessage-attachments">';
 			foreach ($message['attachments'] as $attachment) {
 				$url = $tickets->attachmentUrl($ticket, $attachment);
@@ -350,12 +367,12 @@ class ProcessTickets extends Process {
 			foreach ($macros as $macro) $out .= '<option value="' . (int)$macro['id'] . '" data-body="' . $this->e($macro['body']) . '">' . $this->e($macro['title']) . '</option>';
 			$out .= '</select>';
 		}
-		$out .= '<label class="uk-form-label" for="ticket-reply">' . $this->_('Message') . '</label><textarea class="uk-textarea" id="ticket-reply" name="body" rows="8" placeholder="' . $this->_('Write a clear, helpful reply…') . '" required data-ticket-reply>' . $this->e($draft) . '</textarea><div class="TicketsReplyActions"><label class="TicketsReplyAttachment" for="ticket-attachment"><i class="fa fa-paperclip" aria-hidden="true"></i><span>' . $this->_('Attach file') . '</span><input id="ticket-attachment" type="file" name="attachment" accept="image/jpeg,image/png,image/webp,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain"></label><button class="uk-button uk-button-primary" type="submit"><i class="fa fa-paper-plane uk-margin-small-right"></i>' . $this->_('Send reply') . '</button></div></form>';
+		$out .= '<label class="uk-form-label" for="ticket-reply">' . $this->_('Message') . '</label><textarea class="uk-textarea" id="ticket-reply" name="body" rows="8" placeholder="' . $this->_('Write a clear, helpful reply…') . '" required data-ticket-reply>' . $this->e($draft) . '</textarea><div class="TicketsReplyActions"><div><label class="TicketsReplyAttachment" for="ticket-attachment"><i class="fa fa-paperclip" aria-hidden="true"></i><span>' . $this->_('Attach file') . '</span><input id="ticket-attachment" type="file" name="attachment" accept="image/jpeg,image/png,image/webp,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain"></label>' . ($tickets->ai_assist_enabled ? '<button class="uk-button uk-button-text" type="button" data-ticket-polish data-endpoint="' . $this->e($this->wire('page')->url . 'view/?id=' . $id) . '"><i class="fa fa-pencil" aria-hidden="true"></i>' . $this->_('Fix writing') . '</button>' : '') . '</div><button class="uk-button uk-button-primary" type="submit"><i class="fa fa-paper-plane uk-margin-small-right"></i>' . $this->_('Send reply') . '</button></div></form>';
 		$out .= '<details class="TicketsInternalNote"><summary><i class="fa fa-lock" aria-hidden="true"></i>' . $this->_('Add internal note') . '</summary><form class="TicketsInternalNoteForm" method="post"><input type="hidden" name="ticket_action" value="note">' . $this->csrf() . '<textarea class="uk-textarea" name="body" rows="5" required placeholder="' . $this->_('Visible only to support staff…') . '"></textarea><button class="uk-button uk-button-default" type="submit">' . $this->_('Save internal note') . '</button></form></details></section></main>';
 
 		$out .= '<aside class="TicketsViewAside"><form class="TicketsSidePanel" method="post"><input type="hidden" name="ticket_action" value="update">' . $this->csrf() . '<header><span class="TicketsSidePanel-icon"><i class="fa fa-sliders"></i></span><div><h2>' . $this->_('Workflow') . '</h2><p>' . $this->_('Route and resolve this request.') . '</p></div></header>' . $this->select('status', $this->_('Status'), $tickets->statuses(), (string)$ticket['status']) . $this->select('priority', $this->_('Priority'), $tickets->priorities(), (string)$ticket['priority']) . $this->select('assigned_user_id', $this->_('Assigned to'), $this->staffOptions(), (string)(int)$ticket['assigned_user_id']) . '<button class="uk-button uk-button-primary uk-width-1-1" type="submit">' . $this->_('Save workflow') . '</button></form>';
 		$slaLabel = $sla['due_at'] !== '' ? date('M j, Y · H:i', strtotime($sla['due_at'])) : $this->_('Not set');
-		$out .= '<section class="TicketsSidePanel TicketsSla" data-breached="' . (!empty($sla['breached']) ? 'true' : 'false') . '"><h2><i class="fa fa-stopwatch" aria-hidden="true"></i>' . $this->_('SLA') . '</h2><p><strong>' . $this->e($sla['phase'] === 'first_response' ? $this->_('First response') : $this->_('Resolution')) . '</strong><br>' . $this->e($slaLabel) . '</p>' . (!empty($sla['breached']) ? '<span class="uk-label uk-label-danger">' . $this->_('Breached') . '</span>' : '') . '</section>';
+		$out .= '<section class="TicketsSidePanel TicketsSla" data-breached="' . (!empty($sla['breached']) ? 'true' : 'false') . '"><h2><i class="fa fa-stopwatch" aria-hidden="true"></i>' . $this->_('SLA') . '</h2><p><strong>' . $this->e($sla['phase'] === 'first_response' ? $this->_('First response') : $this->_('Resolution')) . '</strong><br>' . $this->e($slaLabel) . '</p>' . (!empty($sla['breached']) ? '<span class="uk-label uk-label-danger">' . $this->_('Breached') . '</span>' : '') . '<form class="TicketsSlaExtend" method="post"><input type="hidden" name="ticket_action" value="extend_sla">' . $this->csrf() . '<label class="uk-form-label" for="ticket-sla-minutes">' . $this->_('Extend deadline') . '</label><div><select class="uk-select" id="ticket-sla-minutes" name="minutes"><option value="60">+1 hour</option><option value="240">+4 hours</option><option value="1440">+1 day</option><option value="4320">+3 days</option></select><button class="uk-button uk-button-default" type="submit">' . $this->_('Extend') . '</button></div></form></section>';
 		$rating = max(0, min(5, (int)($ticket['rating'] ?? 0)));
 		if ($rating > 0 || in_array((string)$ticket['status'], ['resolved', 'closed'], true)) {
 			$feedbackBody = $rating > 0
@@ -373,6 +390,13 @@ class ProcessTickets extends Process {
 		if ($links) { $out .= '<ul class="TicketsRelated">'; foreach ($links as $link) $out .= '<li><a href="' . $this->e($this->wire('page')->url . 'view/?id=' . (int)$link['related_ticket_id']) . '">#' . $this->e($link['public_key']) . ' · ' . $this->e($link['subject']) . '</a><small>' . $this->e($link['link_type']) . '</small></li>'; $out .= '</ul>'; }
 		$out .= '<form method="post" class="TicketsLinkForm"><input type="hidden" name="ticket_action" value="link">' . $this->csrf() . '<label class="uk-form-label">' . $this->_('Ticket ID') . '</label><input class="uk-input" type="number" min="1" name="related_ticket_id" required><select class="uk-select uk-margin-small-top" name="link_type"><option value="related">' . $this->_('Related') . '</option><option value="duplicate">' . $this->_('Duplicate') . '</option><option value="parent">' . $this->_('Parent') . '</option><option value="child">' . $this->_('Child') . '</option></select><button class="uk-button uk-button-default uk-width-1-1 uk-margin-small-top" type="submit">' . $this->_('Link ticket') . '</button></form><form method="post" class="uk-margin-small-top" onsubmit="return confirm(\'' . $this->_('Close this duplicate and merge it into the selected primary ticket?') . '\')"><input type="hidden" name="ticket_action" value="merge">' . $this->csrf() . '<input class="uk-input" type="number" min="1" name="related_ticket_id" required placeholder="' . $this->_('Primary ticket ID') . '"><button class="uk-button uk-button-danger uk-width-1-1 uk-margin-small-top" type="submit">' . $this->_('Merge duplicate') . '</button></form></section>';
 		$out .= '<section class="TicketsSidePanel"><header><span class="TicketsSidePanel-avatar">' . $this->e($customerInitial) . '</span><div><h2>' . $this->e($ticket['customer_name']) . '</h2><p>' . $this->_('Customer') . '</p></div></header><dl><dt>' . $this->_('Email') . '</dt><dd><a href="mailto:' . $this->e($ticket['customer_email']) . '">' . $this->e($ticket['customer_email']) . '</a></dd><dt>' . $this->_('Type') . '</dt><dd>' . $this->e($tickets->types()[$ticket['category']] ?? $ticket['category']) . '</dd><dt>' . $this->_('Topic') . '</dt><dd>' . $this->e($tickets->topics()[(string)($ticket['topic'] ?? 'general')] ?? (string)($ticket['topic'] ?? 'general')) . '</dd>';
+		$place = implode(', ', array_filter([(string)($ticket['customer_city'] ?? ''), (string)($ticket['customer_region'] ?? ''), (string)($ticket['customer_country'] ?? '')]));
+		if ($place !== '') $out .= '<dt>' . $this->_('Location') . '</dt><dd>' . $this->e($place) . '</dd>';
+		$customerZone = (string)($ticket['customer_timezone'] ?? '');
+		if ($customerZone !== '' && in_array($customerZone, timezone_identifiers_list(), true)) {
+			$customerNow = new \DateTimeImmutable('now', new \DateTimeZone($customerZone));
+			$out .= '<dt>' . $this->_('Customer local time') . '</dt><dd><strong>' . $this->e($customerNow->format('g:i A')) . '</strong><br><small>' . $this->e($customerNow->format('D, M j · T')) . '</small></dd>';
+		}
 		if (!empty($ticket['context_url'])) $out .= '<dt>' . $this->_('Related record') . '</dt><dd><a href="' . $this->e($ticket['context_url']) . '" target="_blank" rel="noopener">' . $this->e($ticket['context_type'] ?: $ticket['context_url']) . '</a></dd>';
 		$labels = [];
 		if (!empty($ticket['form'])) {
@@ -442,8 +466,8 @@ class ProcessTickets extends Process {
 			$editorName = 'html_body_' . $key;
 			$editorId = 'tickets-editor-' . str_replace('_', '-', $key);
 			$templateMeta = $meta[$key] ?? ['recipient' => 'Customer', 'purpose' => 'Transactional ticket update.'];
-			$out .= '<section class="TicketsTemplateWorkspace uk-card uk-card-default" id="template-editor"><header><div><span class="uk-label">' . $this->e($templateMeta['recipient']) . '</span><h2>' . $this->e($selected['label']) . '</h2><p>' . $this->e($templateMeta['purpose']) . '</p></div><code>' . $this->e($key) . '</code></header>'
-				. '<form class="TicketsTemplateForm" method="post" data-ticket-template-form>' . $this->csrf()
+			$out .= '<section class="TicketsTemplateWorkspace uk-card uk-card-default" id="template-editor"><header><div><span class="uk-label">' . $this->e($templateMeta['recipient']) . '</span><h2>' . $this->e($selected['label']) . '</h2><p>' . $this->e($templateMeta['purpose']) . '</p><a href="' . $this->e($this->wire('config')->urls->admin . 'module/edit?name=Tickets#Inputfield_mail_header_html') . '">' . $this->_('Customize shared header and footer') . '</a></div><code>' . $this->e($key) . '</code></header>'
+				. '<form class="TicketsTemplateForm" method="post" data-ticket-template-form data-ticket-mail-header="' . $this->e((string)$tickets->mail_header_html) . '" data-ticket-mail-footer="' . $this->e((string)$tickets->mail_footer_html) . '">' . $this->csrf()
 				. '<input type="hidden" name="template_key" value="' . $this->e($key) . '"><div class="TicketsTemplateGrid"><div class="TicketsTemplateEditor">'
 				. '<label class="uk-form-label" for="subject-' . $this->e($key) . '">' . $this->_('Email subject') . '</label><input class="uk-input TicketsTemplateSubject" id="subject-' . $this->e($key) . '" name="subject" maxlength="240" required value="' . $this->e($selected['subject']) . '" data-ticket-template-subject>'
 				. '<div class="TicketsVariableBar"><span>' . $this->_('Insert variable') . '</span>';
@@ -719,6 +743,19 @@ class ProcessTickets extends Process {
 		return $out . '</tbody></table></div>';
 	}
 
+	private function reportTrendChart(array $rows): string {
+		$max = 1;
+		foreach ($rows as $row) $max = max($max, (int)($row['created'] ?? 0), (int)($row['completed'] ?? 0));
+		if (!$rows) return '<p class="TicketsEmptyChart">' . $this->_('No ticket activity in this period.') . '</p>';
+		$out = '<div class="TicketsReportBars" role="img" aria-label="' . $this->_('Daily created and completed ticket volume') . '">';
+		foreach ($rows as $row) {
+			$created = (int)($row['created'] ?? 0);
+			$completed = (int)($row['completed'] ?? 0);
+			$out .= '<span class="TicketsReportBars-day" title="' . $this->e(date('M j', strtotime((string)$row['day'])) . ': ' . $created . ' created, ' . $completed . ' completed') . '"><i data-series="created" style="--tickets-bar:' . max(2, (int)round(($created / $max) * 100)) . '%"></i><i data-series="completed" style="--tickets-bar:' . max(2, (int)round(($completed / $max) * 100)) . '%"></i><small>' . $this->e(date('j', strtotime((string)$row['day']))) . '</small></span>';
+		}
+		return $out . '</div>';
+	}
+
 	private function workspace(string $content): string {
 		return '<div class="pw-wrap pw-module-workspace TicketsAdmin">' . $content . '</div>';
 	}
@@ -754,6 +791,11 @@ class ProcessTickets extends Process {
 		if ($seconds < 3600) return sprintf($this->_('%d min ago'), intdiv($seconds, 60));
 		if ($seconds < 86400) return sprintf($this->_('%d h ago'), intdiv($seconds, 3600));
 		return sprintf($this->_('%d d ago'), intdiv($seconds, 86400));
+	}
+
+	private function dateTime(string $date): string {
+		$timestamp = strtotime($date);
+		return $timestamp ? date('M j, Y · H:i', $timestamp) : $this->_('Unknown');
 	}
 
 	private function trendChart(array $trend): string {

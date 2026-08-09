@@ -1,5 +1,22 @@
 # Changelog
 
+## 1.0.13 - 2026-08-08
+
+- Reworked the ticket workspace with editable subjects, an SLA extension
+  control, compact conversation receipts with exact sent/delivered/read dates,
+  and customer-local time when GeoIP supplies a valid timezone.
+- Added non-IP customer location snapshots from the optional GeoIP module and
+  read-receipt APIs for staff and customer portal views.
+- Made AI drafts consider every public message in chronological order within a
+  bounded prompt, and added a separate grammar-and-clarity editing action that
+  preserves facts and commitments.
+- Corrected recipient-specific notification links: staff messages now open the
+  admin ticket while customers receive the public or private portal URL.
+- Added configurable, sanitized shared HTML email headers and footers and made
+  the template preview render the complete notification wrapper.
+- Expanded reports with daily created/completed charts plus status and priority
+  distributions.
+
 ## 1.0.12 - 2026-08-08
 
 - Reordered the dashboard queue to Priority, Status, Ticket, and Activity,
