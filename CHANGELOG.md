@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.15 - 2026-08-08
+
+- Kept long editable subjects within the case header using a compact accessible
+  save control, and hid SLA extension controls when no active deadline exists.
+
 ## 1.0.14 - 2026-08-08
 
 - Added a validated canonical notification origin so links generated during

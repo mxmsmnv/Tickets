@@ -1199,8 +1199,13 @@
 	gap: .5rem;
 }
 
+.ProcessTickets .TicketsSubjectForm,
+.ProcessTickets .TicketsCaseHeader-main { min-width: 0; width: 100%; }
+
 .ProcessTickets .TicketsSubjectForm .uk-input {
-	min-width: min(38rem, 65vw);
+	min-width: 0;
+	width: 100%;
+	flex: 1 1 auto;
 	height: auto;
 	padding: .15rem .35rem;
 	border-color: transparent;
@@ -1215,7 +1220,14 @@
 	background: var(--pw-blocks-background);
 }
 
-.ProcessTickets .TicketsSubjectForm .uk-button span { margin-left: .35rem; }
+.ProcessTickets .TicketsSubjectForm .uk-button {
+	display: grid;
+	place-items: center;
+	flex: 0 0 2.75rem;
+	width: 2.75rem;
+	min-width: 2.75rem;
+	padding: 0;
+}
 
 .ProcessTickets .TicketsReplyActions > div {
 	display: flex;
@@ -1242,6 +1254,16 @@
 	grid-template-columns: minmax(0, 1fr) auto;
 	gap: .5rem;
 	margin-top: .35rem;
+}
+
+.ProcessTickets .TicketsSlaComplete {
+	display: flex;
+	align-items: center;
+	gap: .45rem;
+	margin: 1rem 0 0;
+	padding-top: 1rem;
+	border-top: 1px solid var(--pw-border-color);
+	color: var(--pw-muted-color);
 }
 
 .ProcessTickets .TicketsMessage-text {
@@ -1889,7 +1911,6 @@
 		width: 100%;
 	}
 
-	.ProcessTickets .TicketsSubjectForm .uk-button span { display: none; }
 
 	.ProcessTickets .TicketsReplyComposer > header form,
 	.ProcessTickets .TicketsReplyComposer > header .uk-button,
