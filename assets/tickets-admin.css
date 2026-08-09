@@ -679,6 +679,7 @@
 
 .ProcessTickets .TicketsQueueTable table {
 	margin: 0;
+	table-layout: fixed;
 }
 
 .ProcessTickets .TicketsQueueTable thead {
@@ -689,6 +690,11 @@
 .ProcessTickets .TicketsQueueTable td {
 	padding-inline: .85rem;
 }
+
+.ProcessTickets .TicketsQueueTable th:nth-child(1) { width: 8rem; }
+.ProcessTickets .TicketsQueueTable th:nth-child(2) { width: 10rem; }
+.ProcessTickets .TicketsQueueTable th:nth-child(4) { width: 17rem; }
+.ProcessTickets .TicketsQueueTable th:nth-child(5) { width: 3rem; }
 
 .ProcessTickets .TicketsQueueSubject {
 	display: inline-block;
@@ -739,6 +745,41 @@
 	background: #b42318;
 }
 
+.ProcessTickets .TicketsPriority[data-priority="normal"] i {
+	background: #2e8540;
+}
+
+.ProcessTickets .TicketsQueueCustomer {
+	display: flex;
+	flex-wrap: wrap;
+	gap: .15rem .5rem;
+	margin-top: .35rem;
+	color: var(--pw-muted-color);
+	font-size: .75rem;
+}
+
+.ProcessTickets .TicketsQueueCustomer span {
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.ProcessTickets .TicketsQueueActivityInner {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: .75rem;
+}
+
+.ProcessTickets .TicketsQueueActivityInner > div > strong,
+.ProcessTickets .TicketsQueueActivityInner > div > span {
+	display: block;
+}
+
+.ProcessTickets .TicketsQueueActivityInner > div > span {
+	color: var(--pw-muted-color);
+	font-size: .75rem;
+}
+
 .ProcessTickets .TicketsQueueSla {
 	display: grid;
 	gap: .15rem;
@@ -781,6 +822,81 @@
 .ProcessTickets .TicketsQueueOpen:hover,
 .ProcessTickets .TicketsQueueOpen:focus-visible {
 	background: color-mix(in srgb, var(--pw-primary-color, #e83561) 10%, transparent);
+}
+
+@media (max-width: 959px) {
+	.ProcessTickets .TicketsQueueTable {
+		overflow: visible;
+	}
+
+	.ProcessTickets .TicketsQueueTable table,
+	.ProcessTickets .TicketsQueueTable tbody {
+		display: block;
+		width: 100%;
+	}
+
+	.ProcessTickets .TicketsQueueTable thead,
+	.ProcessTickets .TicketsQueueAction {
+		display: none;
+	}
+
+	.ProcessTickets .TicketsQueueTable tr {
+		display: grid;
+		grid-template-columns: 1.25rem minmax(8rem, auto) minmax(14rem, 1fr) minmax(10rem, auto);
+		align-items: center;
+		gap: .75rem;
+		padding: 1rem;
+		cursor: pointer;
+	}
+
+	.ProcessTickets .TicketsQueueTable tbody tr + tr {
+		border-top: 1px solid var(--pw-border-color);
+	}
+
+	.ProcessTickets .TicketsQueueTable td {
+		min-width: 0;
+		padding: 0;
+		border: 0;
+	}
+
+	.ProcessTickets .TicketsPriorityLabel {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		padding: 0;
+		margin: -1px;
+		overflow: hidden;
+		clip: rect(0, 0, 0, 0);
+		white-space: nowrap;
+		border: 0;
+	}
+
+	.ProcessTickets .TicketsPriority i {
+		width: .75rem;
+		height: .75rem;
+	}
+
+	.ProcessTickets .TicketsQueueTable tr:focus-visible {
+		outline: 2px solid var(--pw-primary-color, #e83561);
+		outline-offset: -2px;
+	}
+}
+
+@media (max-width: 639px) {
+	.ProcessTickets .TicketsQueueTable tr {
+		grid-template-columns: 1.25rem minmax(0, 1fr);
+		grid-template-areas:
+			"priority status"
+			"ticket ticket"
+			"activity activity";
+		align-items: start;
+	}
+
+	.ProcessTickets .TicketsQueuePriority { grid-area: priority; padding-top: .3rem !important; }
+	.ProcessTickets .TicketsQueueStatus { grid-area: status; }
+	.ProcessTickets .TicketsQueueTicket { grid-area: ticket; }
+	.ProcessTickets .TicketsQueueActivity { grid-area: activity; }
+	.ProcessTickets .TicketsQueueActivity .TicketsQueueSla { text-align: right; }
 }
 
 .ProcessTickets .TicketsViewBack {

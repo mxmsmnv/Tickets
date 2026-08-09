@@ -65,18 +65,18 @@ class ProcessTickets extends Process {
 		if (!$queue) {
 			$out .= '<div class="TicketsEmpty"><i class="fa fa-search" aria-hidden="true"></i><h3>' . $this->_('No tickets match these filters') . '</h3><p>' . $this->_('Change or reset the filters to return to the full queue.') . '</p></div></section>';
 		} else {
-			$out .= '<div class="uk-overflow-auto TicketsQueueTable"><table class="uk-table uk-table-divider uk-table-hover uk-table-middle"><thead><tr><th>' . $this->_('Ticket') . '</th><th>' . $this->_('Customer') . '</th><th>' . $this->_('Status') . '</th><th>' . $this->_('Priority') . '</th><th>' . $this->_('SLA') . '</th><th>' . $this->_('Activity') . '</th><th></th></tr></thead><tbody>';
+			$out .= '<div class="uk-overflow-auto TicketsQueueTable"><table class="uk-table uk-table-divider uk-table-hover uk-table-middle"><thead><tr><th>' . $this->_('Priority') . '</th><th>' . $this->_('Status') . '</th><th>' . $this->_('Ticket') . '</th><th>' . $this->_('Activity') . '</th><th><span class="uk-hidden">' . $this->_('Action') . '</span></th></tr></thead><tbody>';
 			foreach ($queue as $ticket) {
 				$url = $this->wire('page')->url . 'view/?id=' . (int)$ticket['id'];
 				$topic = (string)($ticket['topic'] ?? 'general');
+				$priorityLabel = (string)($tickets->priorities()[$ticket['priority']] ?? $ticket['priority']);
 				$statusColor = in_array($ticket['status'], ['resolved', 'closed'], true) ? 'success' : ($ticket['status'] === 'waiting_staff' ? 'warning' : 'neutral');
-				$out .= '<tr><td><a class="TicketsQueueSubject" href="' . $this->e($url) . '">' . $this->e($ticket['subject']) . '</a><div class="uk-text-meta">#' . $this->e($ticket['public_key']) . ' · ' . $this->e($tickets->types()[$ticket['category']] ?? $ticket['category']) . ' · ' . $this->e($tickets->topics()[$topic] ?? $topic) . '</div></td>'
-					. '<td><strong>' . $this->e($ticket['customer_name']) . '</strong><div class="uk-text-meta">' . $this->e($ticket['customer_email']) . '</div></td>'
-					. '<td><span class="TicketsBadge" data-color="' . $statusColor . '">' . $this->e($tickets->statuses()[$ticket['status']] ?? $ticket['status']) . '</span></td>'
-					. '<td><span class="TicketsPriority" data-priority="' . $this->e($ticket['priority']) . '"><i></i>' . $this->e($tickets->priorities()[$ticket['priority']] ?? $ticket['priority']) . '</span></td>'
-					. '<td>' . $this->queueSlaCell($tickets, $ticket) . '</td>'
-					. '<td><strong>' . $this->e($this->age((string)$ticket['updated_at'])) . '</strong><div class="uk-text-meta">' . $this->e(date('M j, H:i', strtotime((string)$ticket['updated_at']))) . '</div></td>'
-					. '<td><a class="TicketsQueueOpen" href="' . $this->e($url) . '" aria-label="' . $this->_('Open ticket') . '"><i class="fa fa-arrow-right"></i></a></td></tr>';
+				$out .= '<tr data-ticket-row data-ticket-url="' . $this->e($url) . '" data-ticket-label="' . $this->e(sprintf($this->_('Open ticket: %s'), (string)$ticket['subject'])) . '">'
+					. '<td class="TicketsQueuePriority"><span class="TicketsPriority" data-priority="' . $this->e($ticket['priority']) . '" aria-label="' . $this->e(sprintf($this->_('Priority: %s'), $priorityLabel)) . '" title="' . $this->e($priorityLabel) . '"><i aria-hidden="true"></i><span class="TicketsPriorityLabel">' . $this->e($priorityLabel) . '</span></span></td>'
+					. '<td class="TicketsQueueStatus"><span class="TicketsBadge" data-color="' . $statusColor . '">' . $this->e($tickets->statuses()[$ticket['status']] ?? $ticket['status']) . '</span></td>'
+					. '<td class="TicketsQueueTicket"><a class="TicketsQueueSubject" href="' . $this->e($url) . '">' . $this->e($ticket['subject']) . '</a><div class="uk-text-meta">#' . $this->e($ticket['public_key']) . ' · ' . $this->e($tickets->types()[$ticket['category']] ?? $ticket['category']) . ' · ' . $this->e($tickets->topics()[$topic] ?? $topic) . '</div><div class="TicketsQueueCustomer"><strong>' . $this->e($ticket['customer_name']) . '</strong><span>' . $this->e($ticket['customer_email']) . '</span></div></td>'
+					. '<td class="TicketsQueueActivity"><div class="TicketsQueueActivityInner"><div><strong>' . $this->e($this->age((string)$ticket['updated_at'])) . '</strong><span>' . $this->e(date('M j, H:i', strtotime((string)$ticket['updated_at']))) . '</span></div>' . $this->queueSlaCell($tickets, $ticket) . '</div></td>'
+					. '<td class="TicketsQueueAction"><a class="TicketsQueueOpen" href="' . $this->e($url) . '" aria-label="' . $this->_('Open ticket') . '"><i class="fa fa-arrow-right"></i></a></td></tr>';
 			}
 			$out .= '</tbody></table></div></section>';
 		}

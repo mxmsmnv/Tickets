@@ -1,6 +1,6 @@
 # Tickets Documentation
 
-This document describes the integration contract implemented by Tickets 1.0.11
+This document describes the integration contract implemented by Tickets 1.0.12
 for ProcessWire.
 
 ## Configuration

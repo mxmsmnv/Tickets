@@ -109,6 +109,37 @@
 		});
 	}
 
+	var queueRowsMedia = window.matchMedia ? window.matchMedia('(max-width: 959px)') : null;
+
+	function syncQueueRows() {
+		var interactive = queueRowsMedia && queueRowsMedia.matches;
+		document.querySelectorAll('[data-ticket-row]').forEach(function (row) {
+			if (interactive) {
+				row.setAttribute('role', 'link');
+				row.setAttribute('tabindex', '0');
+				row.setAttribute('aria-label', row.getAttribute('data-ticket-label') || 'Open ticket');
+			} else {
+				row.removeAttribute('role');
+				row.removeAttribute('tabindex');
+				row.removeAttribute('aria-label');
+			}
+		});
+	}
+
+	function openQueueRow(event) {
+		var row = event.target.closest && event.target.closest('[data-ticket-row]');
+		if (!row || !queueRowsMedia || !queueRowsMedia.matches) return;
+		if (event.type === 'click' && event.target.closest('a, button, input, select, textarea, label')) return;
+		if (event.type === 'keydown' && event.key !== 'Enter' && event.key !== ' ') return;
+		var url = row.getAttribute('data-ticket-url');
+		if (!url) return;
+		event.preventDefault();
+		window.location.assign(url);
+	}
+
+	document.addEventListener('click', openQueueRow);
+	document.addEventListener('keydown', openQueueRow);
+
 	document.addEventListener('click', function (event) {
 		var button = event.target.closest('[data-ticket-variable]');
 		if (!button) return;
@@ -151,6 +182,11 @@
 	}, true);
 
 	document.addEventListener('DOMContentLoaded', function () {
+		syncQueueRows();
+		if (queueRowsMedia) {
+			if (queueRowsMedia.addEventListener) queueRowsMedia.addEventListener('change', syncQueueRows);
+			else if (queueRowsMedia.addListener) queueRowsMedia.addListener(syncQueueRows);
+		}
 		var forms = document.querySelectorAll('[data-ticket-template-form]');
 		forms.forEach(function (form) {
 			renderPreview(form);

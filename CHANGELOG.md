@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.0.12 - 2026-08-08
+
+- Reordered the dashboard queue to Priority, Status, Ticket, and Activity,
+  folding customer and SLA context into the two relevant cells.
+- Reduced priority to an accessible red, yellow, green, or neutral dot on
+  mobile and tablet while retaining its text label on desktop.
+- Made the complete queue row keyboard- and pointer-activatable below the
+  desktop breakpoint, while keeping the explicit open button on desktop.
+
 ## 1.0.11 - 2026-08-08
 
 - Moved the active-ticket work queue directly below the dashboard introduction
