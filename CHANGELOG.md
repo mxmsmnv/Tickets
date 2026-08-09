@@ -29,7 +29,7 @@
 - Added portable section and date fields and raised the safe field limit for long intake forms.
 - Generalized custom-form attachment copy for supported protected file types.
 
-## 1.0.0 - 2026-08-03
+## 1.0.0 - 2026-07-31
 
 Initial public release.
 

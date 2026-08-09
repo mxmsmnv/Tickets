@@ -1,7 +1,7 @@
 # Tickets public API
 
-This document describes the verified public interface of Tickets 1.0.0
-(`version` 100). It is stronger than README for method usage, but the installed
+This document describes the verified public interface of Tickets 1.0.5
+(`version` 105). It is stronger than README for method usage, but the installed
 module version and live site configuration remain authoritative for a specific
 ProcessWire site.
 
@@ -426,7 +426,7 @@ When both `mail_enabled` and `mailbox_outbound_enabled` are true and Mailbox SMT
 
 ## Configuration keys
 
-The stable 1.0.0 configuration keys are:
+The stable 1.x configuration keys are:
 
 ```text
 public_path
