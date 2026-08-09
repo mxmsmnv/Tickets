@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.8 - 2026-08-08
+
+- Fixed API and CLI workspace labels and command examples so ampersands and
+  line breaks render correctly in the ProcessWire admin.
+
 ## 1.0.7 - 2026-08-08
 
 - Added independently disabled PHP agent API, same-origin JSON REST, and local
