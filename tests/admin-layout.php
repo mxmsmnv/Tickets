@@ -32,6 +32,10 @@ $checks = [
 	'mobile conversation remains first' => str_contains($css, '@media (max-width: 767px)')
 		&& str_contains($css, '.TicketsViewMain > .TicketsConversation { order: 1; }')
 		&& str_contains($css, '.TicketsViewMain > .TicketsReplyComposer { order: 2; }'),
+	'subject form has isolated persistence action' => str_contains($process, "elseif (\$action === 'update_subject')")
+		&& str_contains($process, "'subject' => (string)\$this->wire('input')->post('subject')")
+		&& str_contains($process, 'name="ticket_action" value="update_subject"')
+		&& !preg_match('/<form class="TicketsSubjectForm"[^>]*>.*?name="status"/s', $process),
 	'attachment selection feedback' => str_contains($process, 'data-ticket-attachment-selection')
 		&& str_contains($process, 'data-ticket-attachment-clear')
 		&& str_contains($javascript, 'syncAttachmentSelection')

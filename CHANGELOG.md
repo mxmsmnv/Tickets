@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.44 - 2026-08-09
+
+- Fixed ticket-subject editing so both Enter and the explicit save button
+  persist the new subject.
+- Isolated subject updates from workflow updates to prevent one form from
+  overwriting fields owned by the other.
+
 ## 1.0.43 - 2026-08-09
 
 - Added independent left/right staff-sidebar settings for desktop and tablet.
