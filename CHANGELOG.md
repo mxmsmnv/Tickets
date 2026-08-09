@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.14 - 2026-08-08
+
+- Added a validated canonical notification origin so links generated during
+  cron and CLI runs use the same HTTPS site as web requests.
+
 ## 1.0.13 - 2026-08-08
 
 - Reworked the ticket workspace with editable subjects, an SLA extension

@@ -43,8 +43,12 @@ try {
 	$ticketIds[] = (int)$first['id'];
 	$check((int)$first['assigned_user_id'] === (int)$admin->id, 'Routing did not assign the ticket.');
 	$check(!empty($first['first_response_due_at']) && !empty($first['resolution_due_at']), 'SLA dates are missing.');
+	$previousOrigin = (string)$tickets->notification_origin;
+	$tickets->notification_origin = 'https://support.example.test';
 	$staffUrl = $tickets->notificationTicketUrl($first, true);
 	$customerUrl = $tickets->notificationTicketUrl($first, false, str_repeat('a', 64));
+	$tickets->notification_origin = $previousOrigin;
+	$check(str_starts_with($staffUrl, 'https://support.example.test/'), 'Configured notification origin was not used.');
 	$check(str_contains($staffUrl, '/setup/tickets/view/?id=' . (int)$first['id']), 'Staff notification URL does not open the admin ticket.');
 	$check(str_contains($customerUrl, '/support/' . $first['public_key'] . '/access/'), 'Customer notification URL does not open the private portal ticket.');
 	$renamed = $tickets->updateTicket((int)$first['id'], $admin, ['subject' => 'Updated priority workflow ' . $suffix]);
