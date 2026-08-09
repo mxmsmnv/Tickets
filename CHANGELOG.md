@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.0.37 - 2026-08-09
+
+- Added complete AdminTheme light/dark color support across the Tickets
+  workspace, including Forms, Automation, conversations, badges, SLA states,
+  interface panels, filters, pagination, and form previews.
+- Replaced hard-coded light surfaces and obsolete fallback variables with the
+  active pw-design-system text, surface, input, border, and semantic tokens.
+
 ## 1.0.36 - 2026-08-09
 
 - Matched settings navigation anchors to ProcessWire's generated fieldset IDs

@@ -5,6 +5,18 @@
 	--tickets-space-md: 1rem;
 	--tickets-space-lg: 1.5rem;
 	--tickets-space-xl: 2rem;
+	--tickets-color-success: #2e8540;
+	--tickets-color-warning: #c77c00;
+	--tickets-color-danger: #c83b32;
+	--tickets-color-info: #1683d8;
+	--tickets-surface-subtle: color-mix(in srgb, var(--pw-border-color) 18%, var(--pw-blocks-background));
+	--tickets-surface-muted: color-mix(in srgb, var(--pw-border-color) 30%, var(--pw-blocks-background));
+	--tickets-success-surface: color-mix(in srgb, var(--tickets-color-success) 18%, var(--pw-blocks-background));
+	--tickets-success-text: color-mix(in srgb, var(--tickets-color-success) 68%, var(--pw-text-color));
+	--tickets-warning-surface: color-mix(in srgb, var(--tickets-color-warning) 18%, var(--pw-blocks-background));
+	--tickets-warning-text: color-mix(in srgb, var(--tickets-color-warning) 68%, var(--pw-text-color));
+	--tickets-danger-surface: color-mix(in srgb, var(--tickets-color-danger) 15%, var(--pw-blocks-background));
+	--tickets-danger-text: color-mix(in srgb, var(--tickets-color-danger) 72%, var(--pw-text-color));
 	color: var(--pw-text-color);
 }
 
@@ -126,7 +138,7 @@
 }
 
 .ProcessTickets .TicketsInterfaceState[data-state="enabled"] i {
-	background: #2e8540;
+	background: var(--tickets-color-success);
 }
 
 .ProcessTickets .TicketsInterfaceState strong {
@@ -286,8 +298,8 @@
 }
 
 .ProcessTickets .TicketsCommandMode[data-mode="preview"] {
-	background: color-mix(in srgb, #b7791f 16%, transparent);
-	color: #8a5a12;
+	background: var(--tickets-warning-surface);
+	color: var(--tickets-warning-text);
 }
 
 .ProcessTickets .TicketsTokenPanel > p {
@@ -315,8 +327,8 @@
 }
 
 .ProcessTickets .TicketsTokenOnce {
-	border-color: color-mix(in srgb, #b7791f 55%, var(--pw-border-color));
-	background: color-mix(in srgb, #f6e7c1 40%, var(--pw-blocks-background));
+	border-color: color-mix(in srgb, var(--tickets-color-warning) 55%, var(--pw-border-color));
+	background: var(--tickets-warning-surface);
 }
 
 .ProcessTickets .TicketsTokenOnce code {
@@ -482,8 +494,8 @@
 	width: .7rem;
 	height: .7rem;
 	border-radius: 50%;
-	background: #2e8540;
-	box-shadow: 0 0 0 .25rem color-mix(in srgb, #2e8540 18%, transparent);
+	background: var(--tickets-color-success);
+	box-shadow: 0 0 0 .25rem color-mix(in srgb, var(--tickets-color-success) 18%, transparent);
 }
 
 .ProcessTickets .TicketsDashboardHealth strong,
@@ -883,7 +895,7 @@
 	line-height: 1.1;
 }
 
-.ProcessTickets .TicketsChartLegend [data-series="completed"]::before { background: #2e8540; }
+.ProcessTickets .TicketsChartLegend [data-series="completed"]::before { background: var(--tickets-color-success); }
 
 .ProcessTickets .TicketsReportBars {
 	display: flex;
@@ -915,7 +927,7 @@
 	background: var(--pw-primary-color, #e83561);
 }
 
-.ProcessTickets .TicketsReportBars-day i[data-series="completed"] { background: #2e8540; }
+.ProcessTickets .TicketsReportBars-day i[data-series="completed"] { background: var(--tickets-color-success); }
 .ProcessTickets .TicketsReportBars-day small { position: absolute; top: calc(100% + .35rem); color: var(--pw-muted-color); font-size: .65rem; }
 .ProcessTickets .TicketsEmptyChart { margin: 0; color: var(--pw-muted-color); }
 
@@ -984,13 +996,13 @@
 }
 
 .ProcessTickets .TicketsBadge[data-color="warning"] {
-	background: #fff1c2;
-	color: #6f4d00;
+	background: var(--tickets-warning-surface);
+	color: var(--tickets-warning-text);
 }
 
 .ProcessTickets .TicketsBadge[data-color="success"] {
-	background: #dff3e3;
-	color: #225e2d;
+	background: var(--tickets-success-surface);
+	color: var(--tickets-success-text);
 }
 
 .ProcessTickets .TicketsPriority {
@@ -1008,15 +1020,15 @@
 }
 
 .ProcessTickets .TicketsPriority[data-priority="high"] i {
-	background: #c77c00;
+	background: var(--tickets-color-warning);
 }
 
 .ProcessTickets .TicketsPriority[data-priority="urgent"] i {
-	background: #b42318;
+	background: var(--tickets-color-danger);
 }
 
 .ProcessTickets .TicketsPriority[data-priority="normal"] i {
-	background: #2e8540;
+	background: var(--tickets-color-success);
 }
 
 .ProcessTickets .TicketsQueueCustomer {
@@ -1068,11 +1080,11 @@
 }
 
 .ProcessTickets .TicketsQueueSla[data-state="breached"] strong {
-	color: #b42318;
+	color: var(--tickets-danger-text);
 }
 
 .ProcessTickets .TicketsQueueSla[data-state="due"] strong {
-	color: #6f4d00;
+	color: var(--tickets-warning-text);
 }
 
 .ProcessTickets .TicketsQueueSla[data-state="complete"],
@@ -1391,7 +1403,7 @@
 }
 
 .ProcessTickets .TicketsMessageReceipt summary::-webkit-details-marker { display: none; }
-.ProcessTickets .TicketsMessageReceipt[data-state="read"] summary { color: #1683d8; }
+.ProcessTickets .TicketsMessageReceipt[data-state="read"] summary { color: color-mix(in srgb, var(--tickets-color-info) 70%, var(--pw-text-color)); }
 
 .ProcessTickets .TicketsMessageReceipt dl {
 	position: absolute;
@@ -1583,7 +1595,7 @@
 	margin: 1rem 1.25rem 0;
 	padding: .8rem 1rem;
 	border-radius: var(--pw-input-radius);
-	background: color-mix(in srgb, #2e8540 9%, transparent);
+	background: var(--tickets-success-surface);
 }
 
 .ProcessTickets .TicketsDraftSources ul {
@@ -2232,20 +2244,20 @@
 }
 
 .ProcessTickets .TicketsMessage[data-author="internal"] .TicketsMessage-content {
-	background: #fff8d8;
-	border-color: #dfca71;
+	background: var(--tickets-warning-surface);
+	border-color: color-mix(in srgb, var(--tickets-color-warning) 55%, var(--pw-border-color));
 }
-.ProcessTickets .TicketsInternalNote { margin: 0 1.25rem 1.25rem; border-top: 1px solid var(--pw-color-border, #d7d7d7); padding-top: 1rem; }
+.ProcessTickets .TicketsInternalNote { margin: 0 1.25rem 1.25rem; border-top: 1px solid var(--pw-border-color); padding-top: 1rem; }
 .ProcessTickets .TicketsInternalNote summary { cursor: pointer; font-weight: 500; }
 .ProcessTickets .TicketsInternalNote summary i { margin-right: .5rem; }
 .ProcessTickets .TicketsInternalNoteForm { display: grid; gap: var(--tickets-space-sm); margin-top: var(--tickets-space-sm); }
 .ProcessTickets .TicketsInternalNoteForm textarea { min-height: 8rem; resize: vertical; }
 .ProcessTickets .TicketsInternalNoteForm .uk-button { justify-self: start; }
-.ProcessTickets .TicketsSla[data-breached="true"] { border-left: 4px solid #c62828; }
+.ProcessTickets .TicketsSla[data-breached="true"] { border-left: 4px solid var(--tickets-color-danger); }
 .ProcessTickets .TicketsSla h2 i { margin-right: .5rem; }
 .ProcessTickets .TicketsRelated { list-style: none; margin: 0 0 1rem; padding: 0; display: grid; gap: .5rem; }
 .ProcessTickets .TicketsRelated li { display: grid; gap: .15rem; }
-.ProcessTickets .TicketsRelated small { color: var(--pw-color-muted, #666); text-transform: capitalize; }
+.ProcessTickets .TicketsRelated small { color: var(--pw-muted-color); text-transform: capitalize; }
 .ProcessTickets .TicketsAutomationRun {
 	display: grid;
 	justify-items: end;
@@ -2267,8 +2279,8 @@
 .ProcessTickets .TicketsAutomationSummary article,
 .ProcessTickets .TicketsAutomationSummary > p {
 	margin: 0;
-	border: 1px solid var(--pw-color-border, #d7d7d7);
-	background: var(--pw-panel-background, #fff);
+	border: 1px solid var(--pw-border-color);
+	background: var(--pw-blocks-background);
 }
 
 .ProcessTickets .TicketsAutomationSummary article {
@@ -2297,7 +2309,7 @@
 }
 
 .ProcessTickets .TicketsAutomationSummary > p i {
-	color: var(--pw-accent-color, #d33b62);
+	color: var(--pw-button-background);
 }
 
 .ProcessTickets .TicketsAutomationGrid {
@@ -2319,7 +2331,7 @@
 	justify-content: space-between;
 	gap: var(--tickets-space-md);
 	padding: var(--tickets-space-lg);
-	border-bottom: 1px solid var(--pw-color-border, #d7d7d7);
+	border-bottom: 1px solid var(--pw-border-color);
 }
 
 .ProcessTickets .TicketsAutomationPanel-header h2 {
@@ -2339,8 +2351,8 @@
 	max-height: 18rem;
 	padding: var(--tickets-space-md) var(--tickets-space-lg);
 	overflow: auto;
-	border-bottom: 1px solid var(--pw-color-border, #d7d7d7);
-	background: color-mix(in srgb, var(--pw-panel-background, #fff) 94%, var(--pw-color-border, #d7d7d7));
+	border-bottom: 1px solid var(--pw-border-color);
+	background: var(--tickets-surface-subtle);
 }
 
 .ProcessTickets .TicketsAutomationList a {
@@ -2350,8 +2362,8 @@
 	gap: var(--tickets-space-md);
 	min-height: 3.5rem;
 	padding: var(--tickets-space-sm) var(--tickets-space-md);
-	border: 1px solid var(--pw-color-border, #d7d7d7);
-	background: var(--pw-panel-background, #fff);
+	border: 1px solid var(--pw-border-color);
+	background: var(--pw-blocks-background);
 	color: inherit;
 	text-decoration: none;
 }
@@ -2359,8 +2371,8 @@
 .ProcessTickets .TicketsAutomationList a:hover,
 .ProcessTickets .TicketsAutomationList a:focus-visible,
 .ProcessTickets .TicketsAutomationList a.is-active {
-	border-color: var(--pw-accent-color, #d33b62);
-	box-shadow: inset 3px 0 0 var(--pw-accent-color, #d33b62);
+	border-color: var(--pw-button-background);
+	box-shadow: inset 3px 0 0 var(--pw-button-background);
 	text-decoration: none;
 }
 
@@ -2372,7 +2384,7 @@
 
 .ProcessTickets .TicketsAutomationList small {
 	display: block;
-	color: var(--pw-muted-color, #666);
+	color: var(--pw-muted-color);
 }
 
 .ProcessTickets .TicketsAutomationEmpty {
@@ -2382,8 +2394,8 @@
 	column-gap: var(--tickets-space-md);
 	min-height: 5rem;
 	padding: var(--tickets-space-md);
-	border: 1px dashed var(--pw-color-border, #d7d7d7);
-	background: var(--pw-panel-background, #fff);
+	border: 1px dashed var(--pw-border-color);
+	background: var(--pw-blocks-background);
 }
 
 .ProcessTickets .TicketsAutomationEmpty i {
@@ -2415,7 +2427,7 @@
 
 .ProcessTickets .TicketsAutomationForm-section + .TicketsAutomationForm-section {
 	padding-top: var(--tickets-space-lg);
-	border-top: 1px solid var(--pw-color-border, #d7d7d7);
+	border-top: 1px solid var(--pw-border-color);
 }
 
 .ProcessTickets .TicketsAutomationForm-section > h3 {
@@ -2472,7 +2484,7 @@
 	justify-content: space-between;
 	gap: var(--tickets-space-md);
 	padding-top: var(--tickets-space-md);
-	border-top: 1px solid var(--pw-color-border, #d7d7d7);
+	border-top: 1px solid var(--pw-border-color);
 }
 
 .ProcessTickets .TicketsAutomationActions label {
@@ -2529,21 +2541,22 @@
 .ProcessTickets .TicketsFormActions { display: inline-flex; flex-wrap: wrap; gap: var(--tickets-space-xs); }
 .ProcessTickets .TicketsImportForms { display: grid; gap: var(--tickets-space-md); }
 .ProcessTickets .TicketsImportForms-list { display: grid; gap: var(--tickets-space-xs); }
-.ProcessTickets .TicketsImportForm { display: flex; align-items: flex-start; gap: var(--tickets-space-sm); padding: var(--tickets-space-md); border: 1px solid #d7d7d7; border-radius: 4px; background: #fff; cursor: pointer; }
+.ProcessTickets .TicketsImportForm { display: flex; align-items: flex-start; gap: var(--tickets-space-sm); padding: var(--tickets-space-md); border: 1px solid var(--pw-border-color); border-radius: var(--pw-input-radius); background: var(--pw-blocks-background); color: var(--pw-text-color); cursor: pointer; }
 .ProcessTickets .TicketsImportForm > input { flex: 0 0 auto; margin-top: .2rem; }
 .ProcessTickets .TicketsImportForm > span { display: grid; min-width: 0; gap: .25rem; }
 .ProcessTickets .TicketsImportForm strong { font-weight: 500; }
-.ProcessTickets .TicketsImportForm small { display: block; color: #666; }
-.ProcessTickets .TicketsImportForm-warning { color: #8a5a00 !important; }
+.ProcessTickets .TicketsImportForm small { display: block; color: var(--pw-muted-color); }
+.ProcessTickets .TicketsImportForm-warning { color: var(--tickets-warning-text) !important; }
 
 .ProcessTickets .TicketsFormCard {
 	display: flex;
 	flex-direction: column;
 	gap: var(--tickets-space-sm);
 	padding: 1.25rem;
-	border: 1px solid #d7d7d7;
-	border-radius: 4px;
-	background: #fff;
+	border: 1px solid var(--pw-border-color);
+	border-radius: var(--pw-input-radius);
+	background: var(--pw-blocks-background);
+	color: var(--pw-text-color);
 }
 
 .ProcessTickets .TicketsFormCard header,
@@ -2557,10 +2570,10 @@
 .ProcessTickets .TicketsFormCard h3,
 .ProcessTickets .TicketsFormCard p { margin: 0; }
 .ProcessTickets .TicketsFormCard h3 { font-weight: 500; }
-.ProcessTickets .TicketsFormCard p { flex: 1; color: #666; }
+.ProcessTickets .TicketsFormCard p { flex: 1; color: var(--pw-muted-color); }
 .ProcessTickets .TicketsFormCard footer { margin-top: auto; padding-top: var(--tickets-space-xs); }
 .ProcessTickets .TicketsFormCard code,
-.ProcessTickets .TicketsEmbedCode { display: block; max-width: 100%; padding: .65rem .75rem; overflow-wrap: anywhere; white-space: pre-wrap; word-break: break-word; background: #f4f4f4; }
+.ProcessTickets .TicketsEmbedCode { display: block; max-width: 100%; padding: .65rem .75rem; overflow-wrap: anywhere; white-space: pre-wrap; word-break: break-word; background: var(--tickets-surface-muted); color: var(--pw-text-color); }
 
 .ProcessTickets .TicketsFormEditor {
 	display: grid;
@@ -2581,12 +2594,12 @@
 .ProcessTickets .TicketsFormEditor-side .uk-card label:has(.uk-checkbox) .uk-checkbox { flex: 0 0 auto; margin: 0; }
 .ProcessTickets .TicketsFormEditor h2 { margin: 0 0 var(--tickets-space-lg); font-weight: 500; }
 .ProcessTickets .TicketsFormFields { display: grid; gap: var(--tickets-space-sm); margin-top: var(--tickets-space-md); }
-.ProcessTickets .TicketsFormField { border: 1px solid #d7d7d7; border-radius: 4px; background: #fafafa; }
-.ProcessTickets .TicketsFormField header { display: flex; align-items: center; gap: .65rem; padding: .65rem .8rem; border-bottom: 1px solid #d7d7d7; background: #f4f4f4; }
+.ProcessTickets .TicketsFormField { border: 1px solid var(--pw-border-color); border-radius: var(--pw-input-radius); background: var(--tickets-surface-subtle); }
+.ProcessTickets .TicketsFormField header { display: flex; align-items: center; gap: .65rem; padding: .65rem .8rem; border-bottom: 1px solid var(--pw-border-color); background: var(--tickets-surface-muted); }
 .ProcessTickets .TicketsFormField header strong { flex: 1; font-weight: 500; }
 .ProcessTickets .TicketsFormField-actions { display: flex; gap: .25rem; }
 .ProcessTickets .TicketsFormField-actions button { width: 2rem; height: 2rem; padding: 0; border: 0; border-radius: 3px; background: transparent; cursor: pointer; }
-.ProcessTickets .TicketsFormField-actions button:hover { background: #e5e5e5; }
+.ProcessTickets .TicketsFormField-actions button:hover { background: var(--tickets-surface-muted); }
 .ProcessTickets .TicketsFormField-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--tickets-space-sm); padding: var(--tickets-space-md); }
 .ProcessTickets .TicketsFormField-grid > *,
 .ProcessTickets .TicketsFormEditor input,
@@ -2598,21 +2611,21 @@
 .ProcessTickets .TicketsFormPreview-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--tickets-space-md); }
 .ProcessTickets .TicketsFormPreview-grid label { display: grid; gap: .4rem; min-width: 0; font-weight: 500; }
 .ProcessTickets .TicketsFormPreview-grid label:not(.is-half) { grid-column: 1 / -1; }
-.ProcessTickets .TicketsFormPreview-section { grid-column: 1 / -1; padding-top: var(--tickets-space-sm); border-top: 1px solid #d7d7d7; }
+.ProcessTickets .TicketsFormPreview-section { grid-column: 1 / -1; padding-top: var(--tickets-space-sm); border-top: 1px solid var(--pw-border-color); }
 .ProcessTickets .TicketsFormPreview-section h3 { margin: 0 0 .25rem; font-weight: 500; }
 .ProcessTickets .TicketsFormPreview-grid input:not([type="checkbox"]),
 .ProcessTickets .TicketsFormPreview-grid select,
-.ProcessTickets .TicketsFormPreview-grid textarea { width: 100%; min-height: 2.65rem; box-sizing: border-box; border: 1px solid #b8b8b8; border-radius: 4px; background: #fff; padding: .65rem .75rem; }
-.ProcessTickets .TicketsFormPreview-grid small { color: #666; font-weight: 400; }
-.ProcessTickets .TicketsBulkBar { display: inline-flex; align-items: center; flex-wrap: wrap; gap: var(--tickets-space-xs); width: fit-content; max-width: 100%; padding: var(--tickets-space-xs); margin: var(--tickets-space-md) 0; border: 1px solid #d7d7d7; border-radius: 4px; background: #f8f8f8; }
+.ProcessTickets .TicketsFormPreview-grid textarea { width: 100%; min-height: 2.65rem; box-sizing: border-box; border: 1px solid var(--pw-border-color); border-radius: var(--pw-input-radius); background: var(--pw-inputs-background); color: var(--pw-text-color); padding: .65rem .75rem; }
+.ProcessTickets .TicketsFormPreview-grid small { color: var(--pw-muted-color); font-weight: 400; }
+.ProcessTickets .TicketsBulkBar { display: inline-flex; align-items: center; flex-wrap: wrap; gap: var(--tickets-space-xs); width: fit-content; max-width: 100%; padding: var(--tickets-space-xs); margin: var(--tickets-space-md) 0; border: 1px solid var(--pw-border-color); border-radius: var(--pw-input-radius); background: var(--tickets-surface-subtle); }
 .ProcessTickets .TicketsBulkBar > strong { padding-inline: var(--tickets-space-xs); white-space: nowrap; }
 .ProcessTickets .TicketsBulkBar > .uk-select { width: clamp(14rem, 28vw, 22rem); }
 .ProcessTickets .TicketsBulkBar > .uk-button { white-space: nowrap; }
-.ProcessTickets .TicketsQueueTable td small { display: block; margin-top: .2rem; color: #666; }
+.ProcessTickets .TicketsQueueTable td small { display: block; margin-top: .2rem; color: var(--pw-muted-color); }
 .ProcessTickets .TicketsPagination { display: flex; flex-wrap: wrap; gap: .35rem; justify-content: center; margin-top: var(--tickets-space-lg); }
 .ProcessTickets .TicketsPagination a { min-width: 2.4rem; min-height: 2.4rem; display: inline-grid; place-items: center; border-radius: 4px; text-decoration: none; }
 .ProcessTickets .TicketsPagination a:hover,
-.ProcessTickets .TicketsPagination a[aria-current="page"] { background: #f4f4f4; color: inherit; }
+.ProcessTickets .TicketsPagination a[aria-current="page"] { background: var(--tickets-surface-muted); color: inherit; }
 .ProcessTickets .TicketsOpsHealth { display: flex; align-items: center; justify-content: space-between; gap: var(--tickets-space-lg); margin-top: var(--tickets-space-lg); padding: var(--tickets-space-lg); }
 .ProcessTickets .TicketsOpsHealth h2,
 .ProcessTickets .TicketsOpsHealth p { margin-top: 0; }
