@@ -173,8 +173,22 @@
 		window.location.assign(url);
 	}
 
+	function closeReceiptPopovers(event) {
+		var active = event.target.closest && event.target.closest('.TicketsMessageReceipt');
+		document.querySelectorAll('.TicketsMessageReceipt[open]').forEach(function (receipt) {
+			if (receipt !== active) receipt.removeAttribute('open');
+		});
+	}
+
 	document.addEventListener('click', openQueueRow);
+	document.addEventListener('click', closeReceiptPopovers);
 	document.addEventListener('keydown', openQueueRow);
+	document.addEventListener('keydown', function (event) {
+		if (event.key !== 'Escape') return;
+		document.querySelectorAll('.TicketsMessageReceipt[open]').forEach(function (receipt) {
+			receipt.removeAttribute('open');
+		});
+	});
 
 	document.addEventListener('click', function (event) {
 		var polish = event.target.closest('[data-ticket-polish]');

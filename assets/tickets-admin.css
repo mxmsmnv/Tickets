@@ -1142,21 +1142,24 @@
 
 .ProcessTickets .TicketsMessage-time {
 	display: flex;
-	align-items: center;
+	align-items: baseline;
 	justify-content: flex-end;
 	gap: .55rem;
 }
 
 .ProcessTickets .TicketsMessageReceipt {
 	position: relative;
+	display: inline-flex;
+	align-items: baseline;
 }
 
 .ProcessTickets .TicketsMessageReceipt summary {
 	display: inline-flex;
-	align-items: center;
+	align-items: baseline;
 	gap: .25rem;
 	color: var(--pw-muted-color);
 	font-size: .72rem;
+	line-height: 1.4;
 	cursor: pointer;
 	list-style: none;
 }

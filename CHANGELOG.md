@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.18 - 2026-08-08
+
+- Aligned message receipt status text and icons with the message timestamp.
+- Closed an open receipt-details popover when staff click elsewhere or press
+  Escape, while preserving interaction inside the popover.
+
 ## 1.0.17 - 2026-08-08
 
 - Made every reply notification use its immutable message ID as the
