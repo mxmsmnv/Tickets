@@ -21,6 +21,7 @@ foreach (['lqrs', 'lqrs.dev', 'lqrs.com', 'narzan'] as $forbidden) {
 }
 if ((int)($runtimeDefaults['mail_enabled'] ?? 1) !== 0) throw new \RuntimeException('Transactional mail must be opt-in on a fresh installation.');
 if ((int)($runtimeDefaults['telegram_notifications_enabled'] ?? 1) !== 0) throw new \RuntimeException('Telegram notifications must be opt-in on a fresh installation.');
+if ((string)($runtimeDefaults['admin_conversation_order'] ?? '') !== 'asc') throw new \RuntimeException('Fresh installations must keep chronological admin conversations by default.');
 if (!str_contains((string)($templates['ticket_reply_customer']['html_body'] ?? ''), '{{support_name}}')) throw new \RuntimeException('The staff reply template does not use the configurable support name.');
 
 fwrite(STDOUT, "Tickets generic defaults: OK\n");

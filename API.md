@@ -527,6 +527,7 @@ ticket_topics
 ticket_priorities
 frontend_framework
 frontend_custom_map
+admin_conversation_order
 sla_first_response_minutes
 sla_resolution_minutes
 auto_close_days
@@ -565,6 +566,9 @@ ai_knowledge_base_limit
 Use ProcessWire's module configuration UI/API rather than setting properties in
 a request. Configuration changes can affect privacy, delivery, routes and data
 lifecycle and therefore require the approval rules in `AGENTS.md`.
+
+`admin_conversation_order` accepts `asc` or `desc` and affects only the staff
+workspace. `ticketMessages()` and agent interfaces remain chronological.
 
 The three `rest_bearer_*` values are internal credential metadata managed from
 **Setup → Tickets → Interfaces → API**. Do not write or display them in a site

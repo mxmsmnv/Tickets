@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.0.34 - 2026-08-09
+
+- Added an ASC/DESC staff conversation preference. DESC renders the reply
+  composer first and lists messages newest-first without changing the stable
+  chronological public API.
+- Added Email as a first-class Interfaces page and overview card, including the
+  selected WireMail provider, delivery state, sender, inbox, and link origin.
+
 ## 1.0.33 - 2026-08-09
 
 - Added rate-limited guest access by matching customer email and a separate

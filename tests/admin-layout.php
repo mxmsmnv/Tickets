@@ -14,11 +14,13 @@ $checks = [
 	'report legend semantics' => str_contains($process, "aria-label=\"' . \$this->_('Chart legend') . '\"") && str_contains($process, 'TicketsChartLegend-value'),
 	'report legend layout' => str_contains($css, '.TicketsChartLegend li {') && str_contains($css, 'grid-template-areas: "swatch label" "swatch value";'),
 	'report legend mobile layout' => str_contains($css, '.TicketsReportTrend > header {') && str_contains($css, 'flex-direction: column;'),
-	'separate interface pages' => str_contains($process, '___executeApi()') && str_contains($process, '___executeCli()') && str_contains($process, '___executeTelegram()') && str_contains($process, "interfaceNav('api')") && str_contains($process, "interfaceNav('cli')") && str_contains($process, "interfaceNav('telegram')"),
+	'separate interface pages' => str_contains($process, '___executeApi()') && str_contains($process, '___executeCli()') && str_contains($process, '___executeEmail()') && str_contains($process, '___executeTelegram()') && str_contains($process, "interfaceNav('api')") && str_contains($process, "interfaceNav('cli')") && str_contains($process, "interfaceNav('email')") && str_contains($process, "interfaceNav('telegram')"),
 	'interface status and catalogues' => str_contains($process, 'Current settings') && str_contains($process, 'apiRoutes()') && str_contains($process, 'cliCommands()'),
 	'interface responsive layout' => str_contains($css, '.TicketsInterfaceSettings dl {') && str_contains($css, '.TicketsTokenActions'),
 	'interface navigation reuses module pills' => str_contains($process, '<nav class="TicketsAdminNavigation"') && str_contains($process, 'uk-subnav uk-subnav-pill TicketsAdmin-nav') && !str_contains($css, '.TicketsInterfaceNav'),
 	'telegram reuses interface components' => str_contains($process, "interfaceOverviewCard('telegram'") && str_contains($process, 'TicketsInterfaceSettings') && str_contains($process, 'TicketsInterfaceSafety'),
+	'email reuses interface components' => str_contains($process, "interfaceOverviewCard('envelope'") && str_contains($process, 'mailProviderLabel()') && str_contains($process, 'Selected provider'),
+	'conversation order moves composer semantically' => str_contains($process, "array_reverse(\$messages)") && str_contains($process, "\$conversationOrder === 'desc' ? \$composerOut . \$conversationOut : \$conversationOut . \$composerOut"),
 	'attachment selection feedback' => str_contains($process, 'data-ticket-attachment-selection')
 		&& str_contains($process, 'data-ticket-attachment-clear')
 		&& str_contains($javascript, 'syncAttachmentSelection')

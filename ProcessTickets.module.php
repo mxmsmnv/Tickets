@@ -135,13 +135,14 @@ class ProcessTickets extends Process {
 		if (!$tickets->canAdmin($this->wire('user'))) throw new WirePermissionException('You cannot manage Tickets interfaces.');
 		$this->headline($this->_('Interfaces'));
 		$channels = $tickets->capabilities()['channels'];
-		$summary = '<div class="TicketsInterfaceSummary">' . $this->interfaceState('API', (bool)$channels['rest']) . $this->interfaceState('CLI', (bool)$channels['cli']) . $this->interfaceState('Telegram', (bool)$channels['telegram']) . '</div>';
+		$summary = '<div class="TicketsInterfaceSummary">' . $this->interfaceState('API', (bool)$channels['rest']) . $this->interfaceState('CLI', (bool)$channels['cli']) . $this->interfaceState('Email', (bool)$tickets->mail_enabled) . $this->interfaceState('Telegram', (bool)$channels['telegram']) . '</div>';
 		$out = $this->adminNav('interfaces')
 			. $this->interfaceNav('overview')
 			. $this->pageIntro($this->_('Operational interfaces'), $this->_('Interfaces'), $this->_('Inspect status, authentication, routes, commands, and administrator notification delivery in one workspace.'), $summary)
 			. '<section class="TicketsInterfaceGrid">'
 			. $this->interfaceOverviewCard('exchange', 'API ' . Tickets::REST_API_VERSION, $this->_('Versioned JSON API'), $this->_('Review session and Bearer authentication, token status, and every supported route.'), $this->wire('page')->url . 'api/', (bool)$channels['rest'])
 			. $this->interfaceOverviewCard('terminal', 'CLI', $this->_('Local command line'), $this->_('Review channel status, safety requirements, and the complete command catalogue.'), $this->wire('page')->url . 'cli/', (bool)$channels['cli'])
+			. $this->interfaceOverviewCard('envelope', $this->_('Email') . ' · ' . $tickets->mailProviderLabel(), $this->_('Transactional email'), $this->_('Review the selected WireMail provider, sender identity, notification origin, and delivery state.'), $this->wire('page')->url . 'email/', (bool)$tickets->mail_enabled)
 			. $this->interfaceOverviewCard('telegram', 'Telegram Bot API', $this->_('Administrator notifications'), $this->_('Review readiness, recipients, selected ticket events, privacy limits, and delivery timeout.'), $this->wire('page')->url . 'telegram/', (bool)$channels['telegram'])
 			. '</section>';
 		return $this->workspace($out);
@@ -230,6 +231,34 @@ class ProcessTickets extends Process {
 			. '<div><dt>' . $this->_('Timeout') . '</dt><dd>' . sprintf($this->_('%d seconds'), max(3, min(30, (int)$tickets->telegram_timeout_seconds))) . '</dd></div>'
 			. '</dl></section>'
 			. '<section class="TicketsInterfaceSafety"><div><p class="uk-text-meta uk-text-uppercase uk-margin-remove">' . $this->_('Privacy boundary') . '</p><h2>' . $this->_('Operational metadata only') . '</h2><p>' . $this->_('Telegram receives the event, ticket key, subject, priority, status, and authenticated admin link. Customer email, message bodies, guest tokens, custom fields, and attachments are never sent.') . '</p></div></section>';
+		return $this->workspace($out);
+	}
+
+	public function ___executeEmail(): string {
+		$tickets = $this->tickets();
+		if (!$tickets->canAdmin($this->wire('user'))) throw new WirePermissionException('You cannot inspect Tickets email delivery.');
+		$this->headline($this->_('Tickets Email'));
+		$enabled = (bool)$tickets->mail_enabled;
+		$providerKey = trim((string)$tickets->mail_module);
+		$providerLabel = $tickets->mailProviderLabel();
+		$providerAvailable = $providerKey === '' || array_key_exists($providerKey, $tickets->mailProviderOptions());
+		$origin = trim((string)$tickets->notification_origin);
+		if ($origin === '') $origin = rtrim((string)$this->wire('config')->urls->httpRoot, '/');
+		$summary = '<div class="TicketsInterfaceSummary">'
+			. $this->interfaceState($this->_('Delivery'), $enabled)
+			. $this->interfaceState($this->_('Provider'), $providerAvailable)
+			. '</div>';
+		$out = $this->adminNav('interfaces') . $this->interfaceNav('email')
+			. $this->pageIntro($this->_('Customer notifications'), $this->_('Tickets Email'), $this->_('Inspect the transactional transport and sender identity used for private ticket updates.'), $summary)
+			. '<section class="TicketsInterfaceSettings"><header><div><p class="uk-text-meta uk-text-uppercase uk-margin-remove">WireMail</p><h2>' . $this->_('Current settings') . '</h2></div><a class="uk-button uk-button-default" href="' . $this->e($this->emailSettingsUrl()) . '">' . $this->_('Module settings') . '</a></header><dl>'
+			. '<div><dt>' . $this->_('Delivery') . '</dt><dd>' . ($enabled ? $this->_('Enabled') : $this->_('Disabled')) . '</dd></div>'
+			. '<div><dt>' . $this->_('Selected provider') . '</dt><dd><strong>' . $this->e($providerLabel) . '</strong></dd></div>'
+			. '<div><dt>' . $this->_('Provider module') . '</dt><dd><code>' . $this->e($providerKey !== '' ? $providerKey : $this->_('Site default')) . '</code></dd></div>'
+			. '<div><dt>' . $this->_('Sender') . '</dt><dd>' . $this->e(trim((string)$tickets->from_name) . ' <' . trim((string)$tickets->from_email) . '>') . '</dd></div>'
+			. '<div><dt>' . $this->_('Support inbox') . '</dt><dd>' . $this->e((string)$tickets->support_email) . '</dd></div>'
+			. '<div><dt>' . $this->_('Notification origin') . '</dt><dd><code>' . $this->e($origin) . '</code></dd></div>'
+			. '</dl></section>'
+			. '<section class="TicketsInterfaceSafety"><div><p class="uk-text-meta uk-text-uppercase uk-margin-remove">' . $this->_('Credential boundary') . '</p><h2>' . $this->_('Provider secrets stay in WireMail') . '</h2><p>' . $this->_('Tickets selects a transport but never stores or displays provider API keys, SMTP passwords, or other WireMail credentials.') . '</p></div></section>';
 		return $this->workspace($out);
 	}
 
@@ -393,6 +422,8 @@ class ProcessTickets extends Process {
 		$ticket = $tickets->getTicket($id);
 		$tickets->markMessagesRead($id, $this->wire('user'), true);
 		$messages = $tickets->ticketMessages($id, true);
+		$conversationOrder = strtolower((string)$tickets->admin_conversation_order) === 'desc' ? 'desc' : 'asc';
+		if ($conversationOrder === 'desc') $messages = array_reverse($messages);
 		$macros = $tickets->macros(true, $ticket);
 		$links = $tickets->ticketLinks($id);
 		$sla = $tickets->slaState($ticket);
@@ -406,7 +437,7 @@ class ProcessTickets extends Process {
 		$out = $this->adminNav('view') . '<div class="TicketsViewBack"><a href="' . $this->e($this->wire('page')->url) . '"><i class="fa fa-arrow-left" aria-hidden="true"></i>' . $this->_('Back to queue') . '</a></div>';
 		$out .= '<header class="TicketsCaseHeader"><div class="TicketsCaseHeader-main"><div class="TicketsCaseHeader-eyebrow"><span>' . $this->_('Support ticket') . '</span><code>#' . $this->e($ticket['public_key']) . '</code></div><form class="TicketsSubjectForm" method="post"><input type="hidden" name="ticket_action" value="update">' . $this->csrf() . '<input type="hidden" name="status" value="' . $this->e($ticket['status']) . '"><input type="hidden" name="priority" value="' . $this->e($ticket['priority']) . '"><input type="hidden" name="assigned_user_id" value="' . (int)$ticket['assigned_user_id'] . '"><label class="uk-form-label" for="ticket-subject">' . $this->_('Subject') . '</label><div><input class="uk-input" id="ticket-subject" name="subject" value="' . $this->e($ticket['subject']) . '" maxlength="180" required><button class="uk-button uk-button-default" type="submit" aria-label="' . $this->_('Save subject') . '" title="' . $this->_('Save subject') . '"><i class="fa fa-check" aria-hidden="true"></i></button></div></form><div class="TicketsCaseHeader-meta"><span><i class="fa fa-user-o" aria-hidden="true"></i>' . $this->e($ticket['customer_name']) . '</span><span><i class="fa fa-clock-o" aria-hidden="true"></i>' . $this->_('Updated') . ' ' . $this->e($this->age((string)$ticket['updated_at'])) . '</span><span><i class="fa fa-comments-o" aria-hidden="true"></i>' . count($messages) . ' ' . $this->_('messages') . '</span></div></div><div class="TicketsCaseHeader-state"><span class="TicketsBadge" data-color="' . $statusColor . '">' . $this->e($tickets->statuses()[$ticket['status']] ?? $ticket['status']) . '</span><span class="TicketsPriority" data-priority="' . $this->e($ticket['priority']) . '"><i></i>' . $this->e($tickets->priorities()[$ticket['priority']] ?? $ticket['priority']) . '</span></div></header>';
 
-		$out .= '<div class="TicketsViewLayout"><main class="TicketsViewMain"><section class="TicketsConversation" aria-labelledby="tickets-conversation-title"><header><div><p class="uk-text-meta uk-text-uppercase uk-margin-remove">' . $this->_('Conversation') . '</p><h2 id="tickets-conversation-title">' . $this->_('Messages') . '</h2></div><span>' . count($messages) . ' ' . $this->_('total') . '</span></header><div class="TicketsThread">';
+		$conversationOut = '<section class="TicketsConversation" data-order="' . $conversationOrder . '" aria-labelledby="tickets-conversation-title"><header><div><p class="uk-text-meta uk-text-uppercase uk-margin-remove">' . $this->_('Conversation') . '</p><h2 id="tickets-conversation-title">' . $this->_('Messages') . '</h2></div><span>' . count($messages) . ' ' . $this->_('total') . '</span></header><div class="TicketsThread">';
 		foreach ($messages as $message) {
 			$isStaff = !empty($message['is_staff']);
 			$isInternal = !empty($message['is_internal']);
@@ -418,35 +449,35 @@ class ProcessTickets extends Process {
 				$receiptLabel = $receiptState === 'read' ? $this->_('Read') : ($receiptState === 'delivered' ? $this->_('Delivered') : $this->_('Sent'));
 				$receipt = '<details class="TicketsMessageReceipt" data-state="' . $receiptState . '"><summary aria-label="' . $this->e($receiptLabel) . '"><i class="fa ' . ($receiptState === 'sent' ? 'fa-check' : 'fa-check-circle') . '" aria-hidden="true"></i><span>' . $this->e($receiptLabel) . '</span></summary><dl><dt>' . $this->_('Sent') . '</dt><dd>' . $this->e($this->dateTime((string)$message['created_at'])) . '</dd><dt>' . $this->_('Delivered') . '</dt><dd>' . $this->e(!empty($message['delivered_at']) ? $this->dateTime((string)$message['delivered_at']) : $this->_('Not confirmed')) . '</dd><dt>' . $this->_('Read') . '</dt><dd>' . $this->e(!empty($message['read_at']) ? $this->dateTime((string)$message['read_at']) : $this->_('Not yet')) . '</dd></dl></details>';
 			}
-			$out .= '<article class="TicketsMessage" data-author="' . ($isInternal ? 'internal' : ($isStaff ? 'staff' : 'customer')) . '"><div class="TicketsMessage-avatar" aria-hidden="true">' . ($isInternal ? '<i class="fa fa-lock"></i>' : ($isStaff ? '<i class="fa fa-life-ring"></i>' : $this->e($customerInitial))) . '</div><div class="TicketsMessage-content"><header><div><strong>' . $this->e($author) . '</strong>' . ($staffName !== '' ? '<span>' . $this->e($staffName) . '</span>' : '<span>' . $this->_('Customer') . '</span>') . '</div><div class="TicketsMessage-time"><time datetime="' . $this->e(date(DATE_ATOM, strtotime((string)$message['created_at']))) . '">' . $this->e($this->dateTime((string)$message['created_at'])) . '</time>' . $receipt . '</div></header><div class="TicketsMessage-text">' . nl2br($this->e($message['body'])) . '</div>';
-			if (!empty($message['attachments'])) $out .= '<div class="TicketsMessage-attachments">';
+			$conversationOut .= '<article class="TicketsMessage" data-author="' . ($isInternal ? 'internal' : ($isStaff ? 'staff' : 'customer')) . '"><div class="TicketsMessage-avatar" aria-hidden="true">' . ($isInternal ? '<i class="fa fa-lock"></i>' : ($isStaff ? '<i class="fa fa-life-ring"></i>' : $this->e($customerInitial))) . '</div><div class="TicketsMessage-content"><header><div><strong>' . $this->e($author) . '</strong>' . ($staffName !== '' ? '<span>' . $this->e($staffName) . '</span>' : '<span>' . $this->_('Customer') . '</span>') . '</div><div class="TicketsMessage-time"><time datetime="' . $this->e(date(DATE_ATOM, strtotime((string)$message['created_at']))) . '">' . $this->e($this->dateTime((string)$message['created_at'])) . '</time>' . $receipt . '</div></header><div class="TicketsMessage-text">' . nl2br($this->e($message['body'])) . '</div>';
+			if (!empty($message['attachments'])) $conversationOut .= '<div class="TicketsMessage-attachments">';
 			foreach ($message['attachments'] as $attachment) {
 				$url = $tickets->attachmentUrl($ticket, $attachment);
 				$isImage = str_starts_with((string)$attachment['mime_type'], 'image/');
 				$preview = $isImage ? '<img src="' . $this->e($url) . '" width="96" height="72" loading="lazy" alt="">' : '<i class="fa fa-file-o" aria-hidden="true"></i>';
-				$out .= '<a class="TicketsMessage-attachment" target="_blank" rel="noopener" href="' . $this->e($url) . '"><span class="TicketsMessage-attachmentPreview">' . $preview . '</span><span><strong>' . $this->e($attachment['original_name']) . '</strong><small><i class="fa fa-external-link" aria-hidden="true"></i>' . $this->_($isImage ? 'Open image' : 'Open attachment') . '</small></span></a>';
+				$conversationOut .= '<a class="TicketsMessage-attachment" target="_blank" rel="noopener" href="' . $this->e($url) . '"><span class="TicketsMessage-attachmentPreview">' . $preview . '</span><span><strong>' . $this->e($attachment['original_name']) . '</strong><small><i class="fa fa-external-link" aria-hidden="true"></i>' . $this->_($isImage ? 'Open image' : 'Open attachment') . '</small></span></a>';
 			}
-			if (!empty($message['attachments'])) $out .= '</div>';
-			$out .= '</div></article>';
+			if (!empty($message['attachments'])) $conversationOut .= '</div>';
+			$conversationOut .= '</div></article>';
 		}
-		$out .= '</div></section>';
+		$conversationOut .= '</div></section>';
 
-		$out .= '<section class="TicketsReplyComposer" aria-labelledby="tickets-reply-title"><header><div><p class="uk-text-meta uk-text-uppercase uk-margin-remove">' . $this->_('Respond') . '</p><h2 id="tickets-reply-title">' . $this->_('Reply to customer') . '</h2><p>' . $this->_('Your reply is added to the private conversation and sent by transactional email.') . '</p></div>';
-		if ($tickets->ai_assist_enabled) $out .= '<form method="post" data-ticket-ai-draft><input type="hidden" name="ticket_action" value="draft"><input type="hidden" name="tickets_ajax" value="1">' . $this->csrf() . '<button class="uk-button uk-button-default" type="submit" data-idle-label="' . $this->_($draft !== '' ? 'Regenerate draft' : 'Prepare AI draft') . '" data-loading-label="' . $this->_('Preparing draft…') . '"><i class="fa fa-magic uk-margin-small-right"></i><span>' . $this->_($draft !== '' ? 'Regenerate draft' : 'Prepare AI draft') . '</span></button><span class="uk-text-meta TicketsAiDraftStatus" role="status" aria-live="polite" data-ticket-ai-status></span></form>';
-		$out .= '</header>';
-		$out .= '<div class="TicketsDraftSources" data-ticket-draft-sources' . (!$draftSources ? ' hidden' : '') . '><strong><i class="fa fa-check-circle" aria-hidden="true"></i>' . $this->_('Verified sources used') . '</strong><ul>';
+		$composerOut = '<section class="TicketsReplyComposer" aria-labelledby="tickets-reply-title"><header><div><p class="uk-text-meta uk-text-uppercase uk-margin-remove">' . $this->_('Respond') . '</p><h2 id="tickets-reply-title">' . $this->_('Reply to customer') . '</h2><p>' . $this->_('Your reply is added to the private conversation and sent by transactional email.') . '</p></div>';
+		if ($tickets->ai_assist_enabled) $composerOut .= '<form method="post" data-ticket-ai-draft><input type="hidden" name="ticket_action" value="draft"><input type="hidden" name="tickets_ajax" value="1">' . $this->csrf() . '<button class="uk-button uk-button-default" type="submit" data-idle-label="' . $this->_($draft !== '' ? 'Regenerate draft' : 'Prepare AI draft') . '" data-loading-label="' . $this->_('Preparing draft…') . '"><i class="fa fa-magic uk-margin-small-right"></i><span>' . $this->_($draft !== '' ? 'Regenerate draft' : 'Prepare AI draft') . '</span></button><span class="uk-text-meta TicketsAiDraftStatus" role="status" aria-live="polite" data-ticket-ai-status></span></form>';
+		$composerOut .= '</header>';
+		$composerOut .= '<div class="TicketsDraftSources" data-ticket-draft-sources' . (!$draftSources ? ' hidden' : '') . '><strong><i class="fa fa-check-circle" aria-hidden="true"></i>' . $this->_('Verified sources used') . '</strong><ul>';
 		if ($draftSources) {
-			foreach ($draftSources as $source) $out .= '<li><a href="' . $this->e((string)($source['url'] ?? '')) . '" target="_blank" rel="noopener">' . $this->e((string)($source['title'] ?? 'Source')) . '</a></li>';
+			foreach ($draftSources as $source) $composerOut .= '<li><a href="' . $this->e((string)($source['url'] ?? '')) . '" target="_blank" rel="noopener">' . $this->e((string)($source['title'] ?? 'Source')) . '</a></li>';
 		}
-		$out .= '</ul></div>';
-		$out .= '<form class="TicketsReplyForm" method="post" enctype="multipart/form-data"><input type="hidden" name="ticket_action" value="reply">' . $this->csrf();
+		$composerOut .= '</ul></div>';
+		$composerOut .= '<form class="TicketsReplyForm" method="post" enctype="multipart/form-data"><input type="hidden" name="ticket_action" value="reply">' . $this->csrf();
 		if ($macros) {
-			$out .= '<label class="uk-form-label" for="ticket-macro">' . $this->_('Quick reply') . '</label><select class="uk-select uk-margin-small-bottom" id="ticket-macro" data-ticket-macro><option value="">' . $this->_('Choose a saved response') . '</option>';
-			foreach ($macros as $macro) $out .= '<option value="' . (int)$macro['id'] . '" data-body="' . $this->e($macro['body']) . '">' . $this->e($macro['title']) . '</option>';
-			$out .= '</select>';
+			$composerOut .= '<label class="uk-form-label" for="ticket-macro">' . $this->_('Quick reply') . '</label><select class="uk-select uk-margin-small-bottom" id="ticket-macro" data-ticket-macro><option value="">' . $this->_('Choose a saved response') . '</option>';
+			foreach ($macros as $macro) $composerOut .= '<option value="' . (int)$macro['id'] . '" data-body="' . $this->e($macro['body']) . '">' . $this->e($macro['title']) . '</option>';
+			$composerOut .= '</select>';
 		}
-		$out .= '<label class="uk-form-label" for="ticket-reply">' . $this->_('Message') . '</label><textarea class="uk-textarea" id="ticket-reply" name="body" rows="8" placeholder="' . $this->_('Write a clear, helpful reply…') . '" required data-ticket-reply>' . $this->e($draft) . '</textarea>';
-		$out .= '<div class="TicketsReplyActions"><div><div class="TicketsReplyAttachmentControl">'
+		$composerOut .= '<label class="uk-form-label" for="ticket-reply">' . $this->_('Message') . '</label><textarea class="uk-textarea" id="ticket-reply" name="body" rows="8" placeholder="' . $this->_('Write a clear, helpful reply…') . '" required data-ticket-reply>' . $this->e($draft) . '</textarea>';
+		$composerOut .= '<div class="TicketsReplyActions"><div><div class="TicketsReplyAttachmentControl">'
 			. '<label class="TicketsReplyAttachment" for="ticket-attachment"><i class="fa fa-paperclip" aria-hidden="true"></i><span>' . $this->_('Attach file') . '</span>'
 			. '<input id="ticket-attachment" type="file" name="attachment" data-ticket-attachment accept="image/jpeg,image/png,image/webp,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain"></label>'
 			. '<div class="TicketsReplyAttachmentSelection" data-ticket-attachment-selection hidden aria-live="polite" data-selected-label="' . $this->_('Selected') . '" data-ready-label="' . $this->_('Ready to send with this reply') . '">'
@@ -454,7 +485,8 @@ class ProcessTickets extends Process {
 			. '<button class="TicketsReplyAttachmentRemove" type="button" data-ticket-attachment-clear aria-label="' . $this->_('Remove selected attachment') . '" title="' . $this->_('Remove selected attachment') . '"><i class="fa fa-times" aria-hidden="true"></i></button></div></div>'
 			. ($tickets->ai_assist_enabled ? '<button class="uk-button uk-button-text" type="button" data-ticket-polish data-endpoint="' . $this->e($this->wire('page')->url . 'view/?id=' . $id) . '"><i class="fa fa-pencil" aria-hidden="true"></i>' . $this->_('Fix writing') . '</button>' : '')
 			. '</div><button class="uk-button uk-button-primary" type="submit"><i class="fa fa-paper-plane uk-margin-small-right"></i>' . $this->_('Send reply') . '</button></div></form>';
-		$out .= '<details class="TicketsInternalNote"><summary><i class="fa fa-lock" aria-hidden="true"></i>' . $this->_('Add internal note') . '</summary><form class="TicketsInternalNoteForm" method="post"><input type="hidden" name="ticket_action" value="note">' . $this->csrf() . '<textarea class="uk-textarea" name="body" rows="5" required placeholder="' . $this->_('Visible only to support staff…') . '"></textarea><button class="uk-button uk-button-default" type="submit">' . $this->_('Save internal note') . '</button></form></details></section></main>';
+		$composerOut .= '<details class="TicketsInternalNote"><summary><i class="fa fa-lock" aria-hidden="true"></i>' . $this->_('Add internal note') . '</summary><form class="TicketsInternalNoteForm" method="post"><input type="hidden" name="ticket_action" value="note">' . $this->csrf() . '<textarea class="uk-textarea" name="body" rows="5" required placeholder="' . $this->_('Visible only to support staff…') . '"></textarea><button class="uk-button uk-button-default" type="submit">' . $this->_('Save internal note') . '</button></form></details></section>';
+		$out .= '<div class="TicketsViewLayout"><main class="TicketsViewMain">' . ($conversationOrder === 'desc' ? $composerOut . $conversationOut : $conversationOut . $composerOut) . '</main>';
 
 		$out .= '<aside class="TicketsViewAside"><form class="TicketsSidePanel" method="post"><input type="hidden" name="ticket_action" value="update">' . $this->csrf() . '<header><span class="TicketsSidePanel-icon"><i class="fa fa-sliders"></i></span><div><h2>' . $this->_('Workflow') . '</h2><p>' . $this->_('Route and resolve this request.') . '</p></div></header>' . $this->select('status', $this->_('Status'), $tickets->statuses(), (string)$ticket['status']) . $this->select('priority', $this->_('Priority'), $tickets->priorities(), (string)$ticket['priority']) . $this->select('assigned_user_id', $this->_('Assigned to'), $this->staffOptions(), (string)(int)$ticket['assigned_user_id']) . '<button class="uk-button uk-button-primary uk-width-1-1" type="submit">' . $this->_('Save workflow') . '</button></form>';
 		$slaLabel = $sla['due_at'] !== '' ? date('M j, Y · H:i', strtotime($sla['due_at'])) : $this->_('Not set');
@@ -880,6 +912,7 @@ class ProcessTickets extends Process {
 			'overview' => [$base . 'interfaces/', $this->_('Overview')],
 			'api' => [$base . 'api/', $this->_('API')],
 			'cli' => [$base . 'cli/', $this->_('CLI')],
+			'email' => [$base . 'email/', $this->_('Email')],
 			'telegram' => [$base . 'telegram/', $this->_('Telegram')],
 		];
 		$out = '<nav class="TicketsAdminNavigation" aria-label="' . $this->_('Interface sections') . '"><ul class="uk-subnav uk-subnav-pill TicketsAdmin-nav">';
@@ -902,6 +935,10 @@ class ProcessTickets extends Process {
 
 	private function telegramSettingsUrl(): string {
 		return $this->wire('config')->urls->admin . 'module/edit?name=Tickets&collapse_info=1#Inputfield_telegram_notifications_enabled';
+	}
+
+	private function emailSettingsUrl(): string {
+		return $this->wire('config')->urls->admin . 'module/edit?name=Tickets&collapse_info=1#Inputfield_mail_module';
 	}
 
 	private function apiRoutes(): array {

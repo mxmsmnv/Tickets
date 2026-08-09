@@ -115,7 +115,7 @@ enforce `tickets-admin` and are not frontend submission APIs.
 
 ## Operational interfaces
 
-Tickets exposes API, CLI, and Telegram as independent operational interfaces.
+Tickets exposes API, CLI, Email, and Telegram as independent operational interfaces.
 Fresh installations and upgrades keep every outbound or remotely accessible
 channel disabled:
 
@@ -123,6 +123,14 @@ channel disabled:
 - versioned JSON REST under `/tickets-api/v1/`;
 - the local `site/modules/Tickets/bin/tickets` executable.
 - administrator alerts through the Telegram Bot API.
+- transactional email status and the selected WireMail provider without
+  exposing provider credentials.
+
+The ticket workspace conversation order is configurable under **Modules →
+Configure → Tickets → Staff workspace**. ASC keeps the oldest message first and
+the reply composer below the thread. DESC places the composer first and lists
+the newest message first. This affects admin presentation only; public APIs and
+AI context remain chronological.
 
 The PHP and REST channels require an actor with both `tickets-api` and
 `tickets-manage`. Report and form-definition reads additionally require

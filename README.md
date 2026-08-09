@@ -47,6 +47,10 @@ If this project helps your work, consider supporting future development:
   staff can see customer-local time without storing a new raw IP field.
 - Provides independently disabled, permission-gated PHP API, versioned JSON
   REST, and local JSON CLI channels for trusted integrations and agents.
+- Shows Email alongside API, CLI, and Telegram in the Interfaces workspace,
+  including the selected WireMail provider without exposing its credentials.
+- Lets administrators choose oldest-first (ASC) or newest-first (DESC)
+  conversation presentation; DESC also places the reply composer first.
 - Supports session/CSRF REST authentication and an optional scoped Bearer
   credential stored only as a hash and assigned to one permitted actor.
 - Uses neutral installation defaults and creates no sample tickets or customers.
