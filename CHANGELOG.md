@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.29 - 2026-08-09
+
+- Kept Telegram credentials, recipients, events, timeout, and privacy guidance
+  visible while delivery is disabled so administrators can configure first and
+  enable only after the interface reports ready.
+
 ## 1.0.28 - 2026-08-09
 
 - Replaced the optional TeleWire dependency with an independent Tickets-owned

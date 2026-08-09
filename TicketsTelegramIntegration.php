@@ -42,7 +42,6 @@ trait TicketsTelegramIntegration {
 		$token->attr('type', 'password');
 		$token->attr('autocomplete', 'new-password');
 		$token->value = (string)$this->telegram_bot_token;
-		$token->showIf = 'telegram_notifications_enabled=1';
 		$token->columnWidth = 50;
 		$interfaces->add($token);
 
@@ -51,7 +50,6 @@ trait TicketsTelegramIntegration {
 		$chatIds->label = $this->_('Administrator chat IDs');
 		$chatIds->description = $this->_('One numeric chat ID or @channel username per line. The bot must already have permission to send there.');
 		$chatIds->value = (string)$this->telegram_chat_ids;
-		$chatIds->showIf = 'telegram_notifications_enabled=1';
 		$chatIds->columnWidth = 50;
 		$interfaces->add($chatIds);
 
@@ -64,7 +62,6 @@ trait TicketsTelegramIntegration {
 			'sla_breach' => $this->_('An SLA target is missed'),
 		]);
 		$events->value = $this->telegramNotificationEvents();
-		$events->showIf = 'telegram_notifications_enabled=1';
 		$events->columnWidth = 70;
 		$interfaces->add($events);
 
@@ -75,14 +72,12 @@ trait TicketsTelegramIntegration {
 		$timeout->attr('min', 3);
 		$timeout->attr('max', 30);
 		$timeout->value = max(3, min(30, (int)$this->telegram_timeout_seconds));
-		$timeout->showIf = 'telegram_notifications_enabled=1';
 		$timeout->columnWidth = 30;
 		$interfaces->add($timeout);
 
 		$privacy = $this->wire('modules')->get('InputfieldMarkup');
 		$privacy->label = $this->_('Telegram payload');
 		$privacy->value = '<p>' . $this->_('Telegram receives only the event, ticket key, subject, priority, workflow status, and an authenticated admin link. Customer email, message text, guest access tokens, custom fields, and attachments are excluded.') . '</p>';
-		$privacy->showIf = 'telegram_notifications_enabled=1';
 		$interfaces->add($privacy);
 	}
 

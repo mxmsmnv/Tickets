@@ -14,6 +14,7 @@ $checks = [
 	'no TeleWire dependency' => !str_contains($module, 'TeleWire') && !str_contains($integration, 'TeleWire'),
 	'bounded HTTPS delivery' => str_contains($integration, 'CURLOPT_PROTOCOLS => CURLPROTO_HTTPS') && str_contains($integration, 'CURLOPT_CONNECTTIMEOUT') && str_contains($integration, 'CURLOPT_FOLLOWLOCATION => false'),
 	'runtime secret support' => str_contains($integration, 'TICKETS_TELEGRAM_BOT_TOKEN') && str_contains($integration, 'ticketsTelegramBotToken'),
+	'configure before enable' => !str_contains($integration, "showIf = 'telegram_notifications_enabled=1'"),
 	'credential redaction' => !str_contains($integration, "'token' => \$token") && !str_contains($integration, "'chat_ids' => \$chatIds"),
 	'privacy copy' => str_contains($integration, 'Customer email, message text, guest access tokens, custom fields, and attachments are excluded.'),
 	'failure isolation' => str_contains($integration, 'catch (\\Throwable $error)') && str_contains($integration, 'return false;'),
