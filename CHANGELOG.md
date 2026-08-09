@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.17 - 2026-08-08
+
+- Made every reply notification use its immutable message ID as the
+  idempotency key, so two messages created within the same second cannot cause
+  a customer-to-staff notification to be suppressed as a duplicate.
+
 ## 1.0.16 - 2026-08-08
 
 - Added a consistent dashboard gap between the active-ticket queue and the
