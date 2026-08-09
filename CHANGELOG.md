@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.24 - 2026-08-09
+
+- Rendered every Overview, API, and CLI interface tab as a complete outlined
+  pill with filled active, hover, and keyboard-focus states.
+
 ## 1.0.23 - 2026-08-09
 
 - Split the operational interface workspace into dedicated API and CLI pages
