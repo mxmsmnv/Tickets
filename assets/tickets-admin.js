@@ -145,6 +145,46 @@
 		});
 	}
 
+	function formatFileSize(bytes) {
+		if (!Number.isFinite(bytes) || bytes < 1) return '';
+		if (bytes < 1024) return bytes + ' B';
+		if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(bytes < 10240 ? 1 : 0) + ' KB';
+		return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+	}
+
+	function clearAttachmentPreview(preview) {
+		if (!preview) return;
+		var image = preview.querySelector('img');
+		if (image && image.dataset.objectUrl) URL.revokeObjectURL(image.dataset.objectUrl);
+		preview.replaceChildren();
+		var icon = document.createElement('i');
+		icon.className = 'fa fa-file-o';
+		icon.setAttribute('aria-hidden', 'true');
+		preview.appendChild(icon);
+	}
+
+	function syncAttachmentSelection(input) {
+		var control = input && input.closest('.TicketsReplyAttachmentControl');
+		var selection = control && control.querySelector('[data-ticket-attachment-selection]');
+		if (!selection) return;
+		var file = input.files && input.files[0];
+		var preview = selection.querySelector('[data-ticket-attachment-preview]');
+		clearAttachmentPreview(preview);
+		selection.hidden = !file;
+		if (!file) return;
+		selection.querySelector('[data-ticket-attachment-state]').textContent = selection.dataset.selectedLabel || 'Selected';
+		selection.querySelector('[data-ticket-attachment-name]').textContent = file.name;
+		selection.querySelector('[data-ticket-attachment-size]').textContent = [formatFileSize(file.size), selection.dataset.readyLabel || 'Ready to send'].filter(Boolean).join(' · ');
+		if (file.type && file.type.indexOf('image/') === 0 && window.URL && URL.createObjectURL) {
+			var url = URL.createObjectURL(file);
+			var image = document.createElement('img');
+			image.src = url;
+			image.alt = '';
+			image.dataset.objectUrl = url;
+			preview.replaceChildren(image);
+		}
+	}
+
 	var queueRowsMedia = window.matchMedia ? window.matchMedia('(max-width: 959px)') : null;
 
 	function syncQueueRows() {
@@ -191,6 +231,15 @@
 	});
 
 	document.addEventListener('click', function (event) {
+		var clearAttachment = event.target.closest('[data-ticket-attachment-clear]');
+		if (clearAttachment) {
+			event.preventDefault();
+			var attachmentInput = clearAttachment.closest('.TicketsReplyAttachmentControl').querySelector('[data-ticket-attachment]');
+			attachmentInput.value = '';
+			syncAttachmentSelection(attachmentInput);
+			attachmentInput.focus();
+			return;
+		}
 		var polish = event.target.closest('[data-ticket-polish]');
 		if (polish) {
 			event.preventDefault();
@@ -217,6 +266,7 @@
 	});
 
 	document.addEventListener('change', function (event) {
+		if (event.target.matches('[data-ticket-attachment]')) syncAttachmentSelection(event.target);
 		if (event.target.matches('[data-ticket-macro]')) {
 			var option = event.target.options[event.target.selectedIndex];
 			var reply = document.querySelector('[data-ticket-reply]');
@@ -238,6 +288,7 @@
 	}, true);
 
 	document.addEventListener('DOMContentLoaded', function () {
+		document.querySelectorAll('[data-ticket-attachment]').forEach(syncAttachmentSelection);
 		syncQueueRows();
 		if (queueRowsMedia) {
 			if (queueRowsMedia.addEventListener) queueRowsMedia.addEventListener('change', syncQueueRows);

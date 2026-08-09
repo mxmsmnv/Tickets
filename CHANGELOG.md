@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.32 - 2026-08-09
+
+- Added immediate attachment feedback to the staff reply composer: selected
+  filename, size, ready-to-send state, local image preview, and an explicit
+  remove action now appear before the reply is submitted.
+
 ## 1.0.31 - 2026-08-09
 
 - Combined Telegram credential state and source into one status cell so the

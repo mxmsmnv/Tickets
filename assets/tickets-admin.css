@@ -1629,6 +1629,72 @@
 	color: var(--pw-primary-color, #e83561);
 }
 
+.ProcessTickets .TicketsReplyAttachmentControl {
+	display: grid;
+	gap: .6rem;
+}
+
+.ProcessTickets .TicketsReplyAttachmentSelection {
+	display: grid;
+	grid-template-columns: 3rem minmax(0, 1fr) 2rem;
+	align-items: center;
+	gap: .7rem;
+	min-width: min(24rem, 72vw);
+	padding: .55rem .65rem;
+	border: 1px solid var(--pw-border-color);
+	border-radius: var(--pw-input-radius);
+	background: var(--pw-blocks-background);
+}
+
+.ProcessTickets .TicketsReplyAttachmentSelection[hidden] { display: none; }
+
+.ProcessTickets .TicketsReplyAttachmentPreview {
+	display: grid;
+	place-items: center;
+	width: 3rem;
+	height: 3rem;
+	overflow: hidden;
+	border-radius: calc(var(--pw-input-radius) * .75);
+	background: color-mix(in srgb, var(--pw-border-color) 35%, transparent);
+	color: var(--pw-muted-color);
+}
+
+.ProcessTickets .TicketsReplyAttachmentPreview img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+.ProcessTickets .TicketsReplyAttachmentSelection strong,
+.ProcessTickets .TicketsReplyAttachmentSelection small {
+	display: block;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.ProcessTickets .TicketsReplyAttachmentSelection strong { margin: .1rem 0; }
+.ProcessTickets .TicketsReplyAttachmentSelection small { color: var(--pw-muted-color); font-size: .72rem; }
+
+.ProcessTickets .TicketsReplyAttachmentRemove {
+	display: grid;
+	place-items: center;
+	width: 2rem;
+	height: 2rem;
+	padding: 0;
+	border: 0;
+	border-radius: 50%;
+	background: transparent;
+	color: var(--pw-muted-color);
+	cursor: pointer;
+}
+
+.ProcessTickets .TicketsReplyAttachmentRemove:hover,
+.ProcessTickets .TicketsReplyAttachmentRemove:focus-visible {
+	background: color-mix(in srgb, var(--pw-border-color) 40%, transparent);
+	color: var(--pw-primary-color, #e83561);
+}
+
 .ProcessTickets .TicketsSidePanel {
 	padding: 1rem;
 }

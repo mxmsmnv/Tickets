@@ -3,6 +3,7 @@
 $root = dirname(__DIR__);
 $process = (string)file_get_contents($root . '/ProcessTickets.module.php');
 $css = (string)file_get_contents($root . '/assets/tickets-admin.css');
+$javascript = (string)file_get_contents($root . '/assets/tickets-admin.js');
 
 $checks = [
 	'queue variants' => str_contains($process, 'TicketsQueueTable--dashboard') && str_contains($process, 'TicketsQueueTable--workspace'),
@@ -18,6 +19,11 @@ $checks = [
 	'interface responsive layout' => str_contains($css, '.TicketsInterfaceSettings dl {') && str_contains($css, '.TicketsTokenActions'),
 	'interface navigation reuses module pills' => str_contains($process, '<nav class="TicketsAdminNavigation"') && str_contains($process, 'uk-subnav uk-subnav-pill TicketsAdmin-nav') && !str_contains($css, '.TicketsInterfaceNav'),
 	'telegram reuses interface components' => str_contains($process, "interfaceOverviewCard('telegram'") && str_contains($process, 'TicketsInterfaceSettings') && str_contains($process, 'TicketsInterfaceSafety'),
+	'attachment selection feedback' => str_contains($process, 'data-ticket-attachment-selection')
+		&& str_contains($process, 'data-ticket-attachment-clear')
+		&& str_contains($javascript, 'syncAttachmentSelection')
+		&& str_contains($javascript, 'URL.createObjectURL(file)')
+		&& str_contains($css, '.TicketsReplyAttachmentSelection'),
 ];
 
 foreach($checks as $label => $ok) {
