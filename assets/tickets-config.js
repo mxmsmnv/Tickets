@@ -16,7 +16,7 @@
 	}
 
 	document.addEventListener('click', function (event) {
-		var link = event.target.closest('#ModuleEditForm .TicketsConfigNav a[href^="#wrap_tickets_config_"]');
+		var link = event.target.closest('#ModuleEditForm .TicketsConfigNav a[href^="#Inputfield_tickets_config_"]');
 		if (!link) return;
 		var section = document.querySelector(link.getAttribute('href'));
 		if (!section) return;
@@ -25,7 +25,7 @@
 		openSection(section);
 	});
 
-	if (window.location.hash.indexOf('#wrap_tickets_config_') === 0) {
+	if (window.location.hash.indexOf('#Inputfield_tickets_config_') === 0) {
 		window.requestAnimationFrame(function () {
 			openSection(document.querySelector(window.location.hash));
 		});

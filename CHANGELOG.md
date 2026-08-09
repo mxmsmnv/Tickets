@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.36 - 2026-08-09
+
+- Matched settings navigation anchors to ProcessWire's generated fieldset IDs
+  so each overview pill opens and focuses its intended section.
+
 ## 1.0.35 - 2026-08-09
 
 - Reworked the module settings screen around native ProcessWire fieldsets with
