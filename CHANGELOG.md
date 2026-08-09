@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.19 - 2026-08-08
+
+- Made the icon-only ticket-subject confirmation control a true circle and
+  centered it beside the editable subject at every heading size.
+
 ## 1.0.18 - 2026-08-08
 
 - Aligned message receipt status text and icons with the message timestamp.

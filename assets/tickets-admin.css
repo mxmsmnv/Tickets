@@ -1199,7 +1199,7 @@
 
 .ProcessTickets .TicketsSubjectForm > div {
 	display: flex;
-	align-items: stretch;
+	align-items: center;
 	gap: .5rem;
 }
 
@@ -1229,8 +1229,10 @@
 	place-items: center;
 	flex: 0 0 2.75rem;
 	width: 2.75rem;
+	height: 2.75rem;
 	min-width: 2.75rem;
 	padding: 0;
+	border-radius: 50%;
 }
 
 .ProcessTickets .TicketsReplyActions > div {
