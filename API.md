@@ -1,7 +1,7 @@
 # Tickets public API
 
-This document describes the verified public interface of Tickets 1.0.25
-(`version` 125). It is stronger than README for method usage, but the installed
+This document describes the verified public interface of Tickets 1.0.26
+(`version` 126). It is stronger than README for method usage, but the installed
 module version and live site configuration remain authoritative for a specific
 ProcessWire site.
 
@@ -518,6 +518,8 @@ enable_cli
 rest_bearer_token_hash
 rest_bearer_user_id
 rest_bearer_token_created_at
+telewire_notifications_enabled
+telewire_notification_events
 resend_inbound_enabled
 resend_inbound_address
 resend_webhook_secret
@@ -543,6 +545,20 @@ The three `rest_bearer_*` values are internal credential metadata managed from
 **Setup → Tickets → Interfaces → API**. Do not write or display them in a site
 template. Tickets stores only a SHA-256 hash, actor ID, and rotation timestamp;
 the raw token is shown once and belongs in a secret manager.
+
+### `telewireIntegrationStatus(): array`
+
+Returns identifier-only installation, compatibility, configuration, enabled,
+ready, and selected-event state for the optional TeleWire integration. It does
+not test the Telegram network connection and never returns bot tokens or chat
+IDs.
+
+### `telewireNotificationEvents(): array`
+
+Returns the normalized enabled subset of `new_ticket`, `customer_reply`, and
+`sla_breach`. TeleWire delivery stays disabled unless
+`telewire_notifications_enabled` is explicitly enabled and the external module
+has both bot token and chat recipients configured.
 
 ## Hooks and internal APIs
 

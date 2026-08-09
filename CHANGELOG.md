@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.0.26 - 2026-08-09
+
+- Added opt-in administrator Telegram notifications through mxmsmnv/TeleWire
+  for new tickets, customer replies, and first-time SLA breaches.
+- Added fail-closed integration status and event settings while keeping bot
+  credentials and chat recipients exclusively in TeleWire.
+- Limited Telegram payloads to operational ticket metadata and the authenticated
+  admin link; customer email, message text, guest tokens, custom data, and
+  attachments remain excluded.
+
 ## 1.0.25 - 2026-08-09
 
 - Reused the module's established admin-navigation pill component for the API

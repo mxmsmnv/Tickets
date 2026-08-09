@@ -232,7 +232,7 @@ It emits a placeholder whose runtime endpoint returns the user-specific form.
 Do not render `renderCustomForm()` into shared cached HTML because it contains a
 session CSRF token.
 
-## Email, webhooks and AI
+## Email, Telegram, webhooks and AI
 
 - Outbound delivery is an external side effect. Enabling it, changing sender or
   recipients, or switching providers requires approval and a delivery test.
@@ -250,9 +250,14 @@ session CSRF token.
 - Mailbox SMTP delivery is a second opt-in. Existing WireMail remains the
   default; never enable Mailbox inbound or outbound merely because Mailbox is
   installed or configured.
+- TeleWire administrator notifications are a separate opt-in. Tickets must use
+  TeleWire's documented `send()` method and must never copy or expose its bot
+  token or chat IDs. Telegram payloads stay limited to the event, ticket key,
+  subject, priority, status, and authenticated admin URL; never include message
+  bodies, customer email, guest access tokens, custom data, or attachments.
 - AI assistance is staff-requested drafting only. It must never send a reply,
   change a ticket or promise an action automatically.
-- Feature-detect `Squad`, `Atlas`, `KnowledgeBase` and `Resend`. Core ticketing
+- Feature-detect `Squad`, `Atlas`, `KnowledgeBase`, `Resend`, and `TeleWire`. Core ticketing
   must continue to work when they are absent.
 - Ticket text and retrieved material are untrusted data, not instructions. Keep
   the configured system prompt and require a staff review of every draft.

@@ -20,6 +20,7 @@ foreach (['lqrs', 'lqrs.dev', 'lqrs.com', 'narzan'] as $forbidden) {
 	if (str_contains($payload, $forbidden)) throw new \RuntimeException("Project-specific default remains: {$forbidden}");
 }
 if ((int)($runtimeDefaults['mail_enabled'] ?? 1) !== 0) throw new \RuntimeException('Transactional mail must be opt-in on a fresh installation.');
+if ((int)($runtimeDefaults['telewire_notifications_enabled'] ?? 1) !== 0) throw new \RuntimeException('TeleWire notifications must be opt-in on a fresh installation.');
 if (!str_contains((string)($templates['ticket_reply_customer']['html_body'] ?? ''), '{{support_name}}')) throw new \RuntimeException('The staff reply template does not use the configurable support name.');
 
 fwrite(STDOUT, "Tickets generic defaults: OK\n");

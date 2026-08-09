@@ -13,7 +13,7 @@ private files publicly.
 - **Author:** Maxim Semenov
 - **Website:** [smnv.org](https://smnv.org)
 - **Email:** [maxim@smnv.org](mailto:maxim@smnv.org)
-- **Release:** 1.0.25 (`version` 125)
+- **Release:** 1.0.26 (`version` 126)
 
 If this project helps your work, consider supporting future development:
 [GitHub Sponsors](https://github.com/sponsors/mxmsmnv) or
@@ -36,6 +36,9 @@ If this project helps your work, consider supporting future development:
   WireMail provider.
 - Supports optional authenticated Resend inbound replies.
 - Supports optional Mailbox ingestion for new support email and Mailbox SMTP delivery for ticket notifications and linked thread replies.
+- Supports opt-in administrator Telegram alerts through mxmsmnv/TeleWire for
+  new tickets, customer replies, and SLA breaches without copying bot
+  credentials into Tickets.
 - Supports optional Squad reply drafts grounded by Atlas and Knowledge Base;
   drafts use the complete public conversation and can be copy-edited separately.
 - Records a non-IP location and timezone snapshot when GeoIP is installed, so
@@ -105,6 +108,8 @@ editor. Only enabled forms open on the configured public portal.
 - Any ProcessWire `WireMail*` provider for outbound transactional email.
 - Resend for authenticated inbound email replies.
 - Mailbox for bounded, deduplicated support-email ingestion and optional SMTP delivery; existing WireMail and Resend paths remain independent.
+- TeleWire for administrator Telegram alerts. TeleWire owns the bot token and
+  chat IDs; Tickets sends a minimal event summary and authenticated admin link.
 - TinyMCE for visual transactional-template editing.
 - Squad for staff-requested reply drafts.
 - Atlas and Knowledge Base for independently optional grounding sources.

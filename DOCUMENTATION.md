@@ -1,6 +1,6 @@
 # Tickets Documentation
 
-This document describes the integration contract implemented by Tickets 1.0.25
+This document describes the integration contract implemented by Tickets 1.0.26
 for ProcessWire.
 
 ## Configuration
@@ -18,6 +18,7 @@ Open **Modules → Configure → Tickets** to configure:
 - retention period, action and batch size;
 - optional Resend inbound replies;
 - optional Mailbox ingestion and SMTP delivery;
+- optional administrator Telegram notifications through TeleWire;
 - optional Squad, Atlas and Knowledge Base reply assistance.
 
 Fresh installations use neutral placeholder addresses and keep transactional
@@ -154,6 +155,27 @@ boundary. Reporting, queue, automation and retention helpers do not all accept
 a user argument; expose them only after an explicit `canManage()` or
 `canAdmin()` check as appropriate. Callers must also validate CSRF for every
 browser-originated write.
+
+## Telegram administrator notifications
+
+Install and configure
+[mxmsmnv/TeleWire](https://github.com/mxmsmnv/TeleWire), then open
+**Modules → Configure → Tickets → Telegram notifications**. Tickets can notify
+the TeleWire recipients when a ticket is created, a customer replies, or an SLA
+target is missed. The integration and every event are opt-in; Telegram delivery
+is independent of transactional email.
+
+TeleWire remains the only owner of the Telegram bot token, chat IDs, parse mode,
+logging, timeout, and delivery implementation. Tickets sends through TeleWire's
+public `send()` method with HTML mode and disabled link previews. A delivery
+failure is logged without message content and never rolls back ticket creation,
+a reply, or SLA automation.
+
+The payload is deliberately minimal: event label, ticket key, subject,
+priority, workflow status, and an authenticated admin URL. Customer email,
+message body, guest access token, custom-form values, attachment names and
+files are never included. Set `notification_origin` to the canonical HTTPS
+origin so web, cron, and CLI notifications all generate the same admin URL.
 
 ## Custom Forms
 
