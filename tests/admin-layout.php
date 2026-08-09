@@ -12,6 +12,7 @@ $checks = [
 	'no shared fixed columns' => !str_contains($css, '.TicketsQueueTable th:nth-child('),
 	'report legend semantics' => str_contains($process, "aria-label=\"' . \$this->_('Chart legend') . '\"") && str_contains($process, 'TicketsChartLegend-value'),
 	'report legend layout' => str_contains($css, '.TicketsChartLegend li {') && str_contains($css, 'grid-template-areas: "swatch label" "swatch value";'),
+	'report legend mobile layout' => str_contains($css, '.TicketsReportTrend > header {') && str_contains($css, 'flex-direction: column;'),
 ];
 
 foreach($checks as $label => $ok) {

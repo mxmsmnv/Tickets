@@ -985,6 +985,15 @@
 }
 
 @media (max-width: 639px) {
+	.ProcessTickets .TicketsReportTrend > header {
+		align-items: stretch;
+		flex-direction: column;
+	}
+
+	.ProcessTickets .TicketsChartLegend li {
+		flex: 1 1 8rem;
+	}
+
 	.ProcessTickets .TicketsQueueTable--dashboard tr {
 		grid-template-columns: 1.25rem minmax(0, 1fr);
 		grid-template-areas:

@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.22 - 2026-08-09
+
+- Stacked the report-chart heading and legend on mobile so both series remain
+  fully readable without squeezing or clipping.
+
 ## 1.0.21 - 2026-08-09
 
 - Replaced the subtle volume-chart key with a prominent accessible legend that
