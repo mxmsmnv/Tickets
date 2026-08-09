@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.10 - 2026-08-08
+
+- Registered the opt-in REST route from Tickets' conditional autoload instead
+  of a newly discovered child module, making existing-site upgrades complete
+  in one ProcessWire module refresh while keeping disabled sites unloaded.
+
 ## 1.0.9 - 2026-08-08
 
 - Fixed local CLI authorization by explicitly making the discovered superuser
