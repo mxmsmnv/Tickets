@@ -353,6 +353,7 @@ php tests/custom-forms.php /path/to/processwire
 php tests/formbuilder-import.php /path/to/processwire
 php tests/operations.php /path/to/processwire
 php tests/priority-workflows.php /path/to/processwire
+php tests/admin-layout.php
 ```
 
 ## Rollback and uninstall

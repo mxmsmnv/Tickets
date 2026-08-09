@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.20 - 2026-08-09
+
+- Isolated the dashboard and All tickets table layouts so their different
+  column structures no longer reuse incompatible fixed widths.
+- Restored readable Priority and SLA columns on desktop while keeping the
+  dashboard's compact card layout limited to mobile and tablet views.
+
 ## 1.0.19 - 2026-08-08
 
 - Made the icon-only ticket-subject confirmation control a true circle and

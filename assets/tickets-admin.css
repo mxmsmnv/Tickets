@@ -744,10 +744,19 @@
 	padding-inline: .85rem;
 }
 
-.ProcessTickets .TicketsQueueTable th:nth-child(1) { width: 8rem; }
-.ProcessTickets .TicketsQueueTable th:nth-child(2) { width: 10rem; }
-.ProcessTickets .TicketsQueueTable th:nth-child(4) { width: 17rem; }
-.ProcessTickets .TicketsQueueTable th:nth-child(5) { width: 3rem; }
+.ProcessTickets .TicketsQueueTable--dashboard th:nth-child(1) { width: 8rem; }
+.ProcessTickets .TicketsQueueTable--dashboard th:nth-child(2) { width: 10rem; }
+.ProcessTickets .TicketsQueueTable--dashboard th:nth-child(4) { width: 17rem; }
+.ProcessTickets .TicketsQueueTable--dashboard th:nth-child(5) { width: 3rem; }
+
+.ProcessTickets .TicketsQueueTable--workspace table { min-width: 68rem; }
+.ProcessTickets .TicketsQueueTable--workspace th { white-space: nowrap; }
+.ProcessTickets .TicketsQueueTable--workspace th:nth-child(1) { width: 3rem; }
+.ProcessTickets .TicketsQueueTable--workspace th:nth-child(3) { width: 14rem; }
+.ProcessTickets .TicketsQueueTable--workspace th:nth-child(4) { width: 12rem; }
+.ProcessTickets .TicketsQueueTable--workspace th:nth-child(5) { width: 7rem; }
+.ProcessTickets .TicketsQueueTable--workspace th:nth-child(6) { width: 10rem; }
+.ProcessTickets .TicketsQueueTable--workspace th:nth-child(7) { width: 7rem; }
 
 .ProcessTickets .TicketsQueueSubject {
 	display: inline-block;
@@ -878,22 +887,22 @@
 }
 
 @media (max-width: 959px) {
-	.ProcessTickets .TicketsQueueTable {
+	.ProcessTickets .TicketsQueueTable--dashboard {
 		overflow: visible;
 	}
 
-	.ProcessTickets .TicketsQueueTable table,
-	.ProcessTickets .TicketsQueueTable tbody {
+	.ProcessTickets .TicketsQueueTable--dashboard table,
+	.ProcessTickets .TicketsQueueTable--dashboard tbody {
 		display: block;
 		width: 100%;
 	}
 
-	.ProcessTickets .TicketsQueueTable thead,
+	.ProcessTickets .TicketsQueueTable--dashboard thead,
 	.ProcessTickets .TicketsQueueAction {
 		display: none;
 	}
 
-	.ProcessTickets .TicketsQueueTable tr {
+	.ProcessTickets .TicketsQueueTable--dashboard tr {
 		display: grid;
 		grid-template-columns: 1.25rem minmax(8rem, auto) minmax(14rem, 1fr) minmax(10rem, auto);
 		align-items: center;
@@ -902,11 +911,11 @@
 		cursor: pointer;
 	}
 
-	.ProcessTickets .TicketsQueueTable tbody tr + tr {
+	.ProcessTickets .TicketsQueueTable--dashboard tbody tr + tr {
 		border-top: 1px solid var(--pw-border-color);
 	}
 
-	.ProcessTickets .TicketsQueueTable td {
+	.ProcessTickets .TicketsQueueTable--dashboard td {
 		min-width: 0;
 		padding: 0;
 		border: 0;
@@ -929,14 +938,14 @@
 		height: .75rem;
 	}
 
-	.ProcessTickets .TicketsQueueTable tr:focus-visible {
+	.ProcessTickets .TicketsQueueTable--dashboard tr:focus-visible {
 		outline: 2px solid var(--pw-primary-color, #e83561);
 		outline-offset: -2px;
 	}
 }
 
 @media (max-width: 639px) {
-	.ProcessTickets .TicketsQueueTable tr {
+	.ProcessTickets .TicketsQueueTable--dashboard tr {
 		grid-template-columns: 1.25rem minmax(0, 1fr);
 		grid-template-areas:
 			"priority status"
