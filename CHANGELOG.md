@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.31 - 2026-08-09
+
+- Combined Telegram credential state and source into one status cell so the
+  existing three-column interface grid remains complete and balanced.
+
 ## 1.0.30 - 2026-08-09
 
 - Restored TeleWire as the required Telegram transport while keeping bot token,
