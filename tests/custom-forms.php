@@ -45,6 +45,14 @@ try {
 	assert(str_contains($renderedForm, 'form_issued_sig'));
 	assert(str_contains($renderedForm, 'href="/privacy-test/"'));
 	assert(str_contains($renderedForm, 'href="https://example.com/terms-test/"'));
+	$draft = $form;
+	$draft['id'] = $formId;
+	$draft['enabled'] = 0;
+	$tickets->saveCustomForm($draft, $admin);
+	assert($tickets->renderFormEmbed($name) === '');
+	assert($tickets->renderCustomForm($name) === '');
+	$draft['enabled'] = 1;
+	$form = $tickets->saveCustomForm($draft, $admin);
 	$rejected = false;
 	try {
 		$tickets->submitCustomForm($name, $guest, ['customer_email' => $name . '@example.com', 'form_issued_at' => time() - 10, 'privacy_consent' => 1, 'summary' => 'Short', 'details' => 'This otherwise valid body confirms server-side field limits.']);

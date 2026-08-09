@@ -82,6 +82,9 @@ result no longer requires FormBuilder at runtime. Imported forms are disabled
 until an administrator reviews routing, consent copy, field mappings and the
 shared protected attachment control.
 
+The Forms workspace keeps disabled-form previews inside the authenticated form
+editor. Only enabled forms open on the configured public portal.
+
 ## Optional Integrations
 
 - Any ProcessWire `WireMail*` provider for outbound transactional email.

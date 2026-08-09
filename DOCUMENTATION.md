@@ -135,6 +135,10 @@ Forms support required state, width, independent minimum and maximum lengths,
 placeholder, help text, select options, guest access, optional image attachment,
 routing and a confirmation message.
 
+Disabled forms are previewed only in the authenticated form editor. The public
+preview action is available after a form is enabled, so draft definitions never
+depend on a public route or reveal an incomplete intake flow.
+
 Add `TextformatterTicketsForms` to a formatted field and use:
 
 ```text
