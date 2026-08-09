@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.0.35 - 2026-08-09
+
+- Reworked the module settings screen around native ProcessWire fieldsets with
+  a live configuration summary, stable section navigation, and compact
+  progressive disclosure for advanced settings.
+- Added responsive, theme-aware settings styles and keyboard-accessible section
+  navigation that opens and focuses the selected fieldset without changing any
+  saved configuration values.
+
 ## 1.0.34 - 2026-08-09
 
 - Added an ASC/DESC staff conversation preference. DESC renders the reply

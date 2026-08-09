@@ -81,10 +81,12 @@ trait TicketsMailboxIntegration {
 		$status = $this->mailboxIntegrationStatus();
 		/** @var InputfieldWrapper $section */
 		$section = $this->wire('modules')->get('InputfieldFieldset');
+		$section->name = 'tickets_config_mailbox';
 		$section->label = $this->_('Mailbox integration');
 		$section->icon = 'envelope-o';
 		$section->description = $this->_('Optionally turn incoming support email into tickets and deliver ticket replies through the configured Mailbox account. Core Tickets, WireMail, and Resend behavior remain available independently.');
 		$section->collapsed = Inputfield::collapsedYes;
+		$section->addClass('TicketsConfigSection', 'wrapClass');
 
 		$readiness = $this->wire('modules')->get('InputfieldMarkup');
 		$readiness->label = $this->_('Integration readiness');

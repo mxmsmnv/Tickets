@@ -1,0 +1,155 @@
+/* Tickets module settings: native ProcessWire inputfields with a compact overview. */
+#ModuleEditForm .TicketsConfigOverview,
+#ModuleEditForm .TicketsConfigSection {
+	--tickets-config-gap: 1rem;
+	box-sizing: border-box;
+}
+
+#ModuleEditForm .TicketsConfigOverview .InputfieldContent {
+	padding: 1.25rem;
+}
+
+#ModuleEditForm .TicketsConfigIntro > p {
+	max-width: 72rem;
+	margin: 0 0 1.25rem;
+	color: var(--pw-muted-color);
+	font-size: 1rem;
+	line-height: 1.55;
+}
+
+#ModuleEditForm .TicketsConfigStatusGrid {
+	display: grid;
+	grid-template-columns: repeat(4, minmax(0, 1fr));
+	gap: var(--tickets-config-gap);
+	margin-bottom: 1.25rem;
+}
+
+#ModuleEditForm .TicketsConfigStatus {
+	display: flex;
+	min-width: 0;
+	align-items: center;
+	gap: .75rem;
+	padding: 1rem;
+	border: 1px solid var(--pw-border-color);
+	border-radius: var(--pw-input-radius);
+	background: var(--pw-blocks-background);
+}
+
+#ModuleEditForm .TicketsConfigStatus__dot {
+	width: .65rem;
+	height: .65rem;
+	flex: 0 0 auto;
+	border-radius: 50%;
+	background: var(--pw-muted-color);
+}
+
+#ModuleEditForm .TicketsConfigStatus[data-state="enabled"] .TicketsConfigStatus__dot {
+	background: #2e8540;
+}
+
+#ModuleEditForm .TicketsConfigStatus small,
+#ModuleEditForm .TicketsConfigStatus strong {
+	display: block;
+	min-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+#ModuleEditForm .TicketsConfigStatus small {
+	margin-bottom: .2rem;
+	color: var(--pw-muted-color);
+	font-size: .75rem;
+	font-weight: 600;
+	letter-spacing: .04em;
+	text-transform: uppercase;
+}
+
+#ModuleEditForm .TicketsConfigStatus strong {
+	color: var(--pw-text-color);
+	font-size: .95rem;
+	font-weight: 500;
+}
+
+#ModuleEditForm .TicketsConfigNav {
+	display: flex;
+	flex-wrap: wrap;
+	gap: .5rem;
+}
+
+#ModuleEditForm .TicketsConfigNav a {
+	display: inline-flex;
+	min-height: 2.25rem;
+	align-items: center;
+	padding: .4rem .8rem;
+	border: 1px solid var(--pw-border-color);
+	border-radius: 999px;
+	color: var(--pw-text-color);
+	background: var(--pw-blocks-background);
+	font-size: .875rem;
+	font-weight: 500;
+	line-height: 1;
+	text-decoration: none;
+}
+
+#ModuleEditForm .TicketsConfigNav a:hover,
+#ModuleEditForm .TicketsConfigNav a:focus-visible {
+	border-color: var(--pw-link-color);
+	color: var(--pw-link-color);
+	text-decoration: none;
+}
+
+#ModuleEditForm .TicketsConfigNav a:focus-visible {
+	outline: 2px solid var(--pw-link-color);
+	outline-offset: 2px;
+}
+
+#ModuleEditForm .TicketsConfigSection {
+	scroll-margin-top: 5rem;
+}
+
+#ModuleEditForm .TicketsConfigSection:target {
+	outline: 2px solid color-mix(in srgb, var(--pw-link-color) 45%, transparent);
+	outline-offset: 2px;
+}
+
+#ModuleEditForm .TicketsConfigSection > .InputfieldHeader {
+	font-weight: 500;
+}
+
+#ModuleEditForm .TicketsConfigSection > .InputfieldContent > .description {
+	max-width: 76rem;
+	line-height: 1.5;
+}
+
+@media (max-width: 1100px) {
+	#ModuleEditForm .TicketsConfigStatusGrid {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+}
+
+@media (max-width: 640px) {
+	#ModuleEditForm .TicketsConfigOverview .InputfieldContent {
+		padding: 1rem;
+	}
+
+	#ModuleEditForm .TicketsConfigStatusGrid {
+		grid-template-columns: 1fr;
+		gap: .75rem;
+	}
+
+	#ModuleEditForm .TicketsConfigStatus {
+		padding: .85rem;
+	}
+
+	#ModuleEditForm .TicketsConfigNav {
+		flex-wrap: nowrap;
+		overflow-x: auto;
+		padding-bottom: .35rem;
+		scrollbar-width: thin;
+	}
+
+	#ModuleEditForm .TicketsConfigNav a {
+		flex: 0 0 auto;
+	}
+}
