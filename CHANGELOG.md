@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.16 - 2026-08-08
+
+- Added a consistent dashboard gap between the active-ticket queue and the
+  following metric grid.
+
 ## 1.0.15 - 2026-08-08
 
 - Kept long editable subjects within the case header using a compact accessible

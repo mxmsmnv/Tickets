@@ -543,6 +543,7 @@
 }
 
 .ProcessTickets .TicketsQueue {
+	margin-bottom: var(--tickets-space-lg);
 	border-top: 1px solid var(--pw-border-color);
 	padding-top: var(--tickets-space-lg);
 }
