@@ -13,7 +13,7 @@ private files publicly.
 - **Author:** Maxim Semenov
 - **Website:** [smnv.org](https://smnv.org)
 - **Email:** [maxim@smnv.org](mailto:maxim@smnv.org)
-- **Release:** 1.0.27 (`version` 127)
+- **Release:** 1.0.28 (`version` 128)
 
 If this project helps your work, consider supporting future development:
 [GitHub Sponsors](https://github.com/sponsors/mxmsmnv) or
@@ -36,9 +36,8 @@ If this project helps your work, consider supporting future development:
   WireMail provider.
 - Supports optional authenticated Resend inbound replies.
 - Supports optional Mailbox ingestion for new support email and Mailbox SMTP delivery for ticket notifications and linked thread replies.
-- Supports opt-in administrator Telegram alerts through mxmsmnv/TeleWire for
-  new tickets, customer replies, and SLA breaches without copying bot
-  credentials into Tickets.
+- Supports independent, opt-in administrator Telegram alerts for new tickets,
+  customer replies, and SLA breaches through the Telegram Bot API.
 - Supports optional Squad reply drafts grounded by Atlas and Knowledge Base;
   drafts use the complete public conversation and can be copy-edited separately.
 - Records a non-IP location and timezone snapshot when GeoIP is installed, so
@@ -63,9 +62,9 @@ Tickets adds a dedicated **Setup → Tickets** workspace where support staff can
 - build reusable intake forms and preview them before publishing;
 - edit transactional email templates;
 - review reports, customer ratings and retention runs.
-- inspect API and CLI availability in separate workspaces, including versioned
-  routes, Bearer credential state, security requirements, and ready-to-run
-  local commands.
+- inspect API, CLI, and Telegram availability in separate workspaces, including
+  versioned routes, Bearer credential state, Telegram recipients and events,
+  security requirements, and ready-to-run local commands.
 
 Staff need the `tickets-manage` permission. Configuration and destructive
 administration can be restricted with `tickets-admin`.
@@ -108,8 +107,8 @@ editor. Only enabled forms open on the configured public portal.
 - Any ProcessWire `WireMail*` provider for outbound transactional email.
 - Resend for authenticated inbound email replies.
 - Mailbox for bounded, deduplicated support-email ingestion and optional SMTP delivery; existing WireMail and Resend paths remain independent.
-- TeleWire for administrator Telegram alerts. TeleWire owns the bot token and
-  chat IDs; Tickets sends a minimal event summary and authenticated admin link.
+- Telegram Bot API for administrator alerts, configured independently in
+  Tickets or injected through private runtime configuration.
 - TinyMCE for visual transactional-template editing.
 - Squad for staff-requested reply drafts.
 - Atlas and Knowledge Base for independently optional grounding sources.

@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.0.28 - 2026-08-09
+
+- Replaced the optional TeleWire dependency with an independent Tickets-owned
+  Telegram Bot API transport, credentials, recipients, events, and timeout.
+- Added Telegram as a first-class Interfaces pill and overview card with a
+  dedicated readiness and privacy screen built from existing module components.
+- Added private runtime credential and recipient overrides, strict local input
+  validation, HTTPS-only delivery, redirect rejection, bounded timeouts, and
+  credential-free status and logging.
+
 ## 1.0.27 - 2026-08-09
 
 - Prefer TeleWire 1.0.1's public, network-free `isConfigured()` readiness API while retaining a fail-closed compatibility fallback for TeleWire 1.0.0.

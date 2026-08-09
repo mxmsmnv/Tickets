@@ -135,13 +135,14 @@ class ProcessTickets extends Process {
 		if (!$tickets->canAdmin($this->wire('user'))) throw new WirePermissionException('You cannot manage Tickets interfaces.');
 		$this->headline($this->_('Interfaces'));
 		$channels = $tickets->capabilities()['channels'];
-		$summary = '<div class="TicketsInterfaceSummary">' . $this->interfaceState('API', (bool)$channels['rest']) . $this->interfaceState('CLI', (bool)$channels['cli']) . '</div>';
+		$summary = '<div class="TicketsInterfaceSummary">' . $this->interfaceState('API', (bool)$channels['rest']) . $this->interfaceState('CLI', (bool)$channels['cli']) . $this->interfaceState('Telegram', (bool)$channels['telegram']) . '</div>';
 		$out = $this->adminNav('interfaces')
 			. $this->interfaceNav('overview')
-			. $this->pageIntro($this->_('Operational interfaces'), $this->_('Interfaces'), $this->_('Inspect status, authentication, routes, and commands without mixing API and CLI workflows.'), $summary)
-			. '<section class="TicketsInterfaceGrid TicketsInterfaceGrid--overview">'
+			. $this->pageIntro($this->_('Operational interfaces'), $this->_('Interfaces'), $this->_('Inspect status, authentication, routes, commands, and administrator notification delivery in one workspace.'), $summary)
+			. '<section class="TicketsInterfaceGrid">'
 			. $this->interfaceOverviewCard('exchange', 'API ' . Tickets::REST_API_VERSION, $this->_('Versioned JSON API'), $this->_('Review session and Bearer authentication, token status, and every supported route.'), $this->wire('page')->url . 'api/', (bool)$channels['rest'])
 			. $this->interfaceOverviewCard('terminal', 'CLI', $this->_('Local command line'), $this->_('Review channel status, safety requirements, and the complete command catalogue.'), $this->wire('page')->url . 'cli/', (bool)$channels['cli'])
+			. $this->interfaceOverviewCard('telegram', 'Telegram Bot API', $this->_('Administrator notifications'), $this->_('Review readiness, recipients, selected ticket events, privacy limits, and delivery timeout.'), $this->wire('page')->url . 'telegram/', (bool)$channels['telegram'])
 			. '</section>';
 		return $this->workspace($out);
 	}
@@ -193,6 +194,40 @@ class ProcessTickets extends Process {
 			. '<section class="TicketsInterfaceTable"><header><div><p class="uk-text-meta uk-text-uppercase uk-margin-remove">CLI</p><h2>' . $this->_('Commands') . '</h2></div><code>' . $this->e($command . ' help') . '</code></header><div class="uk-overflow-auto"><table class="uk-table uk-table-divider uk-table-middle"><thead><tr><th>' . $this->_('Mode') . '</th><th>' . $this->_('Command') . '</th><th>' . $this->_('Purpose') . '</th></tr></thead><tbody>';
 		foreach ($this->cliCommands() as $row) $out .= '<tr><td><span class="TicketsCommandMode" data-mode="' . $this->e($row[0]) . '">' . ucfirst($row[0]) . '</span></td><td><code>' . $this->e($command . ' ' . $row[1]) . '</code></td><td>' . $this->e($row[2]) . '</td></tr>';
 		$out .= '</tbody></table></div></section><section class="TicketsInterfaceSafety"><div><p class="uk-text-meta uk-text-uppercase uk-margin-remove">' . $this->_('Execution safety') . '</p><h2>' . $this->_('Preview first, mutate explicitly') . '</h2><p>' . $this->_('CLI never accepts a password or API token argument. Ticket writes and real maintenance require --execute; automation and retention expose --dry-run previews.') . '</p></div></section>';
+		return $this->workspace($out);
+	}
+
+	public function ___executeTelegram(): string {
+		$tickets = $this->tickets();
+		if (!$tickets->canAdmin($this->wire('user'))) throw new WirePermissionException('You cannot inspect Tickets Telegram notifications.');
+		$this->headline($this->_('Tickets Telegram'));
+		$status = $tickets->telegramIntegrationStatus();
+		$eventLabels = [
+			'new_ticket' => $this->_('New ticket'),
+			'customer_reply' => $this->_('Customer reply'),
+			'sla_breach' => $this->_('SLA breach'),
+		];
+		$events = array_map(static fn(string $event): string => (string)($eventLabels[$event] ?? $event), (array)$status['events']);
+		$source = match ((string)$status['credential_source']) {
+			'runtime' => $this->_('Private runtime override'),
+			'module' => $this->_('Tickets module configuration'),
+			default => $this->_('Not configured'),
+		};
+		$summary = '<div class="TicketsInterfaceSummary">'
+			. $this->interfaceState($this->_('Delivery'), (bool)$status['ready'])
+			. $this->interfaceState($this->_('Credentials'), (bool)$status['configured'])
+			. '</div>';
+		$out = $this->adminNav('interfaces') . $this->interfaceNav('telegram')
+			. $this->pageIntro($this->_('Administrator notifications'), $this->_('Tickets Telegram'), $this->_('Send concise operational alerts directly through the Telegram Bot API without another ProcessWire module.'), $summary)
+			. '<section class="TicketsInterfaceSettings"><header><div><p class="uk-text-meta uk-text-uppercase uk-margin-remove">Telegram Bot API</p><h2>' . $this->_('Current settings') . '</h2></div><a class="uk-button uk-button-default" href="' . $this->e($this->telegramSettingsUrl()) . '">' . $this->_('Module settings') . '</a></header><dl>'
+			. '<div><dt>' . $this->_('Delivery') . '</dt><dd>' . ((bool)$status['enabled'] ? $this->_('Enabled') : $this->_('Disabled')) . '</dd></div>'
+			. '<div><dt>' . $this->_('Credentials') . '</dt><dd>' . ((bool)$status['configured'] ? $this->_('Configured') : $this->_('Not configured')) . '</dd></div>'
+			. '<div><dt>' . $this->_('Credential source') . '</dt><dd>' . $this->e($source) . '</dd></div>'
+			. '<div><dt>' . $this->_('Recipients') . '</dt><dd>' . (int)$status['recipient_count'] . '</dd></div>'
+			. '<div><dt>' . $this->_('Events') . '</dt><dd>' . $this->e($events ? implode(', ', $events) : $this->_('None selected')) . '</dd></div>'
+			. '<div><dt>' . $this->_('Timeout') . '</dt><dd>' . sprintf($this->_('%d seconds'), max(3, min(30, (int)$tickets->telegram_timeout_seconds))) . '</dd></div>'
+			. '</dl></section>'
+			. '<section class="TicketsInterfaceSafety"><div><p class="uk-text-meta uk-text-uppercase uk-margin-remove">' . $this->_('Privacy boundary') . '</p><h2>' . $this->_('Operational metadata only') . '</h2><p>' . $this->_('Telegram receives the event, ticket key, subject, priority, status, and authenticated admin link. Customer email, message bodies, guest tokens, custom fields, and attachments are never sent.') . '</p></div></section>';
 		return $this->workspace($out);
 	}
 
@@ -835,6 +870,7 @@ class ProcessTickets extends Process {
 			'overview' => [$base . 'interfaces/', $this->_('Overview')],
 			'api' => [$base . 'api/', $this->_('API')],
 			'cli' => [$base . 'cli/', $this->_('CLI')],
+			'telegram' => [$base . 'telegram/', $this->_('Telegram')],
 		];
 		$out = '<nav class="TicketsAdminNavigation" aria-label="' . $this->_('Interface sections') . '"><ul class="uk-subnav uk-subnav-pill TicketsAdmin-nav">';
 		foreach ($items as $key => [$url, $label]) $out .= '<li' . ($key === $active ? ' class="uk-active"' : '') . '><a href="' . $this->e($url) . '"' . ($key === $active ? ' aria-current="page"' : '') . '>' . $this->e($label) . '</a></li>';
@@ -852,6 +888,10 @@ class ProcessTickets extends Process {
 
 	private function interfaceSettingsUrl(): string {
 		return $this->wire('config')->urls->admin . 'module/edit?name=Tickets&collapse_info=1#Inputfield_enable_agent_api';
+	}
+
+	private function telegramSettingsUrl(): string {
+		return $this->wire('config')->urls->admin . 'module/edit?name=Tickets&collapse_info=1#Inputfield_telegram_notifications_enabled';
 	}
 
 	private function apiRoutes(): array {

@@ -1,7 +1,7 @@
 # Tickets public API
 
-This document describes the verified public interface of Tickets 1.0.27
-(`version` 127). It is stronger than README for method usage, but the installed
+This document describes the verified public interface of Tickets 1.0.28
+(`version` 128). It is stronger than README for method usage, but the installed
 module version and live site configuration remain authoritative for a specific
 ProcessWire site.
 
@@ -518,8 +518,11 @@ enable_cli
 rest_bearer_token_hash
 rest_bearer_user_id
 rest_bearer_token_created_at
-telewire_notifications_enabled
-telewire_notification_events
+telegram_notifications_enabled
+telegram_bot_token
+telegram_chat_ids
+telegram_notification_events
+telegram_timeout_seconds
 resend_inbound_enabled
 resend_inbound_address
 resend_webhook_secret
@@ -546,19 +549,23 @@ The three `rest_bearer_*` values are internal credential metadata managed from
 template. Tickets stores only a SHA-256 hash, actor ID, and rotation timestamp;
 the raw token is shown once and belongs in a secret manager.
 
-### `telewireIntegrationStatus(): array`
+The `telegram_bot_token` and `telegram_chat_ids` values are outbound credentials
+managed under **Modules → Configure → Tickets → Operational interfaces**. Never
+return them from a site template, API response, capability manifest, or log.
+Private runtime overrides are preferred for production deployments.
 
-Returns identifier-only installation, compatibility, configuration, enabled,
-ready, and selected-event state for the optional TeleWire integration. It does
-not test the Telegram network connection and never returns bot tokens or chat
-IDs.
+### `telegramIntegrationStatus(): array`
 
-### `telewireNotificationEvents(): array`
+Returns configuration, enabled, ready, recipient count, credential source, and
+selected-event state for the independent Telegram interface. It does not test
+the Telegram network connection and never returns bot tokens or chat IDs.
+
+### `telegramNotificationEvents(): array`
 
 Returns the normalized enabled subset of `new_ticket`, `customer_reply`, and
-`sla_breach`. TeleWire delivery stays disabled unless
-`telewire_notifications_enabled` is explicitly enabled and the external module
-has both bot token and chat recipients configured.
+`sla_breach`. Telegram delivery stays disabled unless
+`telegram_notifications_enabled` is explicitly enabled and Tickets has a valid
+bot token plus at least one valid recipient configured.
 
 ## Hooks and internal APIs
 

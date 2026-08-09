@@ -1,6 +1,6 @@
 # Tickets Documentation
 
-This document describes the integration contract implemented by Tickets 1.0.27
+This document describes the integration contract implemented by Tickets 1.0.28
 for ProcessWire.
 
 ## Configuration
@@ -18,7 +18,7 @@ Open **Modules → Configure → Tickets** to configure:
 - retention period, action and batch size;
 - optional Resend inbound replies;
 - optional Mailbox ingestion and SMTP delivery;
-- optional administrator Telegram notifications through TeleWire;
+- independent optional administrator Telegram notifications;
 - optional Squad, Atlas and Knowledge Base reply assistance.
 
 Fresh installations use neutral placeholder addresses and keep transactional
@@ -113,14 +113,16 @@ enforce `tickets-admin` and are not frontend submission APIs.
 - `runAutomation(bool $dryRun = false): array`
 - `runRetention(bool $dryRun = false): array`
 
-## Operational API and CLI
+## Operational interfaces
 
-Tickets exposes three independent operational channels. Fresh installations
-and upgrades keep all of them disabled:
+Tickets exposes API, CLI, and Telegram as independent operational interfaces.
+Fresh installations and upgrades keep every outbound or remotely accessible
+channel disabled:
 
 - the PHP facade from `$tickets->api($actor)`;
 - versioned JSON REST under `/tickets-api/v1/`;
 - the local `site/modules/Tickets/bin/tickets` executable.
+- administrator alerts through the Telegram Bot API.
 
 The PHP and REST channels require an actor with both `tickets-api` and
 `tickets-manage`. Report and form-definition reads additionally require
@@ -158,18 +160,20 @@ browser-originated write.
 
 ## Telegram administrator notifications
 
-Install and configure
-[mxmsmnv/TeleWire](https://github.com/mxmsmnv/TeleWire), then open
-**Modules → Configure → Tickets → Telegram notifications**. Tickets can notify
-the TeleWire recipients when a ticket is created, a customer replies, or an SLA
-target is missed. The integration and every event are opt-in; Telegram delivery
-is independent of transactional email.
+Open **Modules → Configure → Tickets → Operational interfaces** to configure a
+Telegram bot token, administrator chat IDs, notification events, and delivery
+timeout. Review the resulting state under **Setup → Tickets → Interfaces →
+Telegram**. No additional ProcessWire module is required. Telegram delivery and
+every event remain opt-in and independent of transactional email.
 
-TeleWire remains the only owner of the Telegram bot token, chat IDs, parse mode,
-logging, timeout, and delivery implementation. Tickets sends through TeleWire's
-public `send()` method with HTML mode and disabled link previews. A delivery
-failure is logged without message content and never rolls back ticket creation,
-a reply, or SLA automation.
+The token may be stored in Tickets module configuration or injected privately
+through `$config->ticketsTelegramBotToken` / `TICKETS_TELEGRAM_BOT_TOKEN`.
+Recipient overrides use `$config->ticketsTelegramChatIds` /
+`TICKETS_TELEGRAM_CHAT_IDS`. Runtime values take precedence over saved module
+configuration. Status and capability output never includes credential values.
+Requests use HTTPS only, reject redirects, and enforce bounded connection and
+total timeouts. A delivery failure is logged without message content or
+credentials and never rolls back ticket creation, a reply, or SLA automation.
 
 The payload is deliberately minimal: event label, ticket key, subject,
 priority, workflow status, and an authenticated admin URL. Customer email,

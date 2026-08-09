@@ -13,10 +13,11 @@ $checks = [
 	'report legend semantics' => str_contains($process, "aria-label=\"' . \$this->_('Chart legend') . '\"") && str_contains($process, 'TicketsChartLegend-value'),
 	'report legend layout' => str_contains($css, '.TicketsChartLegend li {') && str_contains($css, 'grid-template-areas: "swatch label" "swatch value";'),
 	'report legend mobile layout' => str_contains($css, '.TicketsReportTrend > header {') && str_contains($css, 'flex-direction: column;'),
-	'separate interface pages' => str_contains($process, '___executeApi()') && str_contains($process, '___executeCli()') && str_contains($process, "interfaceNav('api')") && str_contains($process, "interfaceNav('cli')"),
+	'separate interface pages' => str_contains($process, '___executeApi()') && str_contains($process, '___executeCli()') && str_contains($process, '___executeTelegram()') && str_contains($process, "interfaceNav('api')") && str_contains($process, "interfaceNav('cli')") && str_contains($process, "interfaceNav('telegram')"),
 	'interface status and catalogues' => str_contains($process, 'Current settings') && str_contains($process, 'apiRoutes()') && str_contains($process, 'cliCommands()'),
 	'interface responsive layout' => str_contains($css, '.TicketsInterfaceSettings dl {') && str_contains($css, '.TicketsTokenActions'),
 	'interface navigation reuses module pills' => str_contains($process, '<nav class="TicketsAdminNavigation"') && str_contains($process, 'uk-subnav uk-subnav-pill TicketsAdmin-nav') && !str_contains($css, '.TicketsInterfaceNav'),
+	'telegram reuses interface components' => str_contains($process, "interfaceOverviewCard('telegram'") && str_contains($process, 'TicketsInterfaceSettings') && str_contains($process, 'TicketsInterfaceSafety'),
 ];
 
 foreach($checks as $label => $ok) {
