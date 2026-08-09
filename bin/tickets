@@ -3,51 +3,163 @@
 
 declare(strict_types=1);
 
-$args = array_slice($argv, 1);
-$command = $args[0] ?? 'help';
-$root = '';
-$dryRun = in_array('--dry-run', $args, true);
-$execute = in_array('--execute', $args, true);
-$limit = 25;
-foreach ($args as $arg) {
-	if (str_starts_with($arg, '--root=')) $root = rtrim(substr($arg, 7), '/');
-	if (str_starts_with($arg, '--limit=')) $limit = max(1, min(100, (int)substr($arg, 8)));
+if(PHP_SAPI !== 'cli' && PHP_SAPI !== 'phpdbg') exit(1);
+
+$arguments = array_slice($argv, 1);
+$command = 'help';
+$options = [];
+foreach($arguments as $argument) {
+	if(strpos($argument, '--') === 0) {
+		$pair = explode('=', substr($argument, 2), 2);
+		$options[$pair[0]] = $pair[1] ?? true;
+	} else if($command === 'help') {
+		$command = $argument;
+	}
 }
 
-if ($command === 'help' || in_array($command, ['-h', '--help'], true)) {
-	fwrite(STDOUT, "Tickets CLI\n\n  automation [--dry-run] [--root=/path/to/processwire]\n  retention [--dry-run] [--root=/path/to/processwire]\n  mailbox-import [--limit=25] [--execute] [--root=/path/to/processwire]\n");
+$help = <<<'TXT'
+Tickets CLI — JSON interface for local agents and cron
+
+Usage:
+  tickets <command> --root=/path/to/processwire [options]
+
+Read commands:
+  capabilities
+  dashboard
+  queue [--scope=active|closed|all] [--status=] [--category=] [--topic=] [--priority=] [--assigned=] [--query=] [--page=1] [--limit=50]
+  ticket --id=123 | --key=PUBLICKEY
+  messages --id=123 | --key=PUBLICKEY
+  report [--days=30]
+  forms
+
+Ticket mutations:
+  update --id=123|--key=PUBLICKEY [--status=] [--priority=] [--assigned=0] --execute
+  reply --id=123|--key=PUBLICKEY --stdin --execute
+  note --id=123|--key=PUBLICKEY --stdin --execute
+
+Maintenance:
+  automation --dry-run
+  automation --execute
+  retention --dry-run
+  retention --execute
+  mailbox-import [--limit=25] [--execute]
+
+Reply and note stdin JSON:
+  {"body":"Message text"}
+
+All results use {"ok":true,"result":...}. The CLI is disabled until
+enable_cli is set in Tickets settings. Every mutation and real maintenance
+run requires the explicit --execute flag.
+TXT;
+
+if($command === 'help' || isset($options['help']) || in_array($command, ['-h', '--help'], true)) {
+	fwrite(STDOUT, $help . PHP_EOL);
 	exit(0);
 }
-if (!in_array($command, ['automation', 'retention', 'mailbox-import'], true)) {
-	fwrite(STDERR, "Unknown command: {$command}\n");
-	exit(2);
-}
 
-if ($root === '') {
+$root = rtrim((string)($options['root'] ?? ''), DIRECTORY_SEPARATOR);
+if($root === '') {
 	$candidate = getcwd();
-	while ($candidate && $candidate !== dirname($candidate)) {
-		if (is_file($candidate . '/index.php') && is_dir($candidate . '/wire')) { $root = $candidate; break; }
+	while($candidate && $candidate !== dirname($candidate)) {
+		if(is_file($candidate . '/index.php') && is_dir($candidate . '/wire')) { $root = $candidate; break; }
 		$candidate = dirname($candidate);
 	}
 }
-if ($root === '' || !is_file($root . '/index.php')) {
-	fwrite(STDERR, "ProcessWire root not found. Run inside the site or pass --root=/path/to/site.\n");
+if($root === '' || !is_file($root . '/index.php') || !is_file($root . '/wire/core/ProcessWire.php')) {
+	fwrite(STDERR, json_encode(['ok' => false, 'error' => 'ProcessWire root not found. Run inside the site or pass --root=/path/to/site.']) . PHP_EOL);
 	exit(2);
 }
 
-chdir($root);
-require $root . '/index.php';
-$tickets = $wire->modules->get('Tickets');
-if (!$tickets instanceof \ProcessWire\Tickets) {
-	fwrite(STDERR, "Tickets is not installed.\n");
-	exit(1);
-}
-
 try {
-	if ($command === 'mailbox-import') $result = $tickets->importMailboxInbox($limit, $execute);
-	else $result = $command === 'retention' ? $tickets->runRetention($dryRun) : $tickets->runAutomation($dryRun);
-	fwrite(STDOUT, json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . PHP_EOL);
-} catch (Throwable $error) {
-	fwrite(STDERR, $error->getMessage() . PHP_EOL);
+	chdir($root);
+	require $root . '/index.php';
+	$tickets = $wire->modules->getModule('Tickets', ['noPermissionCheck' => true]);
+	if(!$tickets instanceof \ProcessWire\Tickets) throw new RuntimeException('Tickets is not installed.');
+	if(!(bool)$tickets->enable_cli) throw new RuntimeException('Tickets CLI is disabled in module settings.');
+
+	$actor = null;
+	foreach($wire->users->find('include=all') as $candidate) {
+		if($candidate->isSuperuser()) { $actor = $candidate; break; }
+	}
+	if(!$actor instanceof \ProcessWire\User || !$actor->id) throw new RuntimeException('A ProcessWire superuser is required for local CLI operations.');
+	$api = new \ProcessWire\TicketsAgentApi($tickets, $actor, 'cli');
+	$identifier = static function() use ($options) {
+		$value = trim((string)($options['key'] ?? $options['id'] ?? ''));
+		if(!preg_match('/^(?:[1-9][0-9]*|[A-Za-z0-9]{6,24})$/', $value)) throw new InvalidArgumentException('--id or --key is required.');
+		return ctype_digit($value) ? (int)$value : strtoupper($value);
+	};
+	$stdinBody = static function() use ($options): string {
+		if(!isset($options['stdin'])) throw new InvalidArgumentException('This command requires --stdin.');
+		$raw = stream_get_contents(STDIN, 65537);
+		if(!is_string($raw) || strlen($raw) > 65536) throw new InvalidArgumentException('Standard-input JSON is too large.');
+		$data = json_decode($raw, true);
+		if(!is_array($data) || !isset($data['body']) || !is_string($data['body'])) throw new InvalidArgumentException('Standard input must contain a JSON object with a string body.');
+		return $data['body'];
+	};
+	$requireExecute = static function(string $operation) use ($options): void {
+		if(!isset($options['execute'])) throw new InvalidArgumentException($operation . ' requires the explicit --execute flag.');
+	};
+
+	switch($command) {
+		case 'capabilities':
+			$result = $api->capabilities();
+			break;
+		case 'dashboard':
+			$result = $api->dashboard();
+			break;
+		case 'queue':
+			$filters = [];
+			foreach(['status', 'category', 'topic', 'priority'] as $name) if(isset($options[$name])) $filters[$name] = (string)$options[$name];
+			if(isset($options['assigned'])) $filters['assigned_user_id'] = max(0, (int)$options['assigned']);
+			if(isset($options['query'])) $filters['q'] = (string)$options['query'];
+			$scope = in_array((string)($options['scope'] ?? 'active'), ['active', 'closed', 'all'], true) ? (string)($options['scope'] ?? 'active') : 'active';
+			$result = $api->queue($filters, max(1, (int)($options['page'] ?? 1)), max(1, min(100, (int)($options['limit'] ?? 50))), $scope);
+			break;
+		case 'ticket':
+			$result = $api->ticket($identifier());
+			break;
+		case 'messages':
+			$result = $api->messages($identifier());
+			break;
+		case 'report':
+			$result = $api->report(['days' => max(1, min(3650, (int)($options['days'] ?? 30)))]);
+			break;
+		case 'forms':
+			$result = $api->forms();
+			break;
+		case 'update':
+			$requireExecute('Ticket update');
+			$changes = [];
+			foreach(['status', 'priority'] as $name) if(isset($options[$name])) $changes[$name] = (string)$options[$name];
+			if(isset($options['assigned'])) $changes['assigned_user_id'] = max(0, (int)$options['assigned']);
+			$result = $api->update($identifier(), $changes);
+			break;
+		case 'reply':
+			$requireExecute('Ticket reply');
+			$result = $api->reply($identifier(), $stdinBody());
+			break;
+		case 'note':
+			$requireExecute('Internal note');
+			$result = $api->note($identifier(), $stdinBody());
+			break;
+		case 'automation':
+			if(!isset($options['dry-run'])) $requireExecute('Automation');
+			$result = $tickets->runAutomation(isset($options['dry-run']));
+			break;
+		case 'retention':
+			if(!isset($options['dry-run'])) $requireExecute('Retention');
+			$result = $tickets->runRetention(isset($options['dry-run']));
+			break;
+		case 'mailbox-import':
+			$result = $tickets->importMailboxInbox(max(1, min(100, (int)($options['limit'] ?? 25))), isset($options['execute']));
+			break;
+		default:
+			throw new InvalidArgumentException('Unknown command: ' . $command);
+	}
+
+	fwrite(STDOUT, json_encode(['ok' => true, 'result' => $result], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) . PHP_EOL);
+	exit(0);
+} catch(Throwable $error) {
+	fwrite(STDERR, json_encode(['ok' => false, 'error' => $error->getMessage()], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) . PHP_EOL);
 	exit(1);
 }

@@ -1,6 +1,6 @@
 # Tickets Documentation
 
-This document describes the integration contract implemented by Tickets 1.0.6
+This document describes the integration contract implemented by Tickets 1.0.7
 for ProcessWire.
 
 ## Configuration
@@ -112,6 +112,33 @@ enforce `tickets-admin` and are not frontend submission APIs.
 - `runAutomation(bool $dryRun = false): array`
 - `runRetention(bool $dryRun = false): array`
 
+## Operational API and CLI
+
+Tickets exposes three independent operational channels. Fresh installations
+and upgrades keep all of them disabled:
+
+- the PHP facade from `$tickets->api($actor)`;
+- same-origin JSON REST under `/tickets-api/v1/`;
+- the local `site/modules/Tickets/bin/tickets` executable.
+
+The PHP and REST channels require a logged-in actor with both `tickets-api` and
+`tickets-manage`. Report and form-definition reads additionally require
+`tickets-admin`. REST uses the existing ProcessWire session, deliberately emits
+no CORS headers, and requires the CSRF token returned by
+`GET /tickets-api/v1/session/` on every POST.
+
+Available REST resources are `session`, `capabilities`, `dashboard`, `queue`,
+`ticket`, `messages`, `report`, `forms`, `update`, `reply`, and `note`. Responses
+use either `{"ok":true,"result":...}` or `{"ok":false,"error":"..."}`.
+The transport is private/no-store and separately rate-limits reads and writes.
+It never returns guest access hashes, attachment access tokens, or private
+storage names.
+
+The local CLI emits the same JSON envelope. Run `bin/tickets help` for the full
+command reference. It never accepts credentials as arguments. Ticket writes,
+real automation and retention runs, and mailbox imports require `--execute`;
+automation and retention support an explicit `--dry-run` preview.
+
 `queuePage()` uses the operational staff order: priority, active versus
 completed state, breached or nearest SLA deadline, workflow status, then most
 recent activity. The admin queue shows the same SLA state beside each ticket.
@@ -222,8 +249,8 @@ settings. First-match routing rules and reusable replies live under
 Run the bounded worker from cron:
 
 ```bash
-php site/modules/Tickets/bin/tickets automation --root=/path/to/processwire
 php site/modules/Tickets/bin/tickets automation --dry-run --root=/path/to/processwire
+php site/modules/Tickets/bin/tickets automation --execute --root=/path/to/processwire
 ```
 
 Repeated runs are idempotent. A five-minute interval is appropriate for normal
@@ -236,7 +263,7 @@ scheduled destructive run:
 
 ```bash
 php site/modules/Tickets/bin/tickets retention --dry-run --root=/path/to/processwire
-php site/modules/Tickets/bin/tickets retention --root=/path/to/processwire
+php site/modules/Tickets/bin/tickets retention --execute --root=/path/to/processwire
 ```
 
 `anonymize` removes customer identity, private content, access tokens, context

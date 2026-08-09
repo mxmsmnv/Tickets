@@ -13,7 +13,7 @@ private files publicly.
 - **Author:** Maxim Semenov
 - **Website:** [smnv.org](https://smnv.org)
 - **Email:** [maxim@smnv.org](mailto:maxim@smnv.org)
-- **Release:** 1.0.6 (`version` 106)
+- **Release:** 1.0.7 (`version` 107)
 
 If this project helps your work, consider supporting future development:
 [GitHub Sponsors](https://github.com/sponsors/mxmsmnv) or
@@ -34,6 +34,8 @@ If this project helps your work, consider supporting future development:
 - Supports optional authenticated Resend inbound replies.
 - Supports optional Mailbox ingestion for new support email and Mailbox SMTP delivery for ticket notifications and linked thread replies.
 - Supports optional Squad reply drafts grounded by Atlas and Knowledge Base.
+- Provides independently disabled, permission-gated PHP API, same-origin JSON
+  REST, and local JSON CLI channels for trusted integrations and agents.
 - Uses neutral installation defaults and creates no sample tickets or customers.
 
 ## Admin Area
@@ -49,6 +51,8 @@ Tickets adds a dedicated **Setup → Tickets** workspace where support staff can
 - build reusable intake forms and preview them before publishing;
 - edit transactional email templates;
 - review reports, customer ratings and retention runs.
+- inspect API and CLI availability, security requirements, endpoints, and
+  ready-to-run local commands.
 
 Staff need the `tickets-manage` permission. Configuration and destructive
 administration can be restricted with `tickets-admin`.
@@ -121,6 +125,8 @@ English.
 5. Add the consuming `site/templates/tickets.php` portal template.
 6. Explicitly enable transactional notifications after the selected provider is configured.
 7. Grant `tickets-manage` and, where appropriate, `tickets-admin` to support roles.
+8. If API access is required, grant `tickets-api` separately and enable only
+   the required PHP, REST, or CLI channel. All three are disabled by default.
 
 The installer creates its tables, permissions, formatter, private attachment
 storage, ProcessWire template and public page. It does not create sample

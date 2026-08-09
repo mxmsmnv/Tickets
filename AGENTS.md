@@ -78,7 +78,8 @@ Blueprint must define:
 - anonymous, member, support-agent and support-admin journeys;
 - the support route and all private subroutes;
 - ticket types, topics, priorities and assignment rules;
-- which roles receive `tickets-manage` and `tickets-admin`;
+- which roles receive `tickets-manage`, `tickets-admin`, and the independently
+  granted `tickets-api` permission;
 - legal consent, attachment policy, spam controls and retention;
 - support hours, SLA targets, escalation and scheduled jobs;
 - outbound mail provider, sender and recipients;
@@ -156,6 +157,9 @@ The stable call groups are:
   `handleResendWebhook()`, `mailboxIntegrationStatus()`,
   `importMailboxNotification()`, `importMailboxMessage()` and the bounded
   `importMailboxInbox()` maintenance helper.
+- operational interfaces: `capabilities()` and the permission-gated
+  `$tickets->api($actor)` facade; same-origin REST and local CLI must each be
+  explicitly enabled before use.
 
 Exact signatures, return shapes, permission boundaries and edge cases are in
 `API.md`. Do not infer a method from a similarly named admin route.
@@ -197,6 +201,12 @@ not a public browser endpoint.
   the returned record, with a safe content type and disposition.
 - Do not log guest tokens, webhook secrets, full request bodies, private
   messages, attachment paths or AI credentials.
+- Never expose low-level `getTicket()` or `ticketMessages()` records through a
+  new transport. Use `TicketsAgentApi`, which strips guest hashes, attachment
+  tokens, and storage names.
+- Keep REST same-origin and session-authenticated. Do not add CORS or bearer
+  authentication implicitly; validate the `tickets-rest` CSRF token for every
+  mutation.
 - Keep attachment storage private and do not replace module validation with a
   public `/site/assets/files/` upload.
 - Map exceptions to generic frontend messages; keep details in protected logs.

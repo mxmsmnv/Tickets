@@ -101,6 +101,152 @@
 	max-width: 100%;
 }
 
+.ProcessTickets .TicketsInterfaceSummary {
+	display: flex;
+	flex-wrap: wrap;
+	gap: .5rem;
+}
+
+.ProcessTickets .TicketsInterfaceState {
+	display: inline-flex;
+	align-items: center;
+	gap: .4rem;
+	padding: .45rem .65rem;
+	border: 1px solid var(--pw-border-color);
+	border-radius: 999px;
+	background: var(--pw-blocks-background);
+	font-size: .78rem;
+}
+
+.ProcessTickets .TicketsInterfaceState i {
+	width: .5rem;
+	height: .5rem;
+	border-radius: 50%;
+	background: var(--pw-muted-color);
+}
+
+.ProcessTickets .TicketsInterfaceState[data-state="enabled"] i {
+	background: #2e8540;
+}
+
+.ProcessTickets .TicketsInterfaceState strong {
+	color: var(--pw-muted-color);
+}
+
+.ProcessTickets .TicketsInterfaceGrid {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: var(--tickets-space-md);
+}
+
+.ProcessTickets .TicketsInterfaceCard {
+	min-width: 0;
+	padding: var(--tickets-space-lg);
+	border: 1px solid var(--pw-border-color);
+	border-radius: var(--pw-input-radius);
+	background: var(--pw-blocks-background);
+}
+
+.ProcessTickets .TicketsInterfaceCard header {
+	display: flex;
+	align-items: center;
+	gap: .85rem;
+}
+
+.ProcessTickets .TicketsInterfaceCard header p,
+.ProcessTickets .TicketsInterfaceCard header h2,
+.ProcessTickets .TicketsInterfaceCard > p {
+	margin: 0;
+}
+
+.ProcessTickets .TicketsInterfaceCard header p {
+	color: var(--pw-muted-color);
+	font-size: .72rem;
+	font-weight: 600;
+	letter-spacing: .06em;
+	text-transform: uppercase;
+}
+
+.ProcessTickets .TicketsInterfaceCard header h2 {
+	font-size: 1.15rem;
+}
+
+.ProcessTickets .TicketsInterfaceCard > p {
+	min-height: 6rem;
+	padding-block: 1rem;
+	color: var(--pw-muted-color);
+	line-height: 1.5;
+}
+
+.ProcessTickets .TicketsInterfaceIcon {
+	display: grid;
+	width: 2.5rem;
+	height: 2.5rem;
+	place-items: center;
+	border-radius: 50%;
+	background: color-mix(in srgb, var(--pw-button-background) 12%, transparent);
+	color: var(--pw-button-background);
+}
+
+.ProcessTickets .TicketsInterfaceCard pre {
+	min-height: 7.5rem;
+	margin: 0;
+	padding: 1rem;
+	overflow: auto;
+	border-radius: var(--pw-input-radius);
+	background: #111827;
+	color: #f8fafc;
+	font-size: .76rem;
+	line-height: 1.55;
+	white-space: pre-wrap;
+	word-break: break-word;
+}
+
+.ProcessTickets .TicketsInterfaceCard pre code {
+	padding: 0;
+	background: transparent;
+	color: inherit;
+}
+
+.ProcessTickets .TicketsInterfaceSafety {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: var(--tickets-space-xl);
+	margin-top: var(--tickets-space-md);
+	padding: var(--tickets-space-lg);
+	border: 1px solid var(--pw-border-color);
+	border-radius: var(--pw-input-radius);
+	background: color-mix(in srgb, var(--pw-blocks-background) 90%, var(--pw-button-background));
+}
+
+.ProcessTickets .TicketsInterfaceSafety h2,
+.ProcessTickets .TicketsInterfaceSafety p {
+	margin: .25rem 0 0;
+}
+
+.ProcessTickets .TicketsInterfaceSafety > div > p:last-child {
+	max-width: 60rem;
+	color: var(--pw-muted-color);
+}
+
+.ProcessTickets .TicketsInterfacePath {
+	display: flex;
+	gap: .75rem;
+	margin-top: var(--tickets-space-md);
+	color: var(--pw-muted-color);
+}
+
+.ProcessTickets .TicketsInterfacePath code {
+	word-break: break-all;
+}
+
+@media (max-width: 959px) {
+	.ProcessTickets .TicketsInterfaceGrid { grid-template-columns: minmax(0, 1fr); }
+	.ProcessTickets .TicketsInterfaceCard > p { min-height: 0; }
+	.ProcessTickets .TicketsInterfaceSafety { align-items: stretch; flex-direction: column; }
+}
+
 .ProcessTickets .TicketsPageIntro {
 	display: flex;
 	align-items: flex-end;

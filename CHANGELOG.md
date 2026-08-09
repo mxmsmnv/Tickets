@@ -1,5 +1,22 @@
 # Changelog
 
+## 1.0.7 - 2026-08-08
+
+- Added independently disabled PHP agent API, same-origin JSON REST, and local
+  CLI channels with a stable capability manifest.
+- Added the `tickets-api` permission, session authentication, CSRF on every
+  REST mutation, bounded request bodies and rate limits, no-store security
+  headers, and strict method/resource validation.
+- Added redacted operational payloads that never expose guest access hashes,
+  attachment access tokens, or private storage names.
+- Expanded the JSON CLI with capabilities, dashboard, queue, ticket,
+  conversation, report, form, update, reply, and note commands. Every mutation
+  and non-preview maintenance run now requires `--execute`.
+- Added an API & CLI workspace explaining live channel status, endpoints,
+  commands, permissions, and the security boundary.
+- Added integration coverage for capability gating, guest denial, payload
+  redaction, bounded queue reads, and ticket updates.
+
 ## 1.0.6 - 2026-08-08
 
 - Ordered staff queues deterministically by priority, active state, breached or

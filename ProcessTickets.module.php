@@ -126,6 +126,31 @@ class ProcessTickets extends Process {
 		return '';
 	}
 
+	public function ___executeInterfaces(): string {
+		$tickets = $this->tickets();
+		if (!$tickets->canAdmin($this->wire('user'))) throw new WirePermissionException('You cannot manage Tickets interfaces.');
+		$this->headline($this->_('API and CLI'));
+		$root = rtrim((string)$this->wire('config')->paths->root, '/');
+		$moduleCommand = 'php site/modules/Tickets/bin/tickets';
+		$apiBase = rtrim((string)$this->wire('config')->urls->root, '/') . '/tickets-api/v1/';
+		$channels = $tickets->capabilities()['channels'];
+		$status = static fn(bool $enabled): string => $enabled ? 'enabled' : 'disabled';
+		$settings = $this->wire('config')->urls->admin . 'module/edit?name=Tickets&collapse_info=1#Inputfield_enable_agent_api';
+		$summary = '<div class="TicketsInterfaceSummary">'
+			. '<span class="TicketsInterfaceState" data-state="' . $status((bool)$channels['php_api']) . '"><i></i>PHP API <strong>' . ucfirst($status((bool)$channels['php_api'])) . '</strong></span>'
+			. '<span class="TicketsInterfaceState" data-state="' . $status((bool)$channels['rest']) . '"><i></i>REST <strong>' . ucfirst($status((bool)$channels['rest'])) . '</strong></span>'
+			. '<span class="TicketsInterfaceState" data-state="' . $status((bool)$channels['cli']) . '"><i></i>CLI <strong>' . ucfirst($status((bool)$channels['cli'])) . '</strong></span></div>';
+		$out = $this->adminNav('interfaces')
+			. $this->pageIntro($this->_('Operational interfaces'), $this->_('API and CLI'), $this->_('Use the same permission-gated ticket operations from trusted PHP code, same-origin tools, local agents, and cron.'), $summary)
+			. '<section class="TicketsInterfaceGrid">'
+			. '<article class="TicketsInterfaceCard"><header><span class="TicketsInterfaceIcon"><i class="fa fa-code" aria-hidden="true"></i></span><div><p>PHP API</p><h2>' . $this->_('Trusted integrations') . '</h2></div></header><p>' . $this->_('Call a typed facade instead of exposing low-level ticket records. The actor needs tickets-api and tickets-manage; administrator-only data keeps its stronger boundary.') . '</p><pre><code>$api = $modules->get(\'Tickets\')->api($user);\n$result = $api->queue([], 1, 50, \'active\');</code></pre></article>'
+			. '<article class="TicketsInterfaceCard"><header><span class="TicketsInterfaceIcon"><i class="fa fa-exchange" aria-hidden="true"></i></span><div><p>JSON REST</p><h2>' . $this->_('Same-origin session API') . '</h2></div></header><p>' . $this->_('REST never enables CORS or bearer credentials. Start with the session endpoint, then send its CSRF token with every POST request.') . '</p><pre><code>' . $this->e($apiBase . 'session/') . '\n' . $this->e($apiBase . 'queue/?scope=active&amp;limit=25') . '</code></pre></article>'
+			. '<article class="TicketsInterfaceCard"><header><span class="TicketsInterfaceIcon"><i class="fa fa-terminal" aria-hidden="true"></i></span><div><p>CLI</p><h2>' . $this->_('Local operations') . '</h2></div></header><p>' . $this->_('Commands emit a stable JSON envelope. Reads are bounded; every write, import, automation, or retention run requires --execute.') . '</p><pre><code>' . $this->e($moduleCommand . ' capabilities') . '\n' . $this->e($moduleCommand . ' queue --scope=active --limit=25') . '\n' . $this->e($moduleCommand . ' automation --dry-run') . '</code></pre></article>'
+			. '</section><section class="TicketsInterfaceSafety"><div><p class="uk-text-meta uk-text-uppercase uk-margin-remove">' . $this->_('Security boundary') . '</p><h2>' . $this->_('Private ticket data stays private') . '</h2><p>' . $this->_('API payloads omit guest access hashes, attachment tokens, and private storage names. REST requires an authenticated ProcessWire session and rate-limits reads and writes independently.') . '</p></div><a class="uk-button uk-button-primary" href="' . $this->e($settings) . '">' . $this->_('Configure interfaces') . '</a></section>'
+			. '<p class="TicketsInterfacePath"><strong>' . $this->_('ProcessWire root') . '</strong><code>' . $this->e($root) . '</code></p>';
+		return $this->workspace($out);
+	}
+
 	public function ___executeReports(): string {
 		$tickets = $this->tickets();
 		if ($this->wire('input')->requestMethod('POST')) {
@@ -635,7 +660,7 @@ class ProcessTickets extends Process {
 	private function adminNav(string $active): string {
 		$base = $this->wire('page')->url;
 		$settings = $this->wire('config')->urls->admin . 'module/edit?name=Tickets&collapse_info=1';
-		$items = ['queue' => [$base, $this->_('Queue')], 'tickets' => [$base . 'tickets/', $this->_('Tickets')], 'reports' => [$base . 'reports/', $this->_('Reports')], 'forms' => [$base . 'forms/', $this->_('Forms')], 'automation' => [$base . 'automation/', $this->_('Automation')], 'templates' => [$base . 'templates/', $this->_('Templates')]];
+		$items = ['queue' => [$base, $this->_('Queue')], 'tickets' => [$base . 'tickets/', $this->_('Tickets')], 'reports' => [$base . 'reports/', $this->_('Reports')], 'forms' => [$base . 'forms/', $this->_('Forms')], 'automation' => [$base . 'automation/', $this->_('Automation')], 'templates' => [$base . 'templates/', $this->_('Templates')], 'interfaces' => [$base . 'interfaces/', $this->_('API & CLI')]];
 		$out = '<div class="TicketsAdminNavigation uk-margin-medium-bottom uk-flex uk-flex-top"><div class="uk-width-expand"><ul class="uk-subnav uk-subnav-pill TicketsAdmin-nav" aria-label="Ticket module sections">';
 		foreach ($items as $key => [$url, $label]) $out .= '<li' . (($active === $key || ($active === 'view' && $key === 'queue')) ? ' class="uk-active"' : '') . '><a href="' . $this->e($url) . '">' . $this->e($label) . '</a></li>';
 		return $out . '</ul></div><div class="uk-width-auto"><a class="TicketsAdminSettings uk-link-muted uk-display-inline-flex uk-flex-middle" href="' . $this->e($settings) . '" title="' . $this->_('Tickets settings') . '" aria-label="' . $this->_('Tickets settings') . '">' . $this->settingsIcon() . '</a></div></div>';

@@ -1,7 +1,7 @@
 # Tickets public API
 
-This document describes the verified public interface of Tickets 1.0.6
-(`version` 106). It is stronger than README for method usage, but the installed
+This document describes the verified public interface of Tickets 1.0.7
+(`version` 107). It is stronger than README for method usage, but the installed
 module version and live site configuration remain authoritative for a specific
 ProcessWire site.
 
@@ -39,6 +39,25 @@ True for a superuser or a user with `tickets-manage`.
 True for a superuser or a user with `tickets-admin`.
 
 These methods do not imply that the caller has validated CSRF or ownership.
+
+### `api(?User $actor = null): TicketsAgentApi`
+
+Returns the operational facade for trusted integrations. It fails closed unless
+the PHP API is enabled and the actor is logged in with both `tickets-api` and
+`tickets-manage`. Its methods expose redacted ticket and attachment payloads,
+not the low-level database-shaped records returned by `getTicket()`.
+
+The facade provides `capabilities()`, `dashboard()`, `queue()`, `ticket()`,
+`messages()`, `report()`, `forms()`, `update()`, `reply()`, and `note()`.
+Report and form methods require `tickets-admin`; writes derive staff identity
+from the actor and never accept a browser-provided staff flag.
+
+### `capabilities(): array`
+
+Returns a dependency-free manifest describing the PHP API, REST, and CLI
+channels and the stable `tickets.*` capability names. A channel marked enabled
+still requires its documented user permission, session, CSRF, or local-host
+boundary.
 
 ## Labels and frontend presentation
 
@@ -379,9 +398,9 @@ Canonical CLI:
 
 ```bash
 php site/modules/Tickets/bin/tickets automation --dry-run --root=/path/to/site
-php site/modules/Tickets/bin/tickets automation --root=/path/to/site
+php site/modules/Tickets/bin/tickets automation --execute --root=/path/to/site
 php site/modules/Tickets/bin/tickets retention --dry-run --root=/path/to/site
-php site/modules/Tickets/bin/tickets retention --root=/path/to/site
+php site/modules/Tickets/bin/tickets retention --execute --root=/path/to/site
 ```
 
 ## Resend inbound replies
@@ -461,6 +480,9 @@ sla_escalation_email
 retention_days
 retention_action
 retention_batch_size
+enable_agent_api
+enable_rest_api
+enable_cli
 resend_inbound_enabled
 resend_inbound_address
 resend_webhook_secret
