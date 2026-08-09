@@ -16,7 +16,7 @@ $checks = [
 	'separate interface pages' => str_contains($process, '___executeApi()') && str_contains($process, '___executeCli()') && str_contains($process, "interfaceNav('api')") && str_contains($process, "interfaceNav('cli')"),
 	'interface status and catalogues' => str_contains($process, 'Current settings') && str_contains($process, 'apiRoutes()') && str_contains($process, 'cliCommands()'),
 	'interface responsive layout' => str_contains($css, '.TicketsInterfaceSettings dl {') && str_contains($css, '.TicketsTokenActions'),
-	'interface navigation pills' => str_contains($css, '.TicketsInterfaceNav .uk-subnav-pill > * > a {') && str_contains($css, 'border-radius: 999px;') && str_contains($css, '.TicketsInterfaceNav .uk-subnav-pill > .uk-active > a {'),
+	'interface navigation reuses module pills' => str_contains($process, '<nav class="TicketsAdminNavigation"') && str_contains($process, 'uk-subnav uk-subnav-pill TicketsAdmin-nav') && !str_contains($css, '.TicketsInterfaceNav'),
 ];
 
 foreach($checks as $label => $ok) {

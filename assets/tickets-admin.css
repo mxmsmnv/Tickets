@@ -107,45 +107,6 @@
 	gap: .5rem;
 }
 
-.ProcessTickets .TicketsInterfaceNav {
-	margin: 0 0 var(--tickets-space-xl);
-	overflow-x: auto;
-	scrollbar-width: thin;
-}
-
-.ProcessTickets .TicketsInterfaceNav .uk-subnav {
-	display: flex;
-	flex-wrap: nowrap;
-	gap: .5rem;
-	width: max-content;
-	margin: 0;
-}
-
-.ProcessTickets .TicketsInterfaceNav .uk-subnav > * { padding: 0; }
-
-.ProcessTickets .TicketsInterfaceNav .uk-subnav-pill > * > a {
-	min-height: 2.5rem;
-	padding: .55rem 1rem;
-	border: 1px solid var(--pw-border-color);
-	border-radius: 999px;
-	background: var(--pw-blocks-background);
-	color: var(--pw-text-color);
-	text-decoration: none;
-}
-
-.ProcessTickets .TicketsInterfaceNav .uk-subnav-pill > * > a:hover,
-.ProcessTickets .TicketsInterfaceNav .uk-subnav-pill > * > a:focus-visible {
-	border-color: var(--pw-button-background);
-	background: color-mix(in srgb, var(--pw-button-background) 8%, var(--pw-blocks-background));
-	color: var(--pw-button-background);
-}
-
-.ProcessTickets .TicketsInterfaceNav .uk-subnav-pill > .uk-active > a {
-	border-color: var(--pw-button-background);
-	background: var(--pw-button-background);
-	color: var(--pw-button-text-color, #fff);
-}
-
 .ProcessTickets .TicketsInterfaceState {
 	display: inline-flex;
 	align-items: center;

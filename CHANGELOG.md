@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.25 - 2026-08-09
+
+- Reused the module's established admin-navigation pill component for the API
+  and CLI subsection instead of maintaining a separate visual variation.
+
 ## 1.0.24 - 2026-08-09
 
 - Rendered every Overview, API, and CLI interface tab as a complete outlined

@@ -836,7 +836,7 @@ class ProcessTickets extends Process {
 			'api' => [$base . 'api/', $this->_('API')],
 			'cli' => [$base . 'cli/', $this->_('CLI')],
 		];
-		$out = '<nav class="TicketsInterfaceNav" aria-label="' . $this->_('Interface sections') . '"><ul class="uk-subnav uk-subnav-pill">';
+		$out = '<nav class="TicketsAdminNavigation" aria-label="' . $this->_('Interface sections') . '"><ul class="uk-subnav uk-subnav-pill TicketsAdmin-nav">';
 		foreach ($items as $key => [$url, $label]) $out .= '<li' . ($key === $active ? ' class="uk-active"' : '') . '><a href="' . $this->e($url) . '"' . ($key === $active ? ' aria-current="page"' : '') . '>' . $this->e($label) . '</a></li>';
 		return $out . '</ul></nav>';
 	}
