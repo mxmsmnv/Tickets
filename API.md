@@ -1,7 +1,7 @@
 # Tickets public API
 
-This document describes the verified public interface of Tickets 1.0.29
-(`version` 129). It is stronger than README for method usage, but the installed
+This document describes the verified public interface of Tickets 1.0.30
+(`version` 130). It is stronger than README for method usage, but the installed
 module version and live site configuration remain authoritative for a specific
 ProcessWire site.
 
@@ -556,8 +556,8 @@ Private runtime overrides are preferred for production deployments.
 
 ### `telegramIntegrationStatus(): array`
 
-Returns configuration, enabled, ready, recipient count, credential source, and
-selected-event state for the independent Telegram interface. It does not test
+Returns TeleWire installation/compatibility, configuration, enabled, ready,
+recipient count, credential source, and selected-event state. It does not test
 the Telegram network connection and never returns bot tokens or chat IDs.
 
 ### `telegramNotificationEvents(): array`

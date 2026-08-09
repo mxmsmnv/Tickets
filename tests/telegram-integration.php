@@ -19,9 +19,10 @@ if (($defaults['telegram_notification_events'] ?? []) !== ['new_ticket', 'custom
 if (($defaults['telegram_bot_token'] ?? 'unexpected') !== '' || ($defaults['telegram_chat_ids'] ?? 'unexpected') !== '') throw new \RuntimeException('Telegram credentials must be empty by default.');
 
 $status = $tickets->telegramIntegrationStatus();
-foreach (['configured', 'enabled', 'ready', 'recipient_count', 'credential_source', 'events'] as $key) {
+foreach (['integration_installed', 'integration_compatible', 'configured', 'enabled', 'ready', 'recipient_count', 'credential_source', 'events'] as $key) {
 	if (!array_key_exists($key, $status)) throw new \RuntimeException('Telegram status is missing: ' . $key);
 }
+if (empty($status['integration_installed']) || empty($status['integration_compatible'])) throw new \RuntimeException('TeleWire 1.0.2 integration is unavailable.');
 
 $oldOrigin = (string)$tickets->notification_origin;
 $oldEvents = (array)$tickets->telegram_notification_events;

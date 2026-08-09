@@ -13,7 +13,7 @@ private files publicly.
 - **Author:** Maxim Semenov
 - **Website:** [smnv.org](https://smnv.org)
 - **Email:** [maxim@smnv.org](mailto:maxim@smnv.org)
-- **Release:** 1.0.29 (`version` 129)
+- **Release:** 1.0.30 (`version` 130)
 
 If this project helps your work, consider supporting future development:
 [GitHub Sponsors](https://github.com/sponsors/mxmsmnv) or
@@ -36,8 +36,9 @@ If this project helps your work, consider supporting future development:
   WireMail provider.
 - Supports optional authenticated Resend inbound replies.
 - Supports optional Mailbox ingestion for new support email and Mailbox SMTP delivery for ticket notifications and linked thread replies.
-- Supports independent, opt-in administrator Telegram alerts for new tickets,
-  customer replies, and SLA breaches through the Telegram Bot API.
+- Supports opt-in administrator Telegram alerts for new tickets, customer
+  replies, and SLA breaches through TeleWire while keeping all credentials and
+  recipient settings independently in Tickets.
 - Supports optional Squad reply drafts grounded by Atlas and Knowledge Base;
   drafts use the complete public conversation and can be copy-edited separately.
 - Records a non-IP location and timezone snapshot when GeoIP is installed, so
@@ -107,8 +108,8 @@ editor. Only enabled forms open on the configured public portal.
 - Any ProcessWire `WireMail*` provider for outbound transactional email.
 - Resend for authenticated inbound email replies.
 - Mailbox for bounded, deduplicated support-email ingestion and optional SMTP delivery; existing WireMail and Resend paths remain independent.
-- Telegram Bot API for administrator alerts, configured independently in
-  Tickets or injected through private runtime configuration.
+- TeleWire 1.0.2+ as the Telegram transport for administrator alerts. Tickets
+  owns separate credentials, recipients, events, and runtime overrides.
 - TinyMCE for visual transactional-template editing.
 - Squad for staff-requested reply drafts.
 - Atlas and Knowledge Base for independently optional grounding sources.

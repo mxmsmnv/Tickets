@@ -214,12 +214,14 @@ class ProcessTickets extends Process {
 			default => $this->_('Not configured'),
 		};
 		$summary = '<div class="TicketsInterfaceSummary">'
+			. $this->interfaceState('TeleWire', (bool)$status['integration_compatible'])
 			. $this->interfaceState($this->_('Delivery'), (bool)$status['ready'])
 			. $this->interfaceState($this->_('Credentials'), (bool)$status['configured'])
 			. '</div>';
 		$out = $this->adminNav('interfaces') . $this->interfaceNav('telegram')
-			. $this->pageIntro($this->_('Administrator notifications'), $this->_('Tickets Telegram'), $this->_('Send concise operational alerts directly through the Telegram Bot API without another ProcessWire module.'), $summary)
+			. $this->pageIntro($this->_('Administrator notifications'), $this->_('Tickets Telegram'), $this->_('Send concise operational alerts through TeleWire using credentials and recipients owned independently by Tickets.'), $summary)
 			. '<section class="TicketsInterfaceSettings"><header><div><p class="uk-text-meta uk-text-uppercase uk-margin-remove">Telegram Bot API</p><h2>' . $this->_('Current settings') . '</h2></div><a class="uk-button uk-button-default" href="' . $this->e($this->telegramSettingsUrl()) . '">' . $this->_('Module settings') . '</a></header><dl>'
+			. '<div><dt>' . $this->_('Integration') . '</dt><dd>' . ((bool)$status['integration_compatible'] ? 'TeleWire 1.0.2+' : $this->_('Unavailable')) . '</dd></div>'
 			. '<div><dt>' . $this->_('Delivery') . '</dt><dd>' . ((bool)$status['enabled'] ? $this->_('Enabled') : $this->_('Disabled')) . '</dd></div>'
 			. '<div><dt>' . $this->_('Credentials') . '</dt><dd>' . ((bool)$status['configured'] ? $this->_('Configured') : $this->_('Not configured')) . '</dd></div>'
 			. '<div><dt>' . $this->_('Credential source') . '</dt><dd>' . $this->e($source) . '</dd></div>'

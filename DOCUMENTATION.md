@@ -1,6 +1,6 @@
 # Tickets Documentation
 
-This document describes the integration contract implemented by Tickets 1.0.29
+This document describes the integration contract implemented by Tickets 1.0.30
 for ProcessWire.
 
 ## Configuration
@@ -163,16 +163,18 @@ browser-originated write.
 Open **Modules → Configure → Tickets → Operational interfaces** to configure a
 Telegram bot token, administrator chat IDs, notification events, and delivery
 timeout. Review the resulting state under **Setup → Tickets → Interfaces →
-Telegram**. No additional ProcessWire module is required. Telegram delivery and
-every event remain opt-in and independent of transactional email.
+Telegram**. TeleWire 1.0.2+ is the required transport, but its saved bot token,
+chat IDs, and notification settings are never used by Tickets. Telegram
+delivery and every event remain opt-in and independent of transactional email.
 
 The token may be stored in Tickets module configuration or injected privately
 through `$config->ticketsTelegramBotToken` / `TICKETS_TELEGRAM_BOT_TOKEN`.
 Recipient overrides use `$config->ticketsTelegramChatIds` /
 `TICKETS_TELEGRAM_CHAT_IDS`. Runtime values take precedence over saved module
 configuration. Status and capability output never includes credential values.
-Requests use HTTPS only, reject redirects, and enforce bounded connection and
-total timeouts. A delivery failure is logged without message content or
+Tickets creates an integration-owned client through TeleWire's public
+`createClient()` API. Requests use HTTPS only, reject redirects, and enforce
+bounded connection and total timeouts. A delivery failure is logged without message content or
 credentials and never rolls back ticket creation, a reply, or SLA automation.
 
 The payload is deliberately minimal: event label, ticket key, subject,

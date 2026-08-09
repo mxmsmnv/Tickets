@@ -4,13 +4,19 @@
 trait TicketsTelegramIntegration {
 
 	public function telegramIntegrationStatus(): array {
+		$modules = $this->wire('modules');
+		$integrationInstalled = $modules->isInstalled('TeleWire');
+		$telewire = $integrationInstalled ? $modules->get('TeleWire') : null;
+		$integrationCompatible = is_object($telewire) && method_exists($telewire, 'createClient');
 		$token = $this->telegramBotToken();
 		$chatIds = $this->telegramChatIds();
 		$configured = $this->telegramTokenIsValid($token) && $chatIds !== [];
 		return [
+			'integration_installed' => $integrationInstalled,
+			'integration_compatible' => $integrationCompatible,
 			'configured' => $configured,
 			'enabled' => (bool)$this->telegram_notifications_enabled,
-			'ready' => (bool)$this->telegram_notifications_enabled && $configured,
+			'ready' => (bool)$this->telegram_notifications_enabled && $integrationCompatible && $configured,
 			'recipient_count' => count($chatIds),
 			'credential_source' => $this->telegramCredentialSource(),
 			'events' => $this->telegramNotificationEvents(),
@@ -24,18 +30,24 @@ trait TicketsTelegramIntegration {
 
 	protected function addTelegramIntegrationInputfields(InputfieldWrapper $interfaces): void {
 		$status = $this->telegramIntegrationStatus();
+		$integration = $this->wire('modules')->get('InputfieldMarkup');
+		$integration->label = $this->_('TeleWire integration');
+		$integration->value = $status['integration_compatible']
+			? '<p><strong>' . $this->_('Connected') . '</strong> — ' . $this->_('Tickets credentials remain separate from TeleWire module settings.') . '</p>'
+			: '<p><strong>' . $this->_('Unavailable') . '</strong> — ' . $this->_('Install or update TeleWire 1.0.2 before enabling Telegram delivery.') . '</p>';
+		$interfaces->add($integration);
 
 		$enabled = $this->wire('modules')->get('InputfieldCheckbox');
 		$enabled->name = 'telegram_notifications_enabled';
 		$enabled->label = $this->_('Enable Telegram administrator notifications');
-		$enabled->description = $this->_('Independent Tickets delivery through the Telegram Bot API. Delivery failures never block ticket creation, replies, or SLA automation.');
+		$enabled->description = $this->_('TeleWire sends using the independent credentials below. Delivery failures never block ticket creation, replies, or SLA automation.');
 		$enabled->checked = (bool)$this->telegram_notifications_enabled;
 		$interfaces->add($enabled);
 
 		$token = $this->wire('modules')->get('InputfieldText');
 		$token->name = 'telegram_bot_token';
 		$token->label = $this->_('Telegram bot token');
-		$token->description = $this->_('Create a bot with @BotFather. A private runtime override takes precedence over this saved value.');
+		$token->description = $this->_('Create a bot with @BotFather. TeleWire settings are not used; a private Tickets runtime override takes precedence over this saved value.');
 		$token->notes = $status['credential_source'] === 'runtime'
 			? $this->_('A runtime credential is active; the saved token is not used.')
 			: $this->_('Stored in ProcessWire module configuration. Never commit this value to source control.');
@@ -92,12 +104,15 @@ trait TicketsTelegramIntegration {
 		$sent = 0;
 		$chatIds = $this->telegramChatIds();
 		try {
+			$telewire = $this->wire('modules')->get('TeleWire');
+			$client = $telewire->createClient($this->telegramBotToken(), [
+				'timeout' => max(3, min(30, (int)$this->telegram_timeout_seconds)),
+				'parseMode' => 'HTML',
+			]);
 			foreach ($chatIds as $chatId) {
-				if ($this->telegramApiRequest($this->telegramBotToken(), [
-					'chat_id' => $chatId,
-					'text' => $this->buildTelegramNotification($event, $ticket),
+				if ($client->sendMessage($chatId, $this->buildTelegramNotification($event, $ticket), [
 					'parse_mode' => 'HTML',
-					'disable_web_page_preview' => 'true',
+					'disable_web_page_preview' => true,
 				])) $sent++;
 			}
 		} catch (\Throwable $error) {
@@ -106,31 +121,6 @@ trait TicketsTelegramIntegration {
 		}
 		if ($sent !== count($chatIds)) $this->wire('log')->save('tickets', 'Telegram notification delivery incomplete (' . $event . ', ' . $sent . '/' . count($chatIds) . ').');
 		return $sent === count($chatIds);
-	}
-
-	private function telegramApiRequest(string $token, array $payload): bool {
-		if (!$this->telegramTokenIsValid($token) || !function_exists('curl_init')) return false;
-		$timeout = max(3, min(30, (int)$this->telegram_timeout_seconds));
-		$handle = curl_init('https://api.telegram.org/bot' . $token . '/sendMessage');
-		if ($handle === false) return false;
-		try {
-			curl_setopt_array($handle, [
-				CURLOPT_POST => true,
-				CURLOPT_POSTFIELDS => http_build_query($payload, '', '&', PHP_QUERY_RFC3986),
-				CURLOPT_RETURNTRANSFER => true,
-				CURLOPT_FOLLOWLOCATION => false,
-				CURLOPT_CONNECTTIMEOUT => min(5, $timeout),
-				CURLOPT_TIMEOUT => $timeout,
-				CURLOPT_PROTOCOLS => CURLPROTO_HTTPS,
-				CURLOPT_HTTPHEADER => ['Content-Type: application/x-www-form-urlencoded'],
-			]);
-			$response = curl_exec($handle);
-			$httpCode = (int)curl_getinfo($handle, CURLINFO_RESPONSE_CODE);
-			$body = is_string($response) ? json_decode($response, true) : null;
-			return $httpCode >= 200 && $httpCode < 300 && is_array($body) && !empty($body['ok']);
-		} finally {
-			curl_close($handle);
-		}
 	}
 
 	private function buildTelegramNotification(string $event, array $ticket): string {

@@ -250,8 +250,10 @@ session CSRF token.
 - Mailbox SMTP delivery is a second opt-in. Existing WireMail remains the
   default; never enable Mailbox inbound or outbound merely because Mailbox is
   installed or configured.
-- Telegram administrator notifications are a separate opt-in interface owned
-  by Tickets. Keep bot credentials in private runtime configuration where
+- Telegram administrator notifications are an opt-in Tickets integration using
+  TeleWire 1.0.2+ as transport. Tickets owns independent credentials,
+  recipients, events, and timeout; never reuse or mutate TeleWire's saved
+  settings. Keep bot credentials in private runtime configuration where
   practical; module configuration is supported but must never enter source,
   logs, status output, or API responses. Telegram payloads stay limited to the
   event, ticket key, subject, priority, status, and authenticated admin URL;

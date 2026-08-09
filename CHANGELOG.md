@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.0.30 - 2026-08-09
+
+- Restored TeleWire as the required Telegram transport while keeping bot token,
+  recipients, events, timeout, and enable state independently owned by Tickets.
+- Switched delivery to TeleWire 1.0.2's credential-scoped `createClient()` API;
+  Tickets never reads or changes TeleWire module settings.
+- Added TeleWire compatibility state to the Telegram interface and module
+  settings without exposing either module's credentials.
+
 ## 1.0.29 - 2026-08-09
 
 - Kept Telegram credentials, recipients, events, timeout, and privacy guidance
