@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.6 - 2026-08-08
+
+- Ordered staff queues deterministically by priority, active state, breached or
+  nearest SLA deadline, workflow status, and recent activity.
+- Added an SLA column to the dashboard and unified ticket workspace so staff can
+  see why a request appears earlier in the queue.
+
 ## 1.0.5 - 2026-08-08
 
 - Kept disabled-form previews inside the authenticated form editor so drafts no

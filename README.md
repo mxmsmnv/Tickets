@@ -13,7 +13,7 @@ private files publicly.
 - **Author:** Maxim Semenov
 - **Website:** [smnv.org](https://smnv.org)
 - **Email:** [maxim@smnv.org](mailto:maxim@smnv.org)
-- **Release:** 1.0.5 (`version` 105)
+- **Release:** 1.0.6 (`version` 106)
 
 If this project helps your work, consider supporting future development:
 [GitHub Sponsors](https://github.com/sponsors/mxmsmnv) or
@@ -42,6 +42,7 @@ Tickets adds a dedicated **Setup → Tickets** workspace where support staff can
 
 - monitor queue health and response metrics;
 - search and filter active, resolved and closed tickets;
+- work tickets in priority, active-state and SLA-risk order;
 - assign, prioritize and update requests individually or in bulk;
 - reply, add internal notes, link duplicates and inspect private attachments;
 - manage routing rules, SLA overrides and reusable replies;

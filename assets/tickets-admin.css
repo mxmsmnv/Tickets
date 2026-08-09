@@ -593,6 +593,36 @@
 	background: #b42318;
 }
 
+.ProcessTickets .TicketsQueueSla {
+	display: grid;
+	gap: .15rem;
+	min-width: 7.5rem;
+	line-height: 1.25;
+}
+
+.ProcessTickets .TicketsQueueSla strong {
+	font-size: .8rem;
+	font-weight: 600;
+}
+
+.ProcessTickets .TicketsQueueSla small {
+	color: var(--pw-muted-color);
+	font-size: .75rem;
+}
+
+.ProcessTickets .TicketsQueueSla[data-state="breached"] strong {
+	color: #b42318;
+}
+
+.ProcessTickets .TicketsQueueSla[data-state="due"] strong {
+	color: #6f4d00;
+}
+
+.ProcessTickets .TicketsQueueSla[data-state="complete"],
+.ProcessTickets .TicketsQueueSla[data-state="unset"] {
+	color: var(--pw-muted-color);
+}
+
 .ProcessTickets .TicketsQueueOpen {
 	display: grid;
 	place-items: center;

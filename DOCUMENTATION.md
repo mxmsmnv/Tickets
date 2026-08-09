@@ -1,6 +1,6 @@
 # Tickets Documentation
 
-This document describes the integration contract implemented by Tickets 1.0.5
+This document describes the integration contract implemented by Tickets 1.0.6
 for ProcessWire.
 
 ## Configuration
@@ -111,6 +111,10 @@ enforce `tickets-admin` and are not frontend submission APIs.
 - `slaState(array $ticket): array`
 - `runAutomation(bool $dryRun = false): array`
 - `runRetention(bool $dryRun = false): array`
+
+`queuePage()` uses the operational staff order: priority, active versus
+completed state, breached or nearest SLA deadline, workflow status, then most
+recent activity. The admin queue shows the same SLA state beside each ticket.
 
 Methods that accept a `User` enforce their documented permission or ownership
 boundary. Reporting, queue, automation and retention helpers do not all accept
