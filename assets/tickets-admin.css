@@ -1364,8 +1364,55 @@
 	padding: 1.15rem 1.25rem;
 }
 
-.ProcessTickets .TicketsMessage + .TicketsMessage {
+.ProcessTickets .TicketsThread > * + * {
 	border-top: 1px solid var(--pw-border-color);
+}
+
+.ProcessTickets .TicketsConversationEvent {
+	display: grid;
+	grid-template-columns: 2.5rem minmax(0, 1fr);
+	gap: .8rem;
+	padding: .9rem 1.25rem;
+	background: color-mix(in srgb, var(--pw-primary-color, #e83561) 4%, var(--pw-blocks-background));
+}
+
+.ProcessTickets .TicketsConversationEvent-icon {
+	display: grid;
+	place-items: center;
+	width: 2.5rem;
+	height: 2.5rem;
+	border-radius: 50%;
+	background: color-mix(in srgb, var(--pw-primary-color, #e83561) 13%, transparent);
+	color: var(--pw-primary-color, #e83561);
+}
+
+.ProcessTickets .TicketsConversationEvent > div {
+	min-width: 0;
+}
+
+.ProcessTickets .TicketsConversationEvent header {
+	display: flex;
+	align-items: baseline;
+	justify-content: space-between;
+	gap: 1rem;
+}
+
+.ProcessTickets .TicketsConversationEvent strong {
+	font-weight: 500;
+}
+
+.ProcessTickets .TicketsConversationEvent time,
+.ProcessTickets .TicketsConversationEvent small {
+	color: var(--pw-muted-color);
+	font-size: .72rem;
+}
+
+.ProcessTickets .TicketsConversationEvent p {
+	margin: .2rem 0 .12rem;
+}
+
+.ProcessTickets .TicketsConversationEvent small {
+	display: block;
 }
 
 .ProcessTickets .TicketsMessage[data-author="staff"] {
@@ -2243,9 +2290,21 @@
 		padding: 1rem;
 	}
 
-	.ProcessTickets .TicketsMessage-avatar {
+	.ProcessTickets .TicketsConversationEvent {
+		grid-template-columns: 2.15rem minmax(0, 1fr);
+		padding: .9rem 1rem;
+	}
+
+	.ProcessTickets .TicketsMessage-avatar,
+	.ProcessTickets .TicketsConversationEvent-icon {
 		width: 2.15rem;
 		height: 2.15rem;
+	}
+
+	.ProcessTickets .TicketsConversationEvent header {
+		align-items: flex-start;
+		flex-direction: column;
+		gap: .1rem;
 	}
 
 	.ProcessTickets .TicketsMessage-content > header {

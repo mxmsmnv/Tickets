@@ -129,8 +129,11 @@ channel disabled:
 The ticket workspace conversation order is configurable under **Modules →
 Configure → Tickets → Staff workspace**. ASC keeps the oldest message first and
 the reply composer below the thread. DESC places the composer first and lists
-the newest message first. This affects admin presentation only; public APIs and
-AI context remain chronological.
+the newest entry first. The staff Conversation timeline includes messages,
+internal notes and SLA-extension activity with its staff actor and new deadline.
+SLA activity is not exposed as a customer message or sent as a transactional
+notification. This affects admin presentation only; public APIs and AI context
+remain chronological.
 
 The same Staff workspace section controls sidebar placement independently for
 desktop (1200px and wider) and tablet (768–1199px). On phones below 768px the
@@ -326,7 +329,9 @@ support queues.
 
 Staff may extend the currently active first-response or resolution deadline by
 a bounded interval from the ticket workspace. The previous breach marker is
-cleared and the change is recorded in the ticket event log.
+cleared and the change is recorded in the ticket event log and rendered in the
+staff Conversation timeline. Existing recorded extensions appear without a
+data migration.
 
 ## Retention
 

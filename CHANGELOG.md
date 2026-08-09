@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.0.46 - 2026-08-09
+
+- Added existing and future SLA-extension audit events to the staff Conversation
+  timeline with actor, duration, phase, new deadline and chronological ASC/DESC
+  ordering.
+- Kept SLA activity staff-only and separate from customer messages and
+  transactional notifications.
+
 ## 1.0.45 - 2026-08-09
 
 - Added account-country and timezone fallbacks for older authenticated tickets

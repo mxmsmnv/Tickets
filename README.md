@@ -13,7 +13,7 @@ private files publicly.
 - **Author:** Maxim Semenov
 - **Website:** [smnv.org](https://smnv.org)
 - **Email:** [maxim@smnv.org](mailto:maxim@smnv.org)
-- **Release:** 1.0.45 (`version` 145)
+- **Release:** 1.0.46 (`version` 146)
 
 If this project helps your work, consider supporting future development:
 [GitHub Sponsors](https://github.com/sponsors/mxmsmnv) or
@@ -26,7 +26,8 @@ If this project helps your work, consider supporting future development:
 - Supports remembered guest access after one email check or private-link visit
   using a scoped signed browser grant rather than the email address as a token.
 - Keeps replies, sent/delivered/read timestamps, staff-only notes, attachments
-  and workflow history together.
+  and workflow history together, including SLA extensions in the staff
+  conversation timeline.
 - Provides statuses, priorities, assignment, bulk actions and ticket merging.
 - Includes SLA targets, routing rules, reusable replies and scheduled automation.
 - Includes operational charts, reports, CSV export and customer satisfaction ratings.

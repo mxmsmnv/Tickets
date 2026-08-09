@@ -24,7 +24,12 @@ $checks = [
 	'interface navigation reuses module pills' => str_contains($process, '<nav class="TicketsAdminNavigation"') && str_contains($process, 'uk-subnav uk-subnav-pill TicketsAdmin-nav') && !str_contains($css, '.TicketsInterfaceNav'),
 	'telegram reuses interface components' => str_contains($process, "interfaceOverviewCard('telegram'") && str_contains($process, 'TicketsInterfaceSettings') && str_contains($process, 'TicketsInterfaceSafety'),
 	'email reuses interface components' => str_contains($process, "interfaceOverviewCard('envelope'") && str_contains($process, 'mailProviderLabel()') && str_contains($process, 'Selected provider'),
-	'conversation order moves composer semantically' => str_contains($process, "array_reverse(\$messages)") && str_contains($process, "\$conversationOrder === 'desc' ? \$composerOut . \$conversationOut : \$conversationOut . \$composerOut"),
+	'conversation order moves composer semantically' => str_contains($process, "array_reverse(\$conversationEntries)") && str_contains($process, "\$conversationOrder === 'desc' ? \$composerOut . \$conversationOut : \$conversationOut . \$composerOut"),
+	'SLA extensions appear in conversation activity' => str_contains($module, 'public function ticketConversationEvents')
+		&& str_contains($module, "event_type=\\'sla_extended\\'")
+		&& str_contains($process, 'TicketsConversationEvent')
+		&& str_contains($process, "\$this->_('SLA extended')")
+		&& str_contains($css, '.TicketsConversationEvent {'),
 	'configurable responsive sidebar' => str_contains($process, 'data-desktop-sidebar=')
 		&& str_contains($process, 'data-tablet-sidebar=')
 		&& str_contains($css, '[data-desktop-sidebar="left"]')

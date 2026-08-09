@@ -453,10 +453,21 @@ class ProcessTickets extends Process {
 		$ticket = $tickets->getTicket($id);
 		$tickets->markMessagesRead($id, $this->wire('user'), true);
 		$messages = $tickets->ticketMessages($id, true);
+		$conversationEvents = $tickets->ticketConversationEvents($id, $this->wire('user'));
+		$conversationEntries = [];
+		foreach ($messages as $message) {
+			$conversationEntries[] = ['type' => 'message', 'created_at' => (string)$message['created_at'], 'id' => (int)$message['id'], 'record' => $message];
+		}
+		foreach ($conversationEvents as $event) {
+			$conversationEntries[] = ['type' => 'event', 'created_at' => (string)$event['created_at'], 'id' => (int)$event['id'], 'record' => $event];
+		}
+		usort($conversationEntries, static function(array $left, array $right): int {
+			return [$left['created_at'], $left['type'], $left['id']] <=> [$right['created_at'], $right['type'], $right['id']];
+		});
 		$conversationOrder = strtolower((string)$tickets->admin_conversation_order) === 'desc' ? 'desc' : 'asc';
 		$desktopSidebar = strtolower((string)$tickets->admin_sidebar_desktop) === 'left' ? 'left' : 'right';
 		$tabletSidebar = strtolower((string)$tickets->admin_sidebar_tablet) === 'left' ? 'left' : 'right';
-		if ($conversationOrder === 'desc') $messages = array_reverse($messages);
+		if ($conversationOrder === 'desc') $conversationEntries = array_reverse($conversationEntries);
 		$macros = $tickets->macros(true, $ticket);
 		$links = $tickets->ticketLinks($id);
 		$ticketOptions = $tickets->ticketSelectionOptions($id, $this->wire('user'));
@@ -471,8 +482,20 @@ class ProcessTickets extends Process {
 		$out = $this->adminNav('view') . '<div class="TicketsViewBack"><a href="' . $this->e($this->wire('page')->url) . '"><i class="fa fa-arrow-left" aria-hidden="true"></i>' . $this->_('Back to queue') . '</a></div>';
 		$out .= '<header class="TicketsCaseHeader"><div class="TicketsCaseHeader-main"><div class="TicketsCaseHeader-eyebrow"><span>' . $this->_('Support ticket') . '</span><code>#' . $this->e($ticket['public_key']) . '</code></div><form class="TicketsSubjectForm" method="post"><input type="hidden" name="ticket_action" value="update_subject">' . $this->csrf() . '<label class="uk-form-label" for="ticket-subject">' . $this->_('Subject') . '</label><div><input class="uk-input" id="ticket-subject" name="subject" value="' . $this->e($ticket['subject']) . '" maxlength="180" required><button class="uk-button uk-button-default" type="submit" aria-label="' . $this->_('Save subject') . '" title="' . $this->_('Save subject') . '"><i class="fa fa-check" aria-hidden="true"></i></button></div></form><div class="TicketsCaseHeader-meta"><span><i class="fa fa-user-o" aria-hidden="true"></i>' . $this->e($ticket['customer_name']) . '</span><span><i class="fa fa-clock-o" aria-hidden="true"></i>' . $this->_('Updated') . ' ' . $this->e($this->age((string)$ticket['updated_at'])) . '</span><span><i class="fa fa-comments-o" aria-hidden="true"></i>' . count($messages) . ' ' . $this->_('messages') . '</span></div></div><div class="TicketsCaseHeader-state"><span class="TicketsBadge" data-color="' . $statusColor . '">' . $this->e($tickets->statuses()[$ticket['status']] ?? $ticket['status']) . '</span><span class="TicketsPriority" data-priority="' . $this->e($ticket['priority']) . '"><i></i>' . $this->e($tickets->priorities()[$ticket['priority']] ?? $ticket['priority']) . '</span></div></header>';
 
-		$conversationOut = '<section class="TicketsConversation" data-order="' . $conversationOrder . '" aria-labelledby="tickets-conversation-title"><header><div><p class="uk-text-meta uk-text-uppercase uk-margin-remove">' . $this->_('Conversation') . '</p><h2 id="tickets-conversation-title">' . $this->_('Messages') . '</h2></div><span>' . count($messages) . ' ' . $this->_('total') . '</span></header><div class="TicketsThread">';
-		foreach ($messages as $message) {
+		$conversationOut = '<section class="TicketsConversation" data-order="' . $conversationOrder . '" aria-labelledby="tickets-conversation-title"><header><div><p class="uk-text-meta uk-text-uppercase uk-margin-remove">' . $this->_('Conversation') . '</p><h2 id="tickets-conversation-title">' . $this->_('Messages and activity') . '</h2></div><span>' . count($conversationEntries) . ' ' . $this->_('total') . '</span></header><div class="TicketsThread">';
+		foreach ($conversationEntries as $entry) {
+			if ($entry['type'] === 'event') {
+				$event = $entry['record'];
+				$metadata = (array)($event['metadata'] ?? []);
+				$phase = (string)($metadata['phase'] ?? '') === 'first_response_due_at' ? $this->_('First response') : $this->_('Resolution');
+				$minutes = max(0, (int)($metadata['minutes'] ?? 0));
+				$actor = trim((string)($event['user_name'] ?? '')) ?: $this->_('Support team');
+				$dueAt = $this->dateTime((string)($metadata['due_at'] ?? ''));
+				$eventSummary = sprintf($this->_('%1$s extended the %2$s deadline by %3$s.'), $actor, mb_strtolower($phase), $this->durationLabel($minutes));
+				$conversationOut .= '<article class="TicketsConversationEvent" data-event="sla_extended"><span class="TicketsConversationEvent-icon" aria-hidden="true"><i class="fa fa-clock-o"></i></span><div><header><strong>' . $this->_('SLA extended') . '</strong><time datetime="' . $this->e(date(DATE_ATOM, strtotime((string)$event['created_at']))) . '">' . $this->e($this->dateTime((string)$event['created_at'])) . '</time></header><p>' . $this->e($eventSummary) . '</p><small>' . $this->e($phase) . ': ' . $this->e($dueAt) . '</small></div></article>';
+				continue;
+			}
+			$message = $entry['record'];
 			$isStaff = !empty($message['is_staff']);
 			$isInternal = !empty($message['is_internal']);
 			$author = $isInternal ? $this->_('Internal note') : ($isStaff ? (trim((string)$tickets->from_name) ?: $this->_('Support team')) : (string)$ticket['customer_name']);
@@ -1074,6 +1097,19 @@ class ProcessTickets extends Process {
 			throw new WireException('Unsupported interface action.');
 		}
 		$this->wire('session')->redirect($this->wire('page')->url . 'api/');
+	}
+
+	private function durationLabel(int $minutes): string {
+		$minutes = max(0, $minutes);
+		if ($minutes > 0 && $minutes % 1440 === 0) {
+			$days = intdiv($minutes, 1440);
+			return sprintf($this->_n('%d day', '%d days', $days), $days);
+		}
+		if ($minutes > 0 && $minutes % 60 === 0) {
+			$hours = intdiv($minutes, 60);
+			return sprintf($this->_n('%d hour', '%d hours', $hours), $hours);
+		}
+		return sprintf($this->_n('%d minute', '%d minutes', $minutes), $minutes);
 	}
 
 	private function age(string $date): string {

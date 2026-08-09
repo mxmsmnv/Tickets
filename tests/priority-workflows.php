@@ -56,6 +56,12 @@ try {
 	$oldDue = strtotime((string)$renamed['first_response_due_at']);
 	$extended = $tickets->extendSla((int)$first['id'], $admin, 60);
 	$check(strtotime((string)$extended['first_response_due_at']) > $oldDue, 'First-response SLA was not extended.');
+	$conversationEvents = $tickets->ticketConversationEvents((int)$first['id'], $admin);
+	$latestSlaEvent = end($conversationEvents);
+	$check(is_array($latestSlaEvent) && (string)($latestSlaEvent['event_type'] ?? '') === 'sla_extended', 'SLA extension is missing from the staff conversation activity.');
+	$check((int)($latestSlaEvent['metadata']['minutes'] ?? 0) === 60, 'Conversation SLA activity has incorrect duration metadata.');
+	$check((string)($latestSlaEvent['metadata']['due_at'] ?? '') === (string)$extended['first_response_due_at'], 'Conversation SLA activity has an incorrect deadline.');
+	$check((string)($latestSlaEvent['user_name'] ?? '') === (string)$admin->name, 'Conversation SLA activity has an incorrect staff actor.');
 	$tickets->markMessagesRead((int)$first['id'], $admin, true);
 	$initialMessages = $tickets->ticketMessages((int)$first['id']);
 	$check(!empty($initialMessages[0]['read_at']), 'Customer message read receipt was not stored.');
