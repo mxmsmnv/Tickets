@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.38 - 2026-08-09
+
+- Made the email-template TinyMCE toolbar and editable document follow the
+  active ProcessWire AdminTheme light, dark, or automatic color scheme.
+- Added live editor reinitialization when the administrator changes theme,
+  while preserving unsaved editor content.
+
 ## 1.0.37 - 2026-08-09
 
 - Added complete AdminTheme light/dark color support across the Tickets

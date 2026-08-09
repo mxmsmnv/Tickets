@@ -2039,6 +2039,10 @@
 	margin-top: .35rem;
 }
 
+.ProcessTickets .TicketsTemplateTinyMCE .tox-tinymce {
+	border-color: var(--pw-border-color);
+}
+
 .ProcessTickets .TicketsTemplateActions {
 	display: flex;
 	align-items: center;

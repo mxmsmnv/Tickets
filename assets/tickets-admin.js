@@ -1,6 +1,51 @@
 (function () {
 	'use strict';
 
+	var ticketsTinyMceTheme = null;
+	var ticketsTinyMceRefreshTimer = 0;
+
+	function isTicketsDarkTheme() {
+		var body = document.body;
+		if (body && body.classList.contains('dark-theme')) return true;
+		if (body && body.classList.contains('light-theme')) return false;
+		return Boolean(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+	}
+
+	function configureTicketsTinyMceTheme(settings, editor, inputfield) {
+		var element = inputfield && inputfield[0] ? inputfield[0] : inputfield;
+		if (!element || !element.classList || !element.classList.contains('TicketsTemplateTinyMCE')) return;
+		var dark = isTicketsDarkTheme();
+		settings.skin = dark ? 'oxide-dark' : 'oxide';
+		settings.content_css = dark ? 'dark' : 'default';
+		delete settings.content_css_url;
+	}
+
+	function registerTicketsTinyMceTheme() {
+		if (ticketsTinyMceTheme) return true;
+		if (!window.InputfieldTinyMCE) return false;
+		window.InputfieldTinyMCE.onConfig(configureTicketsTinyMceTheme);
+		ticketsTinyMceTheme = isTicketsDarkTheme() ? 'dark' : 'light';
+		return true;
+	}
+
+	function refreshTicketsTinyMceTheme() {
+		if (!registerTicketsTinyMceTheme() || !window.jQuery || !window.tinymce) return;
+		var nextTheme = isTicketsDarkTheme() ? 'dark' : 'light';
+		if (nextTheme === ticketsTinyMceTheme) return;
+		ticketsTinyMceTheme = nextTheme;
+		window.clearTimeout(ticketsTinyMceRefreshTimer);
+		ticketsTinyMceRefreshTimer = window.setTimeout(function () {
+			var editors = window.jQuery('.TicketsTemplateTinyMCE .InputfieldTinyMCEEditor.InputfieldTinyMCELoaded');
+			editors.each(function () {
+				var editor = window.tinymce.get(this.id);
+				if (editor) editor.save();
+			});
+			if (editors.length) window.InputfieldTinyMCE.resetEditors(editors);
+		}, 50);
+	}
+
+	registerTicketsTinyMceTheme();
+
 	var samples = {
 		ticket_key: 'BAF3103C3CF8',
 		subject: 'Unable to update my profile',
@@ -288,6 +333,15 @@
 	}, true);
 
 	document.addEventListener('DOMContentLoaded', function () {
+		registerTicketsTinyMceTheme();
+		if (document.body && window.MutationObserver) {
+			new MutationObserver(refreshTicketsTinyMceTheme).observe(document.body, { attributes: true, attributeFilter: ['class'] });
+		}
+		if (window.matchMedia) {
+			var colorScheme = window.matchMedia('(prefers-color-scheme: dark)');
+			if (colorScheme.addEventListener) colorScheme.addEventListener('change', refreshTicketsTinyMceTheme);
+			else if (colorScheme.addListener) colorScheme.addListener(refreshTicketsTinyMceTheme);
+		}
 		document.querySelectorAll('[data-ticket-attachment]').forEach(syncAttachmentSelection);
 		syncQueueRows();
 		if (queueRowsMedia) {

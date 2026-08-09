@@ -29,6 +29,11 @@ $checks = [
 		&& str_contains($javascript, 'syncAttachmentSelection')
 		&& str_contains($javascript, 'URL.createObjectURL(file)')
 		&& str_contains($css, '.TicketsReplyAttachmentSelection'),
+	'TinyMCE follows admin theme' => str_contains($javascript, 'InputfieldTinyMCE.onConfig(configureTicketsTinyMceTheme)')
+		&& str_contains($javascript, "settings.skin = dark ? 'oxide-dark' : 'oxide'")
+		&& str_contains($javascript, "settings.content_css = dark ? 'dark' : 'default'")
+		&& str_contains($javascript, 'InputfieldTinyMCE.resetEditors(editors)')
+		&& str_contains($css, '.TicketsTemplateTinyMCE .tox-tinymce'),
 ];
 
 foreach($checks as $label => $ok) {
