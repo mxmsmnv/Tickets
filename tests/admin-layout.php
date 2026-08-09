@@ -34,6 +34,8 @@ $checks = [
 		&& str_contains($process, 'id="ticket-message-')
 		&& str_contains($css, '.TicketsMessage:target {')
 		&& str_contains($module, "'internal_note_message_id'"),
+	'internal note colors the complete row' => str_contains($css, '.TicketsMessage[data-author="internal"] {')
+		&& !str_contains($css, '.TicketsMessage[data-author="internal"] .TicketsMessage-content {'),
 	'configurable responsive sidebar' => str_contains($process, 'data-desktop-sidebar=')
 		&& str_contains($process, 'data-tablet-sidebar=')
 		&& str_contains($css, '[data-desktop-sidebar="left"]')

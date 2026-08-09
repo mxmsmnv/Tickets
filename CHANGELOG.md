@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.48 - 2026-08-09
+
+- Extended the internal-note warning surface across the complete conversation
+  row, including the icon column, in light and dark admin themes.
+
 ## 1.0.47 - 2026-08-09
 
 - Made internal-note persistence atomic and update ticket activity time.

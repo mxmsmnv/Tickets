@@ -2361,7 +2361,7 @@
 	}
 }
 
-.ProcessTickets .TicketsMessage[data-author="internal"] .TicketsMessage-content {
+.ProcessTickets .TicketsMessage[data-author="internal"] {
 	background: var(--tickets-warning-surface);
 	border-color: color-mix(in srgb, var(--tickets-color-warning) 55%, var(--pw-border-color));
 }
