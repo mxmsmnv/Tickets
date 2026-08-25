@@ -1,9 +1,19 @@
 # Tickets public API
 
-This document describes the verified public interface of Tickets 1.0.49
-(`version` 148). It is stronger than README for method usage, but the installed
+This document describes the verified public interface of Tickets 1.0.50
+(`version` 150). It is stronger than README for method usage, but the installed
 module version and live site configuration remain authoritative for a specific
 ProcessWire site.
+
+## MCP provider
+
+Module metadata declares `mcpProvider => true`. `mcpProviderInfo()` identifies
+the provider and `mcpTools()` registers `tickets_status` with `read` scope and
+a closed empty input schema. `mcpTicketsStatus()` returns aggregate summary and
+status counts, workflow option keys, and safe channel readiness. It never
+returns ticket records, customer data, messages, attachments, guest tokens, or
+internal notes. The permission-gated `TicketsAgentApi` is not exposed through
+MCP because an MCP client is not automatically a ProcessWire user.
 
 All examples assume the ProcessWire namespace and a feature-detected module:
 

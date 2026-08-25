@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.50 - 2026-08-25
+
+- Added an explicit MCP provider with a bounded read-only operational status
+  tool. It exposes workflow taxonomy, delivery readiness, and aggregate counts
+  without customer data, messages, attachments, tokens, or internal notes.
+
 ## 1.0.49 - 2026-08-24
 
 - Added signed source context to custom-form embeds for trustworthy page,

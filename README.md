@@ -13,7 +13,7 @@ private files publicly.
 - **Author:** Maxim Semenov
 - **Website:** [smnv.org](https://smnv.org)
 - **Email:** [maxim@smnv.org](mailto:maxim@smnv.org)
-- **Release:** 1.0.49 (`version` 149)
+- **Release:** 1.0.50 (`version` 150)
 
 If this project helps your work, consider supporting future development:
 [GitHub Sponsors](https://github.com/sponsors/mxmsmnv) or
@@ -154,6 +154,14 @@ The installer creates its tables, permissions, formatter, private attachment
 storage, ProcessWire template and public page. It does not create sample
 customers, tickets, conversations, forms, routing rules or macros. Upgrades
 retain saved configuration, edited mail templates and ticket data.
+
+## MCP Server integration
+
+When the optional first-party MCP Server is installed, Tickets contributes the
+read-only `tickets_status` tool. It returns aggregate workflow counts, taxonomy,
+and channel readiness only. Customer identities, ticket records, messages,
+attachments, guest tokens, and internal notes are never exposed through this
+surface.
 
 ## Documentation
 
