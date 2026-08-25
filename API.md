@@ -1,6 +1,6 @@
 # Tickets public API
 
-This document describes the verified public interface of Tickets 1.0.48
+This document describes the verified public interface of Tickets 1.0.49
 (`version` 148). It is stronger than README for method usage, but the installed
 module version and live site configuration remain authoritative for a specific
 ProcessWire site.
@@ -295,13 +295,21 @@ administrative configuration and requires an outer `canAdmin()` check.
 
 Returns a decorated definition by numeric ID or slug, or `[]`.
 
-### `renderFormEmbed(string $name, array $defaults = []): string`
+### `renderFormEmbed(string $name, array $defaults = [], array $context = []): string`
 
 Returns a cache-safe frontend placeholder plus module assets for an enabled
 form. Defaults are filtered to defined form fields and stored as data
 attributes. This is the preferred output inside otherwise cacheable pages.
+Context accepts `type`/`context_type`, `id`/`context_id`, `url`/`context_url`,
+`source`/`source_channel`, and standard `utm_*` keys. Tickets sanitizes and
+signs that public attribution before it reaches the browser.
 
-### `renderCustomForm(string $name): string`
+### `formContextEnvelope(string $formName, array $context): array`
+
+Returns a signed `payload` and `signature` pair for trusted server-side
+integrations, or `[]` when no valid context remains after sanitization.
+
+### `renderCustomForm(string $name, array $contextEnvelope = []): string`
 
 Returns runtime form HTML containing CSRF and guest-proof values. The endpoint
 must be private/no-store. Returns an empty string for a missing/disabled form
@@ -316,6 +324,9 @@ Validates the form definition and values, then creates a ticket. Returns:
 ```
 
 The site controller must validate ProcessWire CSRF before calling it.
+When `form_context` fields are present, `submitCustomForm()` verifies the
+signature and maps page context to the ticket record while retaining channel
+and UTM values in custom data.
 
 ### `saveCustomForm(array $data, User $user): array`
 

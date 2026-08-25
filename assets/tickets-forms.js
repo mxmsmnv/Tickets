@@ -54,7 +54,12 @@
 		if (container.dataset.ticketsLoaded) return;
 		container.dataset.ticketsLoaded = 'true';
 		container.classList.add('is-loading');
-		fetch(container.dataset.ticketsFormUrl, {credentials: 'same-origin', headers: {'X-Requested-With': 'XMLHttpRequest'}})
+		var url = new URL(container.dataset.ticketsFormUrl, window.location.href);
+		if (container.dataset.ticketsFormContext && container.dataset.ticketsFormContextSignature) {
+			url.searchParams.set('form_context', container.dataset.ticketsFormContext);
+			url.searchParams.set('form_context_sig', container.dataset.ticketsFormContextSignature);
+		}
+		fetch(url.toString(), {credentials: 'same-origin', headers: {'X-Requested-With': 'XMLHttpRequest'}})
 			.then(function (response) { if (!response.ok) throw new Error('The form is unavailable.'); return response.text(); })
 			.then(function (html) { container.innerHTML = html; container.classList.remove('is-loading'); bind(container); })
 			.catch(function () { container.innerHTML = '<p class="TicketsCustomForm-error" role="alert">The form is temporarily unavailable. Please try again.</p>'; container.classList.remove('is-loading'); });

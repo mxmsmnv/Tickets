@@ -1,6 +1,6 @@
 # Tickets Documentation
 
-This document describes the integration contract implemented by Tickets 1.0.48
+This document describes the integration contract implemented by Tickets 1.0.49
 for ProcessWire.
 
 ## Configuration
@@ -87,10 +87,11 @@ rendered inline; other validated files should download as attachments.
 - `formFieldTypes(): array`
 - `customForms(bool $enabledOnly = false): array`
 - `customForm($identifier): array`
-- `renderFormEmbed(string $name, array $defaults = []): string`
+- `renderFormEmbed(string $name, array $defaults = [], array $context = []): string`
+- `formContextEnvelope(string $formName, array $context): array`
 - `formBuilderImporter(): TicketsFormBuilderImporter` for an optional, one-way
   migration of installed FormBuilder definitions into independent form drafts
-- `renderCustomForm(string $name): string`
+- `renderCustomForm(string $name, array $contextEnvelope = []): string`
 - `submitCustomForm(string $name, User $user, array $data, ?array $upload = null): array`
 
 Administrative methods such as `saveCustomForm()` and `deleteCustomForm()`
@@ -237,12 +238,18 @@ Or render a cache-safe placeholder from PHP:
 ```php
 echo $modules->get('Tickets')->renderFormEmbed('product-enquiry', [
     'product' => 'Example service',
+], [
+    'type' => 'service',
+    'id' => (string) $page->id,
+    'url' => $page->url,
+    'source' => 'website',
 ]);
 ```
 
 The placeholder loads the runtime form from
 `{public_path}/form/{name}/`. The consuming support template must route GET to
-`renderCustomForm()` and validated POST to `submitCustomForm()` and return
+`renderCustomForm()` with the signed `form_context` and `form_context_sig`
+query values, and validated POST to `submitCustomForm()`, and return
 private/no-store responses.
 
 ## Transactional Email

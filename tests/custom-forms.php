@@ -30,19 +30,27 @@ try {
 		'title' => 'Custom form integration test', 'name' => $name, 'enabled' => 1, 'allow_guests' => 1,
 		'category' => 'technical', 'topic' => 'technical', 'priority' => 'normal',
 		'fields' => [
+			['name' => 'full_name', 'label' => 'Full name', 'type' => 'text', 'required' => 1, 'width' => 'half'],
 			['name' => 'summary', 'label' => 'Summary', 'type' => 'text', 'required' => 1, 'width' => 'half', 'min_length' => 10, 'max_length' => 40],
 			['name' => 'details', 'label' => 'Details', 'type' => 'textarea', 'required' => 1, 'width' => 'full'],
 		],
 	], $admin);
 	$formId = (int)$form['id'];
 	assert($formId > 0);
-	$embed = $tickets->renderFormEmbed($name, ['summary' => 'Lifecycle preset', 'unknown' => 'Ignored']);
+	$context = ['type' => 'service', 'id' => 'interior-design', 'url' => '/service/interior-design/', 'source_channel' => 'website', 'utm_campaign' => 'summer-intake', 'unknown' => 'Ignored'];
+	$envelope = $tickets->formContextEnvelope($name, $context);
+	assert(!empty($envelope['payload']) && !empty($envelope['signature']));
+	$embed = $tickets->renderFormEmbed($name, ['summary' => 'Lifecycle preset', 'unknown' => 'Ignored'], $context);
 	assert(str_contains($embed, 'data-tickets-form-url'));
+	assert(str_contains($embed, 'data-tickets-form-context='));
+	assert(str_contains($embed, 'data-tickets-form-context-signature='));
 	assert(str_contains($embed, 'Lifecycle preset'));
 	assert(!str_contains($embed, 'Ignored'));
-	$renderedForm = $tickets->renderCustomForm($name);
+	$renderedForm = $tickets->renderCustomForm($name, $envelope);
 	assert(str_contains($renderedForm, 'data-tickets-custom-form'));
 	assert(str_contains($renderedForm, 'form_issued_sig'));
+	assert(str_contains($renderedForm, 'name="form_context"'));
+	assert(str_contains($renderedForm, 'name="form_context_sig"'));
 	assert(str_contains($renderedForm, 'href="/privacy-test/"'));
 	assert(str_contains($renderedForm, 'href="https://example.com/terms-test/"'));
 	$draft = $form;
@@ -55,7 +63,7 @@ try {
 	$form = $tickets->saveCustomForm($draft, $admin);
 	$rejected = false;
 	try {
-		$tickets->submitCustomForm($name, $guest, ['customer_email' => $name . '@example.com', 'form_issued_at' => time() - 10, 'privacy_consent' => 1, 'summary' => 'Short', 'details' => 'This otherwise valid body confirms server-side field limits.']);
+		$tickets->submitCustomForm($name, $guest, ['customer_email' => $name . '@example.com', 'form_issued_at' => time() - 10, 'privacy_consent' => 1, 'full_name' => 'Lifecycle Tester', 'summary' => 'Short', 'details' => 'This otherwise valid body confirms server-side field limits.']);
 	} catch (WireException $error) { $rejected = str_contains($error->getMessage(), 'at least 10'); }
 	assert($rejected);
 
@@ -63,6 +71,9 @@ try {
 		'customer_email' => $name . '@example.com',
 		'form_issued_at' => time() - max(4, (int)$tickets->spam_min_submit_seconds),
 		'privacy_consent' => 1,
+		'form_context' => $envelope['payload'],
+		'form_context_sig' => $envelope['signature'],
+		'full_name' => 'Lifecycle Tester',
 		'summary' => 'Lifecycle test',
 		'details' => 'Validate rendering, validation, ticket persistence, and attribution.',
 	], null);
@@ -70,7 +81,24 @@ try {
 	$ticketId = (int)$ticket['id'];
 	assert($ticketId > 0);
 	assert((int)$ticket['form_id'] === $formId);
+	assert($ticket['customer_name'] === 'Lifecycle Tester');
+	assert($ticket['context_type'] === 'service');
+	assert($ticket['context_id'] === 'interior-design');
+	assert($ticket['context_url'] === '/service/interior-design/');
+	assert(($ticket['custom_values']['_source'] ?? '') === 'website');
+	assert(($ticket['custom_values']['_utm_campaign'] ?? '') === 'summer-intake');
 	assert(($ticket['custom_values']['summary'] ?? '') === 'Lifecycle test');
+
+	$tampered = false;
+	try {
+		$tickets->submitCustomForm($name, $guest, [
+			'customer_email' => $name . '@example.com', 'form_issued_at' => time() - 10, 'privacy_consent' => 1,
+			'form_context' => $envelope['payload'] . 'x', 'form_context_sig' => $envelope['signature'],
+			'full_name' => 'Lifecycle Tester', 'summary' => 'Lifecycle test',
+			'details' => 'This request carries a deliberately modified attribution payload.',
+		]);
+	} catch (WireException $error) { $tampered = str_contains($error->getMessage(), 'source could not be verified'); }
+	assert($tampered);
 
 	$text = 'Before [[tickets-form:' . $name . ']] After';
 	wire('modules')->get('TextformatterTicketsForms')->format($text);

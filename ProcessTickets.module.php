@@ -588,13 +588,22 @@ class ProcessTickets extends Process {
 			$customerNow = new \DateTimeImmutable('now', new \DateTimeZone($customerZone));
 			$out .= '<dt>' . $this->_('Customer local time') . '</dt><dd><strong>' . $this->e($customerNow->format('g:i A')) . '</strong><br><small>' . $this->e($customerNow->format('D, M j · T')) . '<br>' . $this->e($customerZone) . '</small></dd>';
 		}
-		if (!empty($ticket['context_url'])) $out .= '<dt>' . $this->_('Related record') . '</dt><dd><a href="' . $this->e($ticket['context_url']) . '" target="_blank" rel="noopener">' . $this->e($ticket['context_type'] ?: $ticket['context_url']) . '</a></dd>';
-		$labels = [];
+		if (!empty($ticket['context_url'])) {
+			$contextLabel = trim(ucwords(str_replace(['-', '_'], ' ', (string)$ticket['context_type'])) . (!empty($ticket['context_id']) ? ' · ' . (string)$ticket['context_id'] : ''));
+			$out .= '<dt>' . $this->_('Related record') . '</dt><dd><a href="' . $this->e($ticket['context_url']) . '" target="_blank" rel="noopener">' . $this->e($contextLabel ?: $ticket['context_url']) . '</a></dd>';
+		}
+		$labels = [
+			'_source' => $this->_('Source channel'), '_utm_source' => 'UTM source', '_utm_medium' => 'UTM medium',
+			'_utm_campaign' => 'UTM campaign', '_utm_content' => 'UTM content', '_utm_term' => 'UTM term',
+		];
 		if (!empty($ticket['form'])) {
 			$out .= '<dt>' . $this->_('Source form') . '</dt><dd>' . $this->e($ticket['form']['title']) . '</dd>';
 			foreach ((array)$ticket['form']['fields'] as $field) $labels[(string)$field['name']] = (string)$field['label'];
 		}
-		foreach ((array)$ticket['custom_values'] as $key => $value) $out .= '<dt>' . $this->e($labels[$key] ?? $key) . '</dt><dd>' . nl2br($this->e($value)) . '</dd>';
+		foreach ((array)$ticket['custom_values'] as $key => $value) {
+			if (!is_scalar($value) || trim((string)$value) === '') continue;
+			$out .= '<dt>' . $this->e($labels[$key] ?? $key) . '</dt><dd>' . nl2br($this->e($value)) . '</dd>';
+		}
 		$out .= '</dl></section><section class="TicketsSidePanel TicketsCaseDates"><h2>' . $this->_('Activity') . '</h2><dl><dt>' . $this->_('Created') . '</dt><dd>' . $this->e(date('M j, Y · H:i', strtotime((string)$ticket['created_at']))) . '</dd><dt>' . $this->_('Last updated') . '</dt><dd>' . $this->e(date('M j, Y · H:i', strtotime((string)$ticket['updated_at']))) . '</dd><dt>' . $this->_('Ticket ID') . '</dt><dd><code>#' . $this->e($ticket['public_key']) . '</code></dd></dl><a class="uk-button uk-button-default uk-width-1-1" href="' . $this->e(rtrim((string)$tickets->public_path, '/') . '/' . $ticket['public_key'] . '/') . '" target="_blank" rel="noopener"><i class="fa fa-external-link uk-margin-small-right"></i>' . $this->_('Open customer view') . '</a></section></aside></div>';
 		return $this->workspace($out);
 	}

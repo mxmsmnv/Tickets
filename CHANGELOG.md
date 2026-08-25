@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.0.49 - 2026-08-24
+
+- Added signed source context to custom-form embeds for trustworthy page,
+  service, project, channel and UTM attribution without new database fields.
+- Preserved a submitted guest's configured full-name field as the ticket
+  customer name and exposed readable attribution labels in the staff view.
+- Forwarded signed context through the asynchronous form loader and rejected
+  modified attribution payloads during submission.
+
 ## 1.0.48 - 2026-08-09
 
 - Extended the internal-note warning surface across the complete conversation
