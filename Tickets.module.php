@@ -39,7 +39,7 @@ class Tickets extends WireData implements Module, ConfigurableModule {
 	public static function getModuleInfo(): array {
 		return [
 			'title' => 'Tickets',
-			'version' => self::VERSION,
+			'version' => 150,
 			'summary' => 'Account and guest support tickets, configurable workflows, private attachments and transactional notifications.',
 			'author' => 'Maxim Semenov',
 			'license' => 'MIT',
