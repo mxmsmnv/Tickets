@@ -5,7 +5,7 @@ class TextformatterTicketsForms extends Textformatter {
 	public static function getModuleInfo(): array {
 		return [
 			'title' => 'Tickets Forms',
-			'version' => 151,
+			'version' => 152,
 			'summary' => 'Render Tickets form shortcodes in text fields.',
 			'author' => 'Maxim Semenov',
 			'requires' => ['Tickets'],

@@ -3,7 +3,7 @@
 /** Bounded MCP provider surface. Private ticket records are never exposed. */
 trait TicketsMcpProviderTrait {
     public function mcpProviderInfo(): array {
-        return ['name' => 'tickets', 'title' => 'Tickets', 'version' => '1.0.51'];
+        return ['name' => 'tickets', 'title' => 'Tickets', 'version' => '1.0.52'];
     }
 
     public function mcpTools(): array {
@@ -23,7 +23,7 @@ trait TicketsMcpProviderTrait {
         $summary = (array)($stats['summary'] ?? []);
         $allowed = ['total', 'active', 'waiting_staff', 'waiting_customer', 'urgent', 'sla_breached', 'unassigned', 'created_7d', 'created_30d', 'resolved_30d'];
         return [
-            'version' => '1.0.51',
+            'version' => '1.0.52',
             'counts' => array_intersect_key($summary, array_flip($allowed)),
             'statuses' => (array)($stats['statuses'] ?? []),
             'workflow' => [

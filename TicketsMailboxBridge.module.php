@@ -6,7 +6,7 @@ class TicketsMailboxBridge extends WireData implements Module {
 	public static function getModuleInfo(): array {
 		return [
 			'title' => 'Tickets Mailbox Bridge',
-			'version' => 151,
+			'version' => 152,
 			'summary' => 'Imports new Mailbox messages into Tickets when the optional integration is enabled.',
 			'author' => 'Maxim Semenov',
 			'icon' => 'envelope-o',

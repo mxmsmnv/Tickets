@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.52 - 2026-09-26
+
+- Fixed PostgreSQL fresh installation by creating migrated ticket indexes through portable `WireDatabase::indexExists()` introspection instead of defining and re-adding them in the same install pass.
+- Fixed SQLite fresh-install warnings by treating missing template, fieldgroup, field, and public-page lookups as nullable.
+- Made report and dashboard duration calculations portable to SQLite by using translated `UNIX_TIMESTAMP()` arithmetic, and avoided PostgreSQL's reserved `day` alias in daily reports.
+- Made first-response timestamp updates portable by selecting the staff-only SQL fragment in PHP instead of relying on SQLite type coercion for a bound boolean comparison.
+
 ## 1.0.51 - 2026-09-26
 
 - Made dashboard and report aggregates portable to PostgreSQL by counting

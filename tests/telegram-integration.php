@@ -40,7 +40,6 @@ try {
 	if (empty($configured['ready']) || (int)$configured['recipient_count'] !== 2) throw new \RuntimeException('Telegram readiness or recipient validation failed.');
 
 	$builder = new \ReflectionMethod($tickets, 'buildTelegramNotification');
-	$builder->setAccessible(true);
 	$message = (string)$builder->invoke($tickets, 'new_ticket', [
 		'id' => 42,
 		'public_key' => 'ABCD1234',

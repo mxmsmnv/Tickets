@@ -42,7 +42,6 @@ try {
 	require_once dirname(__DIR__) . '/TicketsRestApi.php';
 	$rest = $wire->wire(new TicketsRestApi($tickets));
 	$authentication = new \ReflectionMethod($rest, 'authentication');
-	$authentication->setAccessible(true);
 	$_SERVER['HTTP_AUTHORIZATION'] = 'Bearer ' . $bearerToken;
 	[, $authMode] = $authentication->invoke($rest);
 	if($authMode !== 'bearer') throw new \RuntimeException('Valid Bearer authentication was not selected.');
