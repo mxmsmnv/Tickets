@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.51 - 2026-09-26
+
+- Made dashboard and report aggregates portable to PostgreSQL by counting
+  conditions with explicit `CASE WHEN` expressions.
+- Replaced the MySQL-only ticket-response `UPDATE JOIN` migration with a
+  correlated update that also works on SQLite and PostgreSQL.
+
 ## 1.0.50 - 2026-08-25
 
 - Added an explicit MCP provider with a bounded read-only operational status

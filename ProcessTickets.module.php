@@ -19,7 +19,7 @@ class ProcessTickets extends Process {
 	public static function getModuleInfo(): array {
 		return [
 			'title' => 'Tickets',
-			'version' => 150,
+			'version' => 151,
 			'summary' => 'Review, assign and answer customer support tickets.',
 			'author' => 'Maxim Semenov',
 			'icon' => 'life-ring',
