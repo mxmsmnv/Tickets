@@ -13,7 +13,7 @@ private files publicly.
 - **Author:** Maxim Semenov
 - **Website:** [smnv.org](https://smnv.org)
 - **Email:** [maxim@smnv.org](mailto:maxim@smnv.org)
-- **Release:** 1.0.52 (`version` 152)
+- **Release:** 1.0.53 (`version` 153)
 
 If this project helps your work, consider supporting future development:
 [GitHub Sponsors](https://github.com/sponsors/mxmsmnv) or
@@ -37,8 +37,12 @@ If this project helps your work, consider supporting future development:
 - Sends editable transactional messages with recipient-correct links and
   customizable shared headers and footers through a selectable ProcessWire
   WireMail provider.
+- Lets administrators choose which new-ticket, customer-reply, and SLA-breach
+  events send staff email while customer receipts and replies remain enabled.
 - Supports optional authenticated Resend inbound replies.
-- Supports optional Mailbox ingestion for new support email and Mailbox SMTP delivery for ticket notifications and linked thread replies.
+- Supports optional Mailbox ingestion for new support email and validated
+  attachments, plus Mailbox SMTP delivery for ticket notifications and linked
+  thread replies with readable links and paragraph spacing.
 - Supports opt-in administrator Telegram alerts for new tickets, customer
   replies, and SLA breaches through TeleWire while keeping all credentials and
   recipient settings independently in Tickets.

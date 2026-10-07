@@ -242,15 +242,20 @@ session CSRF token.
   recipients, or switching providers requires approval and a delivery test.
 - Select an installed `WireMail*` provider. Credentials remain in that provider;
   never place credentials in Tickets source or templates.
+- Staff email events are independently selectable through
+  `mail_notification_events`; disabling a staff alert must not disable customer
+  receipts or staff-to-customer replies.
 - Expose `handleResendWebhook()` only at the configured private endpoint. Pass
   the raw body unchanged and the original Svix headers. It verifies signatures,
   deduplicates events and checks the customer sender.
 - Mailbox ingestion is separately opt-in and must use the agent-safe message
-  DTO. Preserve account/folder/UID and Message-ID deduplication,
+  DTO plus Mailbox's public bounded attachment API. Preserve
+  account/folder/UID and Message-ID deduplication,
   support-recipient filtering, self-message rejection, existing-ticket sender
-  equality, and the silent initial seed. Never substitute `getMessage()`, raw
-  MIME, HTML, attachment bytes, executable links, or automatic AI
-  classification.
+  equality, the silent initial seed, and Tickets attachment validation. Never
+  substitute `getMessage()`, raw MIME, HTML, executable links, or automatic AI
+  classification; attachment bytes may enter Tickets only from
+  `getAttachment()` and must never enter logs or agent-facing payloads.
 - Mailbox SMTP delivery is a second opt-in. Existing WireMail remains the
   default; never enable Mailbox inbound or outbound merely because Mailbox is
   installed or configured.

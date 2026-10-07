@@ -1,7 +1,7 @@
 # Tickets public API
 
-This document describes the verified public interface of Tickets 1.0.52
-(`version` 152). It is stronger than README for method usage, but the installed
+This document describes the verified public interface of Tickets 1.0.53
+(`version` 153). It is stronger than README for method usage, but the installed
 module version and live site configuration remain authoritative for a specific
 ProcessWire site.
 
@@ -148,6 +148,10 @@ for ProcessWire CSRF.
 
 Creates a ticket and initial message, applies routing/SLA, optionally stores one
 validated attachment and attempts configured notifications.
+
+This method is hookable. An after hook on `Tickets::createTicket` observes web,
+custom-form, and other callers that use the public creation API. Mailbox imports
+retain their separate `Tickets::mailboxMessageImported` outcome hook.
 
 Supported input includes:
 
@@ -433,6 +437,7 @@ saveMacro(array $data, User $user): array
 mailTemplateDefaults(): array
 mailProviderOptions(): array
 mailProviderLabel(): string
+mailNotificationEvents(): array
 mailTemplates(): array
 saveMailTemplate(string $key, string $subject, string $htmlBody, User $user): void
 ```
@@ -441,6 +446,10 @@ All save methods require `tickets-admin`. The read methods do not independently
 authorize the caller; treat rules, macros and templates as staff/admin data.
 Provider options contain installed `WireMail*` modules plus the site default.
 Tickets stores only the selected module class, never its credentials.
+`mailNotificationEvents()` returns the normalized enabled subset of
+`new_ticket`, `customer_reply`, and `sla_breach`. These switches affect only
+staff alerts; customer creation receipts and staff-to-customer replies remain
+enabled whenever transactional mail is enabled.
 
 ## AI reply drafting
 
@@ -500,7 +509,7 @@ secret or full email body.
 
 ### `mailboxIntegrationStatus(): array`
 
-Returns non-secret installation, compatibility, credential-readiness, background-sync, SMTP, and redacted enabled-account status. It never returns a mailbox username, password, OAuth token, host, subject, sender, or body.
+Returns non-secret installation, compatibility, attachment-access, credential-readiness, background-sync, SMTP, and redacted enabled-account status. It never returns a mailbox username, password, OAuth token, host, subject, sender, or body.
 
 ### `importMailboxNotification(array $notification, string $actor = 'backend'): array`
 
@@ -510,13 +519,13 @@ Trusted hook/worker entry point for the identifier payload emitted by `Mailbox::
 
 Trusted bounded import for one selected message. Tickets calls Mailbox `getAgentMessage()` inside `withAccount()`, so HTML, raw MIME, executable URL targets, credentials, and attachment bytes are excluded. By default the configured `support_email` must appear in To or Cc. A new message creates a ticket; `[Ticket KEY]`, `Ticket #KEY`, or `ticket+KEY@…` appends a reply only when the sender matches the existing ticket customer. Results are `ticket_created`, `reply_added`, `ignored`, or `duplicate` with identifiers/reason only.
 
-Sources are deduplicated by account/folder/UID and account/Message-ID in `tickets_mailbox_messages`. Initial Mailbox synchronization intentionally emits no events, so enabling the bridge never imports historical mail or downloads an entire account. The bridge stores no attachments and performs no automatic AI classification.
+Sources are deduplicated by account/folder/UID and account/Message-ID in `tickets_mailbox_messages`. Initial Mailbox synchronization intentionally emits no events, so enabling the bridge never imports historical mail or downloads an entire account. Up to 20 listed attachments are fetched individually through Mailbox's bounded public attachment API and stored only when they pass the same extension, decoded MIME, size, and real-image checks as portal uploads. Rejected or over-limit parts are logged without message content or filenames. Inline `[cid:…]` placeholders become a readable attachment reference. The bridge performs no automatic AI classification.
 
 ### `importMailboxInbox(int $limit = 25, bool $execute = false): array`
 
 Trusted CLI/maintenance helper for a bounded page of the newest messages in the configured account/folder. The default preview reads summaries only and returns counts without importing; `execute=true` fetches and recognizes at most 100 individual messages through the same idempotent safe path. Canonical CLI: `php site/modules/Tickets/bin/tickets mailbox-import --limit=25 --root=/path/to/processwire` for preview, then repeat with `--execute` after review.
 
-When both `mail_enabled` and `mailbox_outbound_enabled` are true and Mailbox SMTP is ready, existing Tickets notifications use Mailbox plain-text delivery. Customer notifications with a linked inbound source use `replyMessage()` to preserve threading; other notifications use `sendMessage()`. When this option is off, the existing selected WireMail provider remains unchanged.
+When both `mail_enabled` and `mailbox_outbound_enabled` are true and Mailbox SMTP is ready, existing Tickets notifications use Mailbox plain-text delivery. Customer notifications with a linked inbound source use `replyMessage()` to preserve threading; other notifications use `sendMessage()`. HTML links retain their address and block elements retain readable paragraph boundaries in the plain-text body. When this option is off, the existing selected WireMail provider remains unchanged.
 
 ## Configuration keys
 
@@ -529,6 +538,7 @@ from_email
 from_name
 mail_module
 mail_enabled
+mail_notification_events
 max_image_mb
 allowed_attachment_types
 support_days
@@ -616,7 +626,12 @@ bot token plus at least one valid recipient configured.
 
 ## Hooks and internal APIs
 
-`Tickets::mailboxMessageImported(array $result)` is a hookable identifier-only result boundary for an optional Mailbox import. Its payload contains outcome, reason when ignored, ticket/message identifiers when created, account ID, and UID; it contains no email text or addresses. Do not perform slow delivery inside this hook.
+`Tickets::createTicket(User $user, array $data, ?array $upload = null)` is
+hookable. An after hook receives the normal arguments and may inspect or replace
+the returned ticket array. Keep hook work bounded; the ticket has already been
+committed and notification attempts occur before the method returns.
+
+`Tickets::mailboxMessageImported(array $result)` is a hookable identifier-only result boundary for an optional Mailbox import. Its payload contains outcome, reason when ignored, ticket/message identifiers when created, the count of stored attachments when applicable, account ID, and UID; it contains no email text or addresses. Do not perform slow delivery inside this hook.
 
 No other stable custom domain-hook contract is declared. Do not hook private methods or `ProcessTickets` render/execute internals. ProcessWire module lifecycle methods, `TicketsMailboxBridge`, and `TextformatterTicketsForms::format()` are framework integration points, not general site-facing service APIs.
 

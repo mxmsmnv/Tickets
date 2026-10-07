@@ -32,6 +32,7 @@ trait TicketsMailboxIntegration {
 			'configured' => false,
 			'background_sync' => false,
 			'sending' => false,
+			'attachment_access' => false,
 			'inbound_ready' => false,
 			'outbound_ready' => false,
 			'accounts' => [],
@@ -46,6 +47,7 @@ trait TicketsMailboxIntegration {
 			&& method_exists($mailbox, 'getAccounts')
 			&& method_exists($mailbox, 'credentialStatus');
 		if (!$status['compatible']) return $status;
+		$status['attachment_access'] = method_exists($mailbox, 'getAttachment');
 		$selectedAccount = max(0, (int)$this->mailbox_account_id);
 		try {
 			$credentials = $selectedAccount > 0
@@ -72,7 +74,7 @@ trait TicketsMailboxIntegration {
 				break;
 			}
 		}
-		$status['inbound_ready'] = $status['configured'] && $accountReady && $status['background_sync'];
+		$status['inbound_ready'] = $status['configured'] && $accountReady && $status['background_sync'] && $status['attachment_access'];
 		$status['outbound_ready'] = $status['configured'] && $accountReady && $status['sending'];
 		return $status;
 	}
@@ -167,6 +169,9 @@ trait TicketsMailboxIntegration {
 		if (!$claim['claimed']) return ['action' => 'duplicate', 'ticket_id' => (int)($claim['row']['ticket_id'] ?? 0), 'message_id' => (int)($claim['row']['message_id'] ?? 0)];
 		try {
 			$result = $this->recognizeMailboxMessage($message, $accountId, $folder, $uid, $actor);
+			if (in_array((string)($result['action'] ?? ''), ['ticket_created', 'reply_added'], true)) {
+				$result['attachments_imported'] = $this->importMailboxAttachments($mailbox, $message, $accountId, $folder, $uid, (int)$result['ticket_id'], (int)$result['message_id']);
+			}
 			$this->finishMailboxSource((int)$claim['id'], $result);
 			$this->mailboxMessageImported($result + ['account_id' => $accountId, 'uid' => $uid]);
 			return $result;
@@ -210,7 +215,7 @@ trait TicketsMailboxIntegration {
 		if (!(bool)$this->mailbox_outbound_enabled || !$this->mailboxIntegrationStatus()['outbound_ready']) return false;
 		$to = (string)$this->wire('sanitizer')->email($to);
 		if ($to === '') return false;
-		$plain = html_entity_decode(strip_tags(preg_replace('/<\s*br\s*\/?\s*>/i', "\n", $html) ?? $html), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+		$plain = $this->mailboxPlainText($html);
 		$plain = mb_substr(trim($plain), 0, 1048576);
 		if ($plain === '') return false;
 		try {
@@ -232,6 +237,24 @@ trait TicketsMailboxIntegration {
 		}
 	}
 
+	private function mailboxPlainText(string $html): string {
+		$html = preg_replace_callback('#<a\b[^>]*\bhref\s*=\s*(?:"([^"]*)"|\'([^\']*)\'|([^\s>]+))[^>]*>(.*?)</a>#is', static function(array $match): string {
+			$href = html_entity_decode((string)($match[1] !== '' ? $match[1] : ($match[2] !== '' ? $match[2] : $match[3])), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+			$href = trim(preg_replace('/[\x00-\x1F\x7F]+/u', '', $href) ?? '');
+			$label = trim(html_entity_decode(strip_tags((string)$match[4]), ENT_QUOTES | ENT_HTML5, 'UTF-8'));
+			if ($href === '') return $label;
+			if ($label === '' || hash_equals($href, $label) || (str_starts_with($href, 'mailto:') && hash_equals(substr($href, 7), $label))) return $label !== '' ? $label : $href;
+			return $label . "\n" . $href;
+		}, $html) ?? $html;
+		$html = preg_replace('/<\s*br\s*\/?\s*>/i', "\n", $html) ?? $html;
+		$html = preg_replace('#</\s*(?:p|div|li|h[1-6]|blockquote|tr)\s*>#i', "\n", $html) ?? $html;
+		$plain = html_entity_decode(strip_tags($html), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+		$plain = str_replace(["\r\n", "\r", "\v", "\f", "\u{0085}", "\u{2028}", "\u{2029}"], "\n", $plain);
+		$plain = preg_replace('/[ \t]+\n/', "\n", $plain) ?? $plain;
+		$plain = preg_replace('/\n[ \t]*\n(?:[ \t]*\n)+/', "\n\n", $plain) ?? $plain;
+		return trim($plain);
+	}
+
 	private function recognizeMailboxMessage(array $message, int $accountId, string $folder, int $uid, string $actor): array {
 		$from = $this->firstMailboxAddress((string)($message['from'] ?? ''));
 		if ($from['email'] === '') return ['action' => 'ignored', 'reason' => 'sender_missing'];
@@ -241,7 +264,7 @@ trait TicketsMailboxIntegration {
 			$recipients = $this->mailboxAddresses((string)($message['to'] ?? '') . ',' . (string)($message['cc'] ?? ''));
 			if (!in_array(strtolower((string)$this->support_email), $recipients, true)) return ['action' => 'ignored', 'reason' => 'recipient_mismatch'];
 		}
-		$body = $this->cleanInboundBody((string)($message['body'] ?? ''));
+		$body = $this->cleanInboundBody((string)($message['body'] ?? ''), !empty($message['attachments']));
 		if ($body === '') return ['action' => 'ignored', 'reason' => 'empty_body'];
 		$subject = mb_substr(trim($this->wire('sanitizer')->text((string)($message['subject'] ?? ''))), 0, 180);
 		if (mb_strlen($subject) < 5) $subject = $this->_('Email support request');
@@ -267,6 +290,49 @@ trait TicketsMailboxIntegration {
 			return ['action' => 'reply_added', 'ticket_id' => (int)$ticket['id'], 'message_id' => $messageRecordId];
 		}
 		return $this->createTicketFromMailbox($from, $subject, $body, $externalId, $actor);
+	}
+
+	private function importMailboxAttachments($mailbox, array $message, int $accountId, string $folder, int $uid, int $ticketId, int $messageId): int {
+		$listed = array_values(array_filter((array)($message['attachments'] ?? []), 'is_array'));
+		$attachments = array_slice($listed, 0, 20);
+		foreach (array_slice($listed, 20) as $attachment) {
+			$this->logSkippedMailboxAttachment($accountId, $folder, $uid, trim((string)($attachment['part'] ?? '')), new WireException('Tickets imports at most 20 attachments per message.'), 'attachment_limit');
+		}
+		if (!$attachments) return 0;
+		$guest = $this->wire('users')->getGuestUser();
+		try {
+			return (int)$mailbox->withAccount($accountId, function() use ($mailbox, $attachments, $folder, $uid, $ticketId, $messageId, $guest): int {
+				$stored = 0;
+				foreach ($attachments as $attachment) {
+					$part = trim((string)($attachment['part'] ?? ''));
+					try {
+						if ($part === '') throw new WireException('Mailbox attachment part is missing.');
+						$fetched = (array)$mailbox->getAttachment($folder, $uid, $part, 'tickets');
+						$this->storeAttachmentBytes($ticketId, $messageId, $guest, (string)($fetched['name'] ?? $attachment['name'] ?? 'attachment'), (string)($fetched['content'] ?? ''));
+						$stored++;
+					} catch (\Throwable $error) {
+						$this->logSkippedMailboxAttachment($accountId, $folder, $uid, $part, $error, 'validation_or_fetch_failed');
+					}
+				}
+				return $stored;
+			});
+		} catch (\Throwable $error) {
+			$this->logSkippedMailboxAttachment($accountId, $folder, $uid, '*', $error, 'mailbox_unavailable');
+			return 0;
+		}
+	}
+
+	private function logSkippedMailboxAttachment(int $accountId, string $folder, int $uid, string $part, \Throwable $error, string $reason): void {
+		$this->wire('log')->save('tickets', json_encode([
+			'event' => 'mailbox_attachment_skipped',
+			'account_id' => $accountId,
+			'folder_hash' => substr(hash('sha256', $folder), 0, 20),
+			'uid' => $uid,
+			'part' => mb_substr($part, 0, 64),
+			'reason' => $reason,
+			'error_class' => get_class($error),
+			'time' => time(),
+		], JSON_UNESCAPED_SLASHES));
 	}
 
 	private function createTicketFromMailbox(array $from, string $subject, string $body, string $externalId, string $actor): array {

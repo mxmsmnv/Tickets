@@ -20,6 +20,7 @@ foreach (['lqrs', 'lqrs.dev', 'lqrs.com', 'narzan'] as $forbidden) {
 	if (str_contains($payload, $forbidden)) throw new \RuntimeException("Project-specific default remains: {$forbidden}");
 }
 if ((int)($runtimeDefaults['mail_enabled'] ?? 1) !== 0) throw new \RuntimeException('Transactional mail must be opt-in on a fresh installation.');
+if (($runtimeDefaults['mail_notification_events'] ?? []) !== ['new_ticket', 'customer_reply', 'sla_breach']) throw new \RuntimeException('Staff mail event defaults must preserve existing delivery behavior.');
 if ((int)($runtimeDefaults['telegram_notifications_enabled'] ?? 1) !== 0) throw new \RuntimeException('Telegram notifications must be opt-in on a fresh installation.');
 if ((string)($runtimeDefaults['admin_conversation_order'] ?? '') !== 'asc') throw new \RuntimeException('Fresh installations must keep chronological admin conversations by default.');
 if ((string)($runtimeDefaults['admin_sidebar_desktop'] ?? '') !== 'right') throw new \RuntimeException('Fresh installations must keep the desktop sidebar on the right by default.');

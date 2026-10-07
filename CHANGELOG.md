@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.0.53 - 2026-10-07
+
+- Added independently selectable staff-email events for new tickets, customer
+  replies, and SLA breaches while preserving customer notifications and making
+  initial-message delivery receipts follow the customer receipt.
+- Imported Mailbox attachments through the public bounded attachment API with
+  the same extension, decoded MIME, size, and real-image validation as portal
+  uploads, safe skip logging, and readable inline-image placeholders.
+- Preserved link addresses and block spacing when converting HTML notification
+  templates to Mailbox plain text.
+- Made `createTicket()` hookable through ProcessWire's `___createTicket()`
+  convention without changing its public call signature.
+
 ## 1.0.52 - 2026-09-26
 
 - Fixed PostgreSQL fresh installation by creating migrated ticket indexes through portable `WireDatabase::indexExists()` introspection instead of defining and re-adding them in the same install pass.

@@ -14,6 +14,7 @@ $tickets = $wire->modules->get('Tickets');
 if (!$tickets) throw new \RuntimeException('Tickets is unavailable.');
 
 $original = (string)$tickets->mail_module;
+$originalEvents = (array)$tickets->mail_notification_events;
 try {
 	$options = $tickets->mailProviderOptions();
 	if (!isset($options['']) || trim((string)$options['']) === '') {
@@ -31,7 +32,11 @@ try {
 		throw new \RuntimeException('Unavailable provider state is not visible.');
 	}
 
+	$tickets->mail_notification_events = ['customer_reply', 'unknown', 'sla_breach'];
+	if ($tickets->mailNotificationEvents() !== ['customer_reply', 'sla_breach']) throw new \RuntimeException('Staff mail events do not fail closed.');
+
 	fwrite(STDOUT, "Tickets mail provider selection: OK\n");
 } finally {
 	$tickets->mail_module = $original;
+	$tickets->mail_notification_events = $originalEvents;
 }
