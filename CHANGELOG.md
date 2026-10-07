@@ -12,6 +12,8 @@
   templates to Mailbox plain text.
 - Made `createTicket()` hookable through ProcessWire's `___createTicket()`
   convention without changing its public call signature.
+- Stored anonymous tickets with the canonical zero owner so email and signed
+  browser-grant recovery can recognize and restore guest access.
 
 ## 1.0.52 - 2026-09-26
 

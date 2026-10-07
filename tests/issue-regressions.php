@@ -62,6 +62,7 @@ $checks = [
 	'staff email defaults preserve prior behavior' => str_contains($ticketsSource, "'mail_notification_events' => ['new_ticket', 'customer_reply', 'sla_breach']"),
 	'staff email events are configurable' => str_contains($ticketsSource, "name = 'mail_notification_events'") && str_contains($ticketsSource, "staffMailEventEnabled('customer_reply')"),
 	'initial delivery follows customer receipt' => str_contains($ticketsSource, '$customerSent = $this->sendTemplateNotification') && !str_contains($ticketsSource, '$staffSent = $this->sendTemplateNotification'),
+	'guest tickets use the canonical zero owner' => str_contains($ticketsSource, "':user_id' => \$isGuest ? 0 : (int)\$user->id"),
 	'Mailbox attachments use the public API' => str_contains($mailboxSource, "\$status['attachment_access'] = method_exists(\$mailbox, 'getAttachment')") && str_contains($mailboxSource, '$mailbox->getAttachment($folder, $uid, $part, \'tickets\')'),
 	'Mailbox bytes use shared attachment validation' => str_contains($ticketsSource, 'private function storeAttachmentBytes(') && str_contains($ticketsSource, 'private function validateAttachment('),
 	'inline image references are readable' => str_contains($ticketsSource, "picture, see attachments"),

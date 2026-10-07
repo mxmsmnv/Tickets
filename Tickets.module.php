@@ -1522,7 +1522,7 @@ class Tickets extends WireData implements Module, ConfigurableModule {
 			$stmt = $db->prepare('INSERT INTO `' . self::TABLE_TICKETS . '` (public_key,user_id,customer_name,customer_email,guest_access_hash,subject,category,topic,priority,status,assigned_user_id,form_id,custom_data,created_at,updated_at,first_response_due_at,resolution_due_at,context_type,context_id,context_url) VALUES (:public_key,:user_id,:customer_name,:customer_email,:guest_access_hash,:subject,:category,:topic,:priority,\'open\',:assigned_user_id,:form_id,:custom_data,:created_at,:updated_at,:first_response_due_at,:resolution_due_at,:context_type,:context_id,:context_url)');
 			$stmt->execute([
 				':public_key' => $key,
-				':user_id' => (int)$user->id,
+				':user_id' => $isGuest ? 0 : (int)$user->id,
 				':customer_name' => $customerName,
 				':customer_email' => $customerEmail,
 				':guest_access_hash' => $guestAccessHash,
