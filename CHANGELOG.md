@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.0.53 - 2026-10-07
+## 1.1.0 - 2026-10-07
 
 - Added independently selectable staff-email events for new tickets, customer
   replies, and SLA breaches while preserving customer notifications and making

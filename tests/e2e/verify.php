@@ -13,7 +13,7 @@ require $root . '/index.php';
 
 /** @var Tickets $tickets */
 $tickets = $modules->get('Tickets');
-if (!$tickets || Tickets::VERSION !== 153) throw new \RuntimeException('Tickets 1.0.53 is not installed.');
+if (!$tickets || Tickets::VERSION !== 110) throw new \RuntimeException('Tickets 1.1.0 is not installed.');
 if ($tickets->mailNotificationEvents() !== []) throw new \RuntimeException('Staff email events were not disabled for the E2E scenario.');
 $mailboxStatus = $tickets->mailboxIntegrationStatus();
 if (empty($mailboxStatus['inbound_ready']) || empty($mailboxStatus['outbound_ready']) || empty($mailboxStatus['attachment_access'])) throw new \RuntimeException('Mailbox fixture is not ready.');
