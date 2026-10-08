@@ -34,6 +34,7 @@ trait TicketsMailboxIntegration {
 			'sending' => false,
 			'attachment_access' => false,
 			'inbound_ready' => false,
+			'hook_ready' => false,
 			'outbound_ready' => false,
 			'accounts' => [],
 		];
@@ -74,7 +75,8 @@ trait TicketsMailboxIntegration {
 				break;
 			}
 		}
-		$status['inbound_ready'] = $status['configured'] && $accountReady && $status['background_sync'] && $status['attachment_access'];
+		$status['inbound_ready'] = $status['configured'] && $accountReady && $status['attachment_access'];
+		$status['hook_ready'] = $status['inbound_ready'] && $status['background_sync'];
 		$status['outbound_ready'] = $status['configured'] && $accountReady && $status['sending'];
 		return $status;
 	}
@@ -94,7 +96,14 @@ trait TicketsMailboxIntegration {
 		$readiness->label = $this->_('Integration readiness');
 		if (!$status['installed']) $readiness->value = '<p>' . $this->_('Mailbox is not installed. Install and configure it before enabling this integration.') . '</p>';
 		elseif (!$status['compatible']) $readiness->value = '<p>' . $this->_('The installed Mailbox version does not expose the required public integration API.') . '</p>';
-		else $readiness->value = '<p><strong>' . ($status['inbound_ready'] ? $this->_('Inbound ready') : $this->_('Inbound unavailable')) . '</strong> · ' . ($status['outbound_ready'] ? $this->_('SMTP ready') : $this->_('SMTP unavailable')) . '</p><p class="notes">' . $this->_('Automatic import observes only new indexed messages after Mailbox completes its initial seed. It never downloads the whole mailbox.') . '</p>';
+		else {
+			$inboundNote = $status['hook_ready']
+				? $this->_('Scheduled import can poll the selected folder, and new messages are also imported as Mailbox indexes them.')
+				: ($status['inbound_ready']
+					? $this->_('Scheduled import can poll the selected folder. Mailbox background sync is off, so messages are not also imported as they are indexed.')
+					: $this->_('Configure an enabled Mailbox account and attachment access before enabling inbound import.'));
+			$readiness->value = '<p><strong>' . ($status['inbound_ready'] ? $this->_('Inbound ready') : $this->_('Inbound unavailable')) . '</strong> · ' . ($status['outbound_ready'] ? $this->_('SMTP ready') : $this->_('SMTP unavailable')) . '</p><p class="notes">' . $inboundNote . '</p>';
+		}
 		$section->add($readiness);
 
 		$inbound = $this->wire('modules')->get('InputfieldCheckbox');
@@ -142,6 +151,7 @@ trait TicketsMailboxIntegration {
 
 	public function importMailboxNotification(array $notification, string $actor = 'backend'): array {
 		if (!(bool)$this->mailbox_inbound_enabled) return ['action' => 'ignored', 'reason' => 'integration_disabled'];
+		if (!$this->mailboxIntegrationStatus()['hook_ready']) return ['action' => 'ignored', 'reason' => 'hook_not_ready'];
 		$accountId = (int)($notification['account_id'] ?? 0);
 		$folder = (string)($notification['folder'] ?? '');
 		$uid = (int)($notification['uid'] ?? 0);

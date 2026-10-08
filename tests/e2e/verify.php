@@ -13,10 +13,10 @@ require $root . '/index.php';
 
 /** @var Tickets $tickets */
 $tickets = $modules->get('Tickets');
-if (!$tickets || Tickets::VERSION !== 110) throw new \RuntimeException('Tickets 1.1.0 is not installed.');
+if (!$tickets || Tickets::VERSION !== 111) throw new \RuntimeException('Tickets 1.1.1 is not installed.');
 if ($tickets->mailNotificationEvents() !== []) throw new \RuntimeException('Staff email events were not disabled for the E2E scenario.');
 $mailboxStatus = $tickets->mailboxIntegrationStatus();
-if (empty($mailboxStatus['inbound_ready']) || empty($mailboxStatus['outbound_ready']) || empty($mailboxStatus['attachment_access'])) throw new \RuntimeException('Mailbox fixture is not ready.');
+if (empty($mailboxStatus['inbound_ready']) || empty($mailboxStatus['hook_ready']) || empty($mailboxStatus['outbound_ready']) || empty($mailboxStatus['attachment_access'])) throw new \RuntimeException('Mailbox fixture is not ready.');
 
 $tables = [Tickets::TABLE_LINKS, Tickets::TABLE_EVENTS, Tickets::TABLE_ATTACHMENTS, Tickets::TABLE_MESSAGES, Tickets::TABLE_MAILBOX, Tickets::TABLE_TICKETS];
 foreach ($tables as $table) $database->exec('DELETE FROM `' . $table . '`');

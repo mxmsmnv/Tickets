@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.1.1 - 2026-10-08
+
+- Allowed the bounded scheduled Mailbox import to poll its configured folder
+  when Mailbox background synchronization is disabled.
+- Kept indexed-message hook ingestion gated by background synchronization and
+  clarified the two independent readiness paths in module settings.
+
 ## 1.1.0 - 2026-10-07
 
 - Added independently selectable staff-email events for new tickets, customer

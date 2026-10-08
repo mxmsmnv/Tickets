@@ -38,6 +38,12 @@ foreach (['registerMailboxIntegrationHook', 'mailbox_inbound_enabled'] as $needl
 	if (!str_contains($bridgeSource, $needle)) throw new \RuntimeException('Mailbox bridge boundary is missing: ' . $needle);
 }
 foreach (['Mailbox::messageIndexed', 'handleMailboxIndexedMessage', 'mailboxIntegrationHookRegistered', 'error_class'] as $needle) if (!str_contains($integrationSource, $needle)) throw new \RuntimeException('Conditional Mailbox autoload boundary is missing: ' . $needle);
+foreach ([
+	"\$status['inbound_ready'] = \$status['configured'] && \$accountReady && \$status['attachment_access']",
+	"\$status['hook_ready'] = \$status['inbound_ready'] && \$status['background_sync']",
+	"mailboxIntegrationStatus()['hook_ready']",
+	"'reason' => 'hook_not_ready'",
+] as $needle) if (!str_contains($integrationSource, $needle)) throw new \RuntimeException('Mailbox scheduled/hook readiness split is missing: ' . $needle);
 if (str_contains($integrationSource, 'getMessage(') || str_contains($integrationSource, "['html']") || str_contains($integrationSource, "['raw']")) throw new \RuntimeException('Mailbox integration crossed the agent-safe DTO boundary.');
 $cliSource = (string)file_get_contents(dirname(__DIR__) . '/bin/tickets');
 foreach (['mailbox-import', '--execute', '--limit=25', 'importMailboxInbox'] as $needle) if (!str_contains($cliSource, $needle)) throw new \RuntimeException('Mailbox import CLI safeguard is missing: ' . $needle);

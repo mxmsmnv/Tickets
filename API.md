@@ -1,7 +1,7 @@
 # Tickets public API
 
-This document describes the verified public interface of Tickets 1.1.0
-(`version` 153). It is stronger than README for method usage, but the installed
+This document describes the verified public interface of Tickets 1.1.1
+(`version` 111). It is stronger than README for method usage, but the installed
 module version and live site configuration remain authoritative for a specific
 ProcessWire site.
 
@@ -509,11 +509,11 @@ secret or full email body.
 
 ### `mailboxIntegrationStatus(): array`
 
-Returns non-secret installation, compatibility, attachment-access, credential-readiness, background-sync, SMTP, and redacted enabled-account status. It never returns a mailbox username, password, OAuth token, host, subject, sender, or body.
+Returns non-secret installation, compatibility, attachment-access, credential-readiness, background-sync, SMTP, and redacted enabled-account status. `inbound_ready` indicates that bounded polling and direct imports can run; `hook_ready` additionally requires Mailbox background sync for indexed-message events. It never returns a mailbox username, password, OAuth token, host, subject, sender, or body.
 
 ### `importMailboxNotification(array $notification, string $actor = 'backend'): array`
 
-Trusted hook/worker entry point for the identifier payload emitted by `Mailbox::messageIndexed()`. It requires the Tickets integration setting, the selected account/folder, configured Mailbox credentials, and Mailbox background synchronization. Account or folder mismatches return an ignored result without reading the message.
+Trusted hook entry point for the identifier payload emitted by `Mailbox::messageIndexed()`. It requires the Tickets integration setting, the selected account/folder, configured Mailbox credentials, attachment access, and Mailbox background synchronization. Account or folder mismatches and hook-unready states return an ignored result without reading the message.
 
 ### `importMailboxMessage(int $accountId, string $folder, int $uid, string $actor = 'backend'): array`
 
@@ -523,7 +523,7 @@ Sources are deduplicated by account/folder/UID and account/Message-ID in `ticket
 
 ### `importMailboxInbox(int $limit = 25, bool $execute = false): array`
 
-Trusted CLI/maintenance helper for a bounded page of the newest messages in the configured account/folder. The default preview reads summaries only and returns counts without importing; `execute=true` fetches and recognizes at most 100 individual messages through the same idempotent safe path. Canonical CLI: `php site/modules/Tickets/bin/tickets mailbox-import --limit=25 --root=/path/to/processwire` for preview, then repeat with `--execute` after review.
+Trusted CLI/maintenance helper for a bounded page of the newest messages in the configured account/folder. It does not require Mailbox background sync because it polls Mailbox directly. The default preview reads summaries only and returns counts without importing; `execute=true` fetches and recognizes at most 100 individual messages through the same idempotent safe path. Canonical CLI: `php site/modules/Tickets/bin/tickets mailbox-import --limit=25 --root=/path/to/processwire` for preview, then repeat with `--execute` after review.
 
 When both `mail_enabled` and `mailbox_outbound_enabled` are true and Mailbox SMTP is ready, existing Tickets notifications use Mailbox plain-text delivery. Customer notifications with a linked inbound source use `replyMessage()` to preserve threading; other notifications use `sendMessage()`. HTML links retain their address and block elements retain readable paragraph boundaries in the plain-text body. When this option is off, the existing selected WireMail provider remains unchanged.
 

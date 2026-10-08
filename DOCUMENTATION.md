@@ -1,6 +1,6 @@
 # Tickets Documentation
 
-This document describes the integration contract implemented by Tickets 1.1.0
+This document describes the integration contract implemented by Tickets 1.1.1
 for ProcessWire.
 
 ## Configuration
@@ -320,7 +320,7 @@ the sender matches the ticket customer.
 
 ### Mailbox ingestion and replies
 
-The collapsed **Mailbox integration** settings section appears without creating a hard dependency. Inbound import can be enabled only when Mailbox is installed, has configured credentials, and background synchronization is enabled. Select one enabled account (or its default), an exact folder such as `INBOX`, and normally keep the support-recipient requirement enabled.
+The collapsed **Mailbox integration** settings section appears without creating a hard dependency. Inbound import can be enabled when Mailbox is installed, has configured credentials, exposes bounded attachment access, and has an enabled selected account. Select one account (or its default), an exact folder such as `INBOX`, and normally keep the support-recipient requirement enabled. Background synchronization is required only for immediate indexed-message events; the scheduled `mailbox-import` command polls the folder directly and remains available when background sync is off.
 
 The lightweight `TicketsMailboxBridge` observes `Mailbox::messageIndexed` after the initial Mailbox seed. It fetches only the one announced message through the agent-safe DTO, ignores unrelated recipients and self-sent messages, creates a new ticket for a valid support request, or appends `[Ticket KEY]` replies after verifying the customer sender. Source rows make retries idempotent. Attachment metadata stays in the safe DTO; up to 20 listed parts are then fetched through Mailbox's bounded attachment API and stored only after the same extension, decoded MIME, size, and real-image validation used for portal uploads. Rejected or over-limit parts are logged without message content or filenames, and inline CID placeholders become readable attachment references. It does not import historical messages, HTML, raw MIME, or executable links, and it does not ask AI to classify mail automatically.
 
