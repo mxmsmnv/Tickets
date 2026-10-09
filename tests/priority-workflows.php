@@ -73,6 +73,26 @@ try {
 	$tickets->addReply((int)$first['id'], $admin, 'Public staff reply.', null, true);
 	$first = $tickets->getTicket((int)$first['id']);
 	$check(!empty($first['first_responded_at']), 'First response timestamp is missing.');
+	$check($first['status'] === 'waiting_customer' && !empty($first['resolution_paused_at']), 'Staff reply did not pause the resolution SLA.');
+	$check(!empty($first['auto_close_at']), 'Staff reply did not schedule waiting-customer auto-close.');
+	$pausedState = $tickets->slaState($first);
+	$check(!empty($pausedState['paused']) && empty($pausedState['breached']), 'Waiting-customer SLA state is not paused.');
+	$pauseStarted = time() - 7200;
+	$dueBeforeResume = time() + 3600;
+	$db = wire('database');
+	$pauseUpdate = $db->prepare('UPDATE tickets_records SET resolution_paused_at=:paused,resolution_due_at=:due,sla_breached_at=:breached WHERE id=:id');
+	$pauseUpdate->execute([
+		':paused' => date('Y-m-d H:i:s', $pauseStarted),
+		':due' => date('Y-m-d H:i:s', $dueBeforeResume),
+		':breached' => date('Y-m-d H:i:s', time() - 60),
+		':id' => (int)$first['id'],
+	]);
+	$resumed = $tickets->addReply((int)$first['id'], $admin, 'Customer follow-up reply.', null, false);
+	$check($resumed['status'] === 'waiting_staff', 'Customer reply did not resume the staff workflow.');
+	$check(empty($resumed['resolution_paused_at']) && empty($resumed['auto_close_at']), 'Customer reply did not clear paused and auto-close state.');
+	$check(empty($resumed['sla_breached_at']), 'Customer reply did not clear the stale waiting-customer breach marker.');
+	$expectedDue = $dueBeforeResume + 7200;
+	$check(abs(strtotime((string)$resumed['resolution_due_at']) - $expectedDue) < 10, 'Customer wait time was not added to the resolution deadline.');
 
 	$second = $tickets->createTicket($admin, [
 		'subject' => 'Related workflow ' . $suffix, 'category' => 'technical', 'topic' => 'technical',
@@ -86,8 +106,9 @@ try {
 	$tickets->updateTicket((int)$first['id'], $admin, ['status' => 'resolved']);
 	$rated = $tickets->rateTicket((int)$first['id'], $admin, 5, 'Resolved clearly.');
 	$check((int)$rated['rating'] === 5, 'Customer rating was not stored.');
-	$reopened = $tickets->reopenTicket((int)$first['id'], $admin);
-	$check($reopened['status'] === 'waiting_staff' && !empty($reopened['reopened_at']), 'Ticket did not reopen.');
+	$reopened = $tickets->addReply((int)$first['id'], $admin, 'Customer reply after resolution.', null, false);
+	$check($reopened['status'] === 'waiting_staff' && !empty($reopened['reopened_at']), 'Reply to a resolved ticket did not record reopening.');
+	$check(strtotime((string)$reopened['resolution_due_at']) >= time() + ((int)$tickets->sla_resolution_minutes * 60) - 10, 'Reopened ticket did not receive a full resolution window.');
 
 	$result = $tickets->runAutomation(true);
 	$check(isset($result['sla_breaches'], $result['auto_closed']), 'Automation result is incomplete.');

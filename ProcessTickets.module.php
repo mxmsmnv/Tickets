@@ -552,7 +552,10 @@ class ProcessTickets extends Process {
 		$slaExtend = in_array((string)$ticket['status'], ['resolved', 'closed'], true)
 			? '<p class="TicketsSlaComplete"><i class="fa fa-check-circle" aria-hidden="true"></i>' . $this->_('No active deadline') . '</p>'
 			: '<form class="TicketsSlaExtend" method="post"><input type="hidden" name="ticket_action" value="extend_sla">' . $this->csrf() . '<label class="uk-form-label" for="ticket-sla-minutes">' . $this->_('Extend deadline') . '</label><div><select class="uk-select" id="ticket-sla-minutes" name="minutes"><option value="60">+1 hour</option><option value="240">+4 hours</option><option value="1440">+1 day</option><option value="4320">+3 days</option></select><button class="uk-button uk-button-default" type="submit">' . $this->_('Extend') . '</button></div></form>';
-		$out .= '<section class="TicketsSidePanel TicketsSla" data-breached="' . (!empty($sla['breached']) ? 'true' : 'false') . '"><h2><i class="fa fa-stopwatch" aria-hidden="true"></i>' . $this->_('SLA') . '</h2><p><strong>' . $this->e($sla['phase'] === 'first_response' ? $this->_('First response') : $this->_('Resolution')) . '</strong><br>' . $this->e($slaLabel) . '</p>' . (!empty($sla['breached']) ? '<span class="uk-label uk-label-danger">' . $this->_('Breached') . '</span>' : '') . $slaExtend . '</section>';
+		$slaStateLabel = !empty($sla['paused'])
+			? '<span class="uk-label uk-label-warning">' . $this->_('Paused while waiting for customer') . '</span>'
+			: (!empty($sla['breached']) ? '<span class="uk-label uk-label-danger">' . $this->_('Breached') . '</span>' : '');
+		$out .= '<section class="TicketsSidePanel TicketsSla" data-breached="' . (!empty($sla['breached']) ? 'true' : 'false') . '" data-paused="' . (!empty($sla['paused']) ? 'true' : 'false') . '"><h2><i class="fa fa-stopwatch" aria-hidden="true"></i>' . $this->_('SLA') . '</h2><p><strong>' . $this->e($sla['phase'] === 'first_response' ? $this->_('First response') : $this->_('Resolution')) . '</strong><br>' . $this->e($slaLabel) . '</p>' . $slaStateLabel . $slaExtend . '</section>';
 		$rating = max(0, min(5, (int)($ticket['rating'] ?? 0)));
 		if ($rating > 0 || in_array((string)$ticket['status'], ['resolved', 'closed'], true)) {
 			$feedbackBody = $rating > 0
@@ -980,6 +983,9 @@ class ProcessTickets extends Process {
 		}
 		$remaining = (int)$sla['remaining_seconds'];
 		$duration = $this->duration(abs($remaining) / 60);
+		if (!empty($sla['paused'])) {
+			return '<span class="TicketsQueueSla" data-state="paused"><strong>' . $this->_('Paused') . '</strong><small>' . $this->e(sprintf($this->_('%s remaining'), $duration)) . '</small></span>';
+		}
 		if (!empty($sla['breached'])) {
 			return '<span class="TicketsQueueSla" data-state="breached"><strong>' . $this->_('Breached') . '</strong><small>' . $this->e(sprintf($this->_('%s overdue'), $duration)) . '</small></span>';
 		}

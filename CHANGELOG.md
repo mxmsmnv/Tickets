@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.1.2 - 2026-10-09
+
+- Paused resolution SLA countdowns while tickets wait for a customer and
+  restored the remaining time consistently for portal, Resend and Mailbox
+  replies.
+- Excluded paused tickets from breach automation, dashboard totals and queue
+  deadline ordering, and surfaced their paused state in the staff workspace.
+- Auto-closed stale waiting-customer tickets alongside resolved tickets and
+  fixed reopened timestamps for reply-driven transitions from resolved or
+  closed states.
+
 ## 1.1.1 - 2026-10-08
 
 - Allowed the bounded scheduled Mailbox import to poll its configured folder

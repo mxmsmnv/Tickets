@@ -1109,6 +1109,10 @@
 	color: var(--tickets-warning-text);
 }
 
+.ProcessTickets .TicketsQueueSla[data-state="paused"] strong {
+	color: var(--tickets-warning-text);
+}
+
 .ProcessTickets .TicketsQueueSla[data-state="complete"],
 .ProcessTickets .TicketsQueueSla[data-state="unset"] {
 	color: var(--pw-muted-color);
@@ -2372,6 +2376,7 @@
 .ProcessTickets .TicketsInternalNoteForm textarea { min-height: 8rem; resize: vertical; }
 .ProcessTickets .TicketsInternalNoteForm .uk-button { justify-self: start; }
 .ProcessTickets .TicketsSla[data-breached="true"] { border-left: 4px solid var(--tickets-color-danger); }
+.ProcessTickets .TicketsSla[data-paused="true"] { border-left: 4px solid var(--tickets-color-warning); }
 .ProcessTickets .TicketsSla h2 i { margin-right: .5rem; }
 .ProcessTickets .TicketsRelated { list-style: none; margin: 0 0 1rem; padding: 0; display: grid; gap: .5rem; }
 .ProcessTickets .TicketsRelated li { display: grid; gap: .15rem; }

@@ -1,7 +1,7 @@
 # Tickets public API
 
-This document describes the verified public interface of Tickets 1.1.1
-(`version` 111). It is stronger than README for method usage, but the installed
+This document describes the verified public interface of Tickets 1.1.2
+(`version` 112). It is stronger than README for method usage, but the installed
 module version and live site configuration remain authoritative for a specific
 ProcessWire site.
 
@@ -422,10 +422,17 @@ Returns:
 [
     'phase' => 'first_response',
     'due_at' => '2026-07-31 12:00:00',
+    'paused' => false,
     'breached' => false,
     'remaining_seconds' => 3600,
 ]
 ```
+
+The resolution phase is paused while the ticket is `waiting_customer`.
+`remaining_seconds` is frozen at the pause instant and `breached` remains
+false. A customer reply adds the complete paused duration to
+`resolution_due_at`; reopening a resolved or closed ticket starts a full new
+resolution window.
 
 ## Routing, macros and mail templates
 
@@ -467,9 +474,11 @@ ticket or promise an action automatically.
 
 ### `runAutomation(bool $dryRun = false): array`
 
-Finds bounded SLA breaches and resolved tickets due for auto-close. A real run
-updates tickets and may send escalation mail. No user permission is checked;
-call from trusted CLI/cron or after explicit admin authorization.
+Finds bounded SLA breaches among `open` and `waiting_staff` tickets, plus
+`resolved` and `waiting_customer` tickets due for auto-close. A real run
+updates tickets and may send escalation mail. Waiting-customer resolution SLAs
+are paused and never escalated. No user permission is checked; call from
+trusted CLI/cron or after explicit admin authorization.
 
 ### `runRetention(bool $dryRun = false): array`
 

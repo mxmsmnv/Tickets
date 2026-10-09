@@ -13,7 +13,7 @@ private files publicly.
 - **Author:** Maxim Semenov
 - **Website:** [smnv.org](https://smnv.org)
 - **Email:** [maxim@smnv.org](mailto:maxim@smnv.org)
-- **Release:** 1.1.1 (`version` 111)
+- **Release:** 1.1.2 (`version` 112)
 
 If this project helps your work, consider supporting future development:
 [GitHub Sponsors](https://github.com/sponsors/mxmsmnv) or
@@ -29,6 +29,9 @@ If this project helps your work, consider supporting future development:
   and workflow history together, including SLA extensions in the staff
   conversation timeline.
 - Provides statuses, priorities, assignment, bulk actions and ticket merging.
+- Pauses the resolution SLA while support is waiting for the customer, resumes
+  the remaining time on the next customer reply, and auto-closes stale
+  waiting-customer tickets after the configured interval.
 - Includes SLA targets, routing rules, reusable replies and scheduled automation.
 - Includes operational charts, reports, CSV export and customer satisfaction ratings.
 - Provides reusable custom forms with validation, live preview and rich-text embeds.

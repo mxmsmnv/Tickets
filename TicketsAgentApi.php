@@ -109,7 +109,7 @@ final class TicketsAgentApi {
 			'category', 'topic', 'priority', 'status', 'assigned_user_id', 'form_id',
 			'custom_values', 'context_type', 'context_id', 'context_url', 'created_at',
 			'updated_at', 'closed_at', 'first_response_due_at', 'first_responded_at',
-			'resolution_due_at', 'sla_breached_at', 'auto_close_at', 'reopened_at',
+			'resolution_due_at', 'resolution_paused_at', 'sla_breached_at', 'auto_close_at', 'reopened_at',
 			'merged_into_id', 'rating', 'rating_comment', 'rated_at', 'form',
 		];
 		return array_intersect_key($ticket, array_flip($allowed));

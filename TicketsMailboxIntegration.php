@@ -289,8 +289,15 @@ trait TicketsMailboxIntegration {
 			try {
 				$messageRecordId = $this->insertMessage((int)$ticket['id'], $guest, $body, false, false, 'email', $externalId);
 				$now = date('Y-m-d H:i:s');
-				$stmt = $db->prepare('UPDATE `' . self::TABLE_TICKETS . '` SET status=\'waiting_staff\',updated_at=:updated_at,closed_at=NULL,auto_close_at=NULL,reopened_at=CASE WHEN status IN (\'resolved\',\'closed\') THEN :updated_at ELSE reopened_at END WHERE id=:id');
-				$stmt->execute([':updated_at' => $now, ':id' => (int)$ticket['id']]);
+				$transition = $this->customerReplySlaTransition($ticket, $now);
+				$stmt = $db->prepare('UPDATE `' . self::TABLE_TICKETS . '` SET reopened_at=:reopened_at,status=\'waiting_staff\',updated_at=:updated_at,closed_at=NULL,auto_close_at=NULL,resolution_due_at=:resolution_due_at,resolution_paused_at=NULL,sla_breached_at=:sla_breached_at WHERE id=:id');
+				$stmt->execute([
+					':reopened_at' => $transition['reopened_at'],
+					':updated_at' => $now,
+					':resolution_due_at' => $transition['resolution_due_at'],
+					':sla_breached_at' => $transition['sla_breached_at'],
+					':id' => (int)$ticket['id'],
+				]);
 				$this->recordEvent((int)$ticket['id'], $guest, 'inbound_email', ['message_id' => $messageRecordId, 'source' => 'mailbox', 'actor' => mb_substr($this->wire('sanitizer')->name($actor), 0, 40)]);
 				$db->commit();
 			} catch (\Throwable $error) {

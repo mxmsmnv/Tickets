@@ -1,6 +1,6 @@
 # Tickets Documentation
 
-This document describes the integration contract implemented by Tickets 1.1.1
+This document describes the integration contract implemented by Tickets 1.1.2
 for ProcessWire.
 
 ## Configuration
@@ -113,6 +113,13 @@ enforce `tickets-admin` and are not frontend submission APIs.
 - `slaState(array $ticket): array`
 - `runAutomation(bool $dryRun = false): array`
 - `runRetention(bool $dryRun = false): array`
+
+The resolution SLA is paused after a public staff reply while the workflow is
+`waiting_customer`. The next customer reply resumes the clock with the same
+remaining duration; replies that reopen a resolved or closed ticket receive a
+full new resolution window. Automation excludes paused tickets from breach
+alerts and auto-closes both resolved and waiting-customer tickets when their
+configured `auto_close_at` deadline passes.
 
 ## Operational interfaces
 
